@@ -61,10 +61,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "practica:build:production"
+              "buildTarget": "practica:build:production"
             },
             "development": {
-              "browserTarget": "practica:build:development"
+              "buildTarget": "practica:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -72,7 +72,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "practica:build"
+            "buildTarget": "practica:build"
           }
         },
         "test": {
