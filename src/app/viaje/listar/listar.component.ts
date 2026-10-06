@@ -6,13 +6,15 @@ import { Viaje } from '../../Models/Viaje';
 import { BusesService } from '../../services/buses.service';
 import { ViajeService } from '../../services/viaje.service';
 import { Toast } from 'bootstrap';
+import { AgregarComponent } from '../agregar/agregar.component';
+import { NgStyle, DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-listar',
-  standalone: false,
-  templateUrl: './listar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./listar.component.css']
+    selector: 'app-listar',
+    templateUrl: './listar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./listar.component.css'],
+    imports: [AgregarComponent, NgStyle, DatePipe]
 })
 export class ListarComponent  implements OnInit {
   update!: boolean;

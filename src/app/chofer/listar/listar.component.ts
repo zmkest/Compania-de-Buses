@@ -2,13 +2,15 @@ import { Component, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angu
 import { Chofer } from '../../Models/Chofer';
 import { ChoferService } from '../../services/chofer.service';
 import { Toast } from 'bootstrap';
+import { AgregarComponent } from '../agregar/agregar.component';
+import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-listar',
-  standalone: false,
-  templateUrl: './listar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./listar.component.css']
+    selector: 'app-listar',
+    templateUrl: './listar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./listar.component.css'],
+    imports: [AgregarComponent, DatePipe]
 })
 export class ListarComponent {
   update!: boolean;

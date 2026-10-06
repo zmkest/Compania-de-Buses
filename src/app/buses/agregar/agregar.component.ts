@@ -1,15 +1,15 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Toast } from 'bootstrap';
 import { Bus } from '../../Models/Buses';
 import { BusesService } from '../../services/buses.service';
 
 @Component({
-  selector: 'app-agregar',
-  standalone: false,
-  templateUrl: './agregar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./agregar.component.css']
+    selector: 'app-agregar',
+    templateUrl: './agregar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./agregar.component.css'],
+    imports: [FormsModule, ReactiveFormsModule]
 })
 export class AgregarComponent implements OnChanges{
   @Input() Nuevo: Bus = new Bus(0, '', '', '',0); // Ajusta los valores iniciales

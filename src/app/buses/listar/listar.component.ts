@@ -3,13 +3,14 @@ import { Component, ElementRef, OnInit, ViewChild, ChangeDetectionStrategy } fro
 import { Bus } from '../../Models/Buses';
 import { BusesService } from '../../services/buses.service';
 import { Toast } from 'bootstrap';
+import { AgregarComponent } from '../agregar/agregar.component';
 
 @Component({
-  selector: 'app-listar',
-  standalone: false,
-  templateUrl: './listar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./listar.component.css']
+    selector: 'app-listar',
+    templateUrl: './listar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./listar.component.css'],
+    imports: [AgregarComponent]
 })
 export class ListarComponent implements OnInit {
   update!: boolean;

@@ -9,21 +9,19 @@ import { TripulacionService } from '../services/tripulacion.service';
 
 
 @NgModule({
-  declarations: [
-    ListarComponent,
-    AgregarComponent,
-    PrincipalComponent
-  ],
-  exports: [
-    ListarComponent, AgregarComponent, PrincipalComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-  ],
-  providers: [
-    TripulacionService
-  ]
+    exports: [
+        ListarComponent, AgregarComponent, PrincipalComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ListarComponent,
+        AgregarComponent,
+        PrincipalComponent,
+    ],
+    providers: [
+        TripulacionService
+    ]
 })
 export class TripulacionModule { }

@@ -1,15 +1,15 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Chofer } from '../../Models/Chofer';
 import { ChoferService } from '../../services/chofer.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Toast } from 'bootstrap';
 
 @Component({
-  selector: 'app-agregar',
-  standalone: false,
-  templateUrl: './agregar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./agregar.component.css']
+    selector: 'app-agregar',
+    templateUrl: './agregar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./agregar.component.css'],
+    imports: [FormsModule, ReactiveFormsModule]
 })
 export class AgregarComponent implements OnChanges {
   @Input() Nuevo: Chofer = {

@@ -1,13 +1,14 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { BusesService } from '../services/buses.service';
 import { ViajeService } from '../services/viaje.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-consultas',
-  standalone: false,
-  templateUrl: './consultas.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./consultas.component.css']
+    selector: 'app-consultas',
+    templateUrl: './consultas.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./consultas.component.css'],
+    imports: [FormsModule]
 })
 export class ConsultasComponent {
   buscarPlaca: string = '';

@@ -9,21 +9,19 @@ import { BusesService } from '../services/buses.service';
 
 
 @NgModule({
-  declarations: [
-    ListarComponent,
-    AgregarComponent,
-    PrincipalComponent
-  ],
-  exports: [
-    ListarComponent, AgregarComponent, PrincipalComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule
-  ],
-  providers: [
-    BusesService
-  ]
+    exports: [
+        ListarComponent, AgregarComponent, PrincipalComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ListarComponent,
+        AgregarComponent,
+        PrincipalComponent
+    ],
+    providers: [
+        BusesService
+    ]
 })
 export class BusesModule { }

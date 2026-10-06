@@ -9,21 +9,19 @@ import { ChoferService } from '../services/chofer.service';
 
 
 @NgModule({
-  declarations: [
-    ListarComponent,
-    AgregarComponent,
-    PrincipalComponent
-  ],
-  exports: [
-    ListarComponent, AgregarComponent, PrincipalComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-  ],
-  providers: [
-    ChoferService
-  ]
+    exports: [
+        ListarComponent, AgregarComponent, PrincipalComponent
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ListarComponent,
+        AgregarComponent,
+        PrincipalComponent,
+    ],
+    providers: [
+        ChoferService
+    ]
 })
 export class ChoferModule { }

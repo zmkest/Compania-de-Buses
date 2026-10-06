@@ -8,8 +8,8 @@ describe('AgregarComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [AgregarComponent]
-    });
+    imports: [AgregarComponent]
+});
     fixture = TestBed.createComponent(AgregarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

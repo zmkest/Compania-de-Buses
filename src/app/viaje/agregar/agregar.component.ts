@@ -5,15 +5,15 @@ import { Viaje } from '../../Models/Viaje';
 import { BusesService } from '../../services/buses.service';
 import { TripulacionService } from '../../services/tripulacion.service';
 import { ViajeService } from '../../services/viaje.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Toast } from 'bootstrap';
 
 @Component({
-  selector: 'app-agregar',
-  standalone: false,
-  templateUrl: './agregar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./agregar.component.css']
+    selector: 'app-agregar',
+    templateUrl: './agregar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./agregar.component.css'],
+    imports: [FormsModule, ReactiveFormsModule]
 })
 export class AgregarComponent implements OnChanges{
   @Input() nuevoViaje: Viaje = new Viaje(0, '', '', '', new Date(), new Bus(0,"","","",0),new Tripulacion(0,0,[]),''); // Ajusta los valores iniciales
