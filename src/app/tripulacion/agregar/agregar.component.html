@@ -1,25 +1,27 @@
 <h3 class="text-center">Agregar Tripulación</h3>
 <div class="p-3 ">
-    <form [formGroup]="miForm" class="py-3 px-2" (ngSubmit)="metodo(); desmarcarChoferes()">
-        <input style="background-color: #5d77bea4;" class="form-control mb-3" type="number" placeholder="Código" formControlName="codigo"/>
-        <input style="background-color: #5d77bea4;" class="form-control mb-3" type="number" placeholder="Personas" formControlName="personas"/>
-        <h6>Seleccione Choferes:</h6>
-        <div #checkboxes class="overflow-y-auto w-100" style="height: 200px;">
-          <div class="px-3" id="checklist" *ngFor="let chofer of listChofer; let i = index">
-            <input class="" (change)="choferSelect(chofer)"  [value]="chofer.codigo" name="r" type="checkbox" id="{{i}}" [checked]="isChoferSelected(chofer)">
-            <label class="" for="{{i}}">{{ chofer.cedula + ' ' + chofer.nombres }}</label>
-          </div>
+  <form [formGroup]="miForm" class="py-3 px-2" (ngSubmit)="metodo(); desmarcarChoferes()">
+    <input style="background-color: #5d77bea4;" class="form-control mb-3" type="number" placeholder="Código" formControlName="codigo"/>
+    <input style="background-color: #5d77bea4;" class="form-control mb-3" type="number" placeholder="Personas" formControlName="personas"/>
+    <h6>Seleccione Choferes:</h6>
+    <div #checkboxes class="overflow-y-auto w-100" style="height: 200px;">
+      @for (chofer of listChofer; track chofer; let i = $index) {
+        <div class="px-3" id="checklist">
+          <input class="" (change)="choferSelect(chofer)"  [value]="chofer.codigo" name="r" type="checkbox" id="{{i}}" [checked]="isChoferSelected(chofer)">
+          <label class="" for="{{i}}">{{ chofer.cedula + ' ' + chofer.nombres }}</label>
         </div>
-        
-          <div class="d-flex mt-2 justify-content-center">
-            <button class="btn text-light mx-1 w-50" type="button" style="background-color: #541b2b;" (click)="limpiar()">
-                Cancelar
-            </button>
-            <button class="btn btn-success mx-1 w-50" type="submit">
-                Insertar
-            </button>
-        </div>
-    </form>
+      }
+    </div>
+
+    <div class="d-flex mt-2 justify-content-center">
+      <button class="btn text-light mx-1 w-50" type="button" style="background-color: #541b2b;" (click)="limpiar()">
+        Cancelar
+      </button>
+      <button class="btn btn-success mx-1 w-50" type="submit">
+        Insertar
+      </button>
+    </div>
+  </form>
 </div>
 
 <div class="toast-container position-fixed bottom-0 end-0 p-3">

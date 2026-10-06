@@ -3,12 +3,16 @@
     <div class="col w-100 my-auto">
       <h1 class="text-center p-3 fst-italic" style="font-size: 60px;">Administración <br> de <br> Tripulaciones</h1>
     </div>
-    <div class="col w-100" *ngIf="!update">
-      <app-agregar [nuevaTripulacion]="newTripulacion" [tipo]="false"></app-agregar>
-    </div>
-    <div class="col w-100" *ngIf="update">
-      <app-agregar [nuevaTripulacion]="newTripulacion" [tipo]="true"></app-agregar>
-    </div>
+    @if (!update) {
+      <div class="col w-100">
+        <app-agregar [nuevaTripulacion]="newTripulacion" [tipo]="false"></app-agregar>
+      </div>
+    }
+    @if (update) {
+      <div class="col w-100">
+        <app-agregar [nuevaTripulacion]="newTripulacion" [tipo]="true"></app-agregar>
+      </div>
+    }
   </div>
   <h3 class="text-center">Registros</h3>
   <table class="table">
@@ -23,22 +27,28 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let tripulacion of ListaTripulaciones; let i = index">
-        <td>{{ tripulacion.codigo }}</td>
-        <td>{{ tripulacion.personas }}</td>
-        <td>
-          <span *ngFor="let chofer of tripulacion.choferes"> <b>{{ chofer.codigo }}</b>:  {{ chofer.cedula }} <br></span>
-        </td>
-        <td>
-          <span *ngFor="let chofer of tripulacion.choferes"> <b>{{ chofer.codigo }}</b>: {{ chofer.nombres }} {{ chofer.apellidos }}<br></span>
-        </td>
-        <td>
-          <button type="button" class="btn mx-1 text-light" (click)="editarTripulacion(tripulacion)" style="background-color: #2B4162;">Actualizar</button>
-        </td>
-        <td>
-          <button type="button" class="btn text-light" (click)="eliminarTripulacion(tripulacion)" style="background-color: #541b2b;">Eliminar</button>
-        </td>
-      </tr>
+      @for (tripulacion of ListaTripulaciones; track tripulacion; let i = $index) {
+        <tr>
+          <td>{{ tripulacion.codigo }}</td>
+          <td>{{ tripulacion.personas }}</td>
+          <td>
+            @for (chofer of tripulacion.choferes; track chofer) {
+              <span> <b>{{ chofer.codigo }}</b>:  {{ chofer.cedula }} <br></span>
+            }
+          </td>
+          <td>
+            @for (chofer of tripulacion.choferes; track chofer) {
+              <span> <b>{{ chofer.codigo }}</b>: {{ chofer.nombres }} {{ chofer.apellidos }}<br></span>
+            }
+          </td>
+          <td>
+            <button type="button" class="btn mx-1 text-light" (click)="editarTripulacion(tripulacion)" style="background-color: #2B4162;">Actualizar</button>
+          </td>
+          <td>
+            <button type="button" class="btn text-light" (click)="eliminarTripulacion(tripulacion)" style="background-color: #541b2b;">Eliminar</button>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 

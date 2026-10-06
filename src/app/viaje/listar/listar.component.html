@@ -1,33 +1,38 @@
 <div class="" style="width: 100%;">
-  <div class="row">    
+  <div class="row">
     <div class="col w-100 my-auto">
       <h1 class="text-center p-3 fst-italic" style="font-size: 60px;">Administración <br> de <br> Viajes</h1>
     </div>
-    <div class="col w-50" *ngIf="!update">
-      <app-agregar [nuevoViaje]="newViaje" [tipo]="false"></app-agregar>
-    </div>
-    <div class="col w-50" *ngIf="update">
-      <app-agregar [nuevoViaje]="newViaje" [tipo]="true"></app-agregar>
-    </div>
+    @if (!update) {
+      <div class="col w-50">
+        <app-agregar [nuevoViaje]="newViaje" [tipo]="false"></app-agregar>
+      </div>
+    }
+    @if (update) {
+      <div class="col w-50">
+        <app-agregar [nuevoViaje]="newViaje" [tipo]="true"></app-agregar>
+      </div>
+    }
   </div>
-    <h3 class="text-center">Registros</h3>    
-    <table class="table table table-hover table-striped">
-      <thead>
+  <h3 class="text-center">Registros</h3>
+  <table class="table table table-hover table-striped">
+    <thead>
+      <tr>
+        <th class="text-light" style="background-color: #2B4162;">Código</th>
+        <th class="text-light" style="background-color: #2B4162;">Origen</th>
+        <th class="text-light" style="background-color: #2B4162;">Destino</th>
+        <th class="text-light" style="background-color: #2B4162;">Hora</th>
+        <th class="text-light" style="background-color: #2B4162;">Fecha</th>
+        <th class="text-light" style="background-color: #2B4162;">Bus</th>
+        <th class="text-light" style="background-color: #2B4162;">Tripulacion</th>
+        <th class="text-light" style="background-color: #2B4162;">Action</th>
+        <th class="text-light" style="background-color: #2B4162;">Actualizar</th>
+        <th class="text-light" style="background-color: #2B4162;">Eliminar</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (viaje of ListaViajes; track viaje) {
         <tr>
-          <th class="text-light" style="background-color: #2B4162;">Código</th>
-          <th class="text-light" style="background-color: #2B4162;">Origen</th>
-          <th class="text-light" style="background-color: #2B4162;">Destino</th>
-          <th class="text-light" style="background-color: #2B4162;">Hora</th>
-          <th class="text-light" style="background-color: #2B4162;">Fecha</th>
-          <th class="text-light" style="background-color: #2B4162;">Bus</th>
-          <th class="text-light" style="background-color: #2B4162;">Tripulacion</th>
-          <th class="text-light" style="background-color: #2B4162;">Action</th>
-          <th class="text-light" style="background-color: #2B4162;">Actualizar</th>
-          <th class="text-light" style="background-color: #2B4162;">Eliminar</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let viaje of ListaViajes">
           <td>{{ viaje.codigo }}</td>
           <td>{{ viaje.origen }}</td>
           <td>{{ viaje.destino }}</td>
@@ -45,8 +50,9 @@
             <button type="button" class="btn text-light" (click)="eliminarViaje(viaje)" [disabled]="viaje.estado == 'Arrivado'" style="background-color: #541b2b;">Eliminar</button>
           </td>
         </tr>
-      </tbody>
-    </table>
+      }
+    </tbody>
+  </table>
 </div>
 
 <div class="toast-container position-fixed bottom-0 end-0 p-3">

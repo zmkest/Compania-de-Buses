@@ -3,27 +3,32 @@
     <div class="col w-100 my-auto">
       <h1 class="text-center p-3 fst-italic" style="font-size: 60px;">Administración <br> de <br> Buses</h1>
     </div>
-    <div class="col" *ngIf="!update">
-      <app-agregar [Nuevo]="newBus" [tipo]="false"></app-agregar>
-    </div>
-    <div class="col" *ngIf="update">
-      <app-agregar [Nuevo]="newBus" [tipo]="true"></app-agregar>
-    </div>
+    @if (!update) {
+      <div class="col">
+        <app-agregar [Nuevo]="newBus" [tipo]="false"></app-agregar>
+      </div>
+    }
+    @if (update) {
+      <div class="col">
+        <app-agregar [Nuevo]="newBus" [tipo]="true"></app-agregar>
+      </div>
+    }
   </div>
-    <h3 class="text-center">Registros</h3>
-    <table class="table table-hover table-striped">
-      <thead>
+  <h3 class="text-center">Registros</h3>
+  <table class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th class="text-light" style="background-color: #2B4162;">Código</th>
+        <th class="text-light" style="background-color: #2B4162;">Placa</th>
+        <th class="text-light" style="background-color: #2B4162;">Tipo</th>
+        <th class="text-light" style="background-color: #2B4162;">Estado</th>
+        <th class="text-light" style="background-color: #2B4162;">Actualizar</th>
+        <th class="text-light" style="background-color: #2B4162;">Eliminar</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (bus of ListaBuses; track bus) {
         <tr>
-          <th class="text-light" style="background-color: #2B4162;">Código</th>
-          <th class="text-light" style="background-color: #2B4162;">Placa</th>
-          <th class="text-light" style="background-color: #2B4162;">Tipo</th>
-          <th class="text-light" style="background-color: #2B4162;">Estado</th>
-          <th class="text-light" style="background-color: #2B4162;">Actualizar</th>
-          <th class="text-light" style="background-color: #2B4162;">Eliminar</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let bus of ListaBuses">
           <td>{{ bus.codigo }}</td>
           <td>{{ bus.placa }}</td>
           <td>{{ bus.tipo }}</td>
@@ -35,8 +40,9 @@
             <button type="button" class="btn text-light" (click)="eliminarBus(bus)" style="background-color: #541b2b;">Eliminar</button>
           </td>
         </tr>
-      </tbody>
-    </table>
+      }
+    </tbody>
+  </table>
 </div>
 
 <div class="toast-container position-fixed bottom-0 end-0 p-3">

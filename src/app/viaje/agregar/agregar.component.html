@@ -2,69 +2,73 @@
 <div class="p-3 w-100">
   <form [formGroup]="miForm" class="py-3 px-2" (ngSubmit)="metodo()">
     <input style="background-color: #5d77bea4;" class="form-control mb-3" type="number" placeholder="Código"
-    formControlName="codigo"/>
-    <input style="background-color: #5d77bea4;" class="form-control mb-3" type="text" placeholder="Origen" formControlName="origen"
-      />
-    <input style="background-color: #5d77bea4;" class="form-control mb-3" type="text" placeholder="Destino"
-    formControlName="destino"/>
-    <input style="background-color: #5d77bea4;" class="form-control mb-3" type="time" placeholder="Hora" formControlName="hora"
-      />
-    <input style="background-color: #5d77bea4;" class="form-control mb-3" type="date" placeholder="Fecha" formControlName="fecha"
-      />
-    <h6>Buses Disponibles:</h6>
-    <div #radios class="radio-inputs overflow-x-auto">
-      <label *ngFor="let bus of listBus; let i = index">
-        <input class="radio-input" type="radio" name="engine" (change)="busSelect(bus)" [value]="bus.codigo"
-          [checked]="isBusSelected(bus)">
-        <span class="radio-tile">
-          <span class="radio-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" height="1em"
-              viewBox="0 0 576 512">
-              <path
-                d="M288 0C422.4 0 512 35.2 512 80V96l0 32c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32l0 160c0 17.7-14.3 32-32 32v32c0 17.7-14.3 32-32 32H416c-17.7 0-32-14.3-32-32V448H192v32c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32l0-32c-17.7 0-32-14.3-32-32l0-160c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h0V96h0V80C64 35.2 153.6 0 288 0zM128 160v96c0 17.7 14.3 32 32 32H272V128H160c-17.7 0-32 14.3-32 32zM304 288H416c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32H304V288zM144 400a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm288 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM384 80c0-8.8-7.2-16-16-16H208c-8.8 0-16 7.2-16 16s7.2 16 16 16H368c8.8 0 16-7.2 16-16z" />
-            </svg>
-          </span>
-          <span class="radio-label">{{ bus.placa }}</span>
-          <span class="radio-label">{{ bus.tipo }}</span>
-        </span>
-      </label>
-    </div>
-    <h6>Tripulación:</h6>
-    <div #radios class="radio-inputs overflow-x-auto">
-      <label *ngFor="let tri of listTripulacion; let i = index">
-        <input class="radio-input" type="radio" name="engine1" (change)="tripulacionSelect(tri)" [value]="tri.codigo"
-          [checked]="isTripulacionSelected(tri)">
-        <span class="radio-tile">
-          <span class="radio-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M144 0a80 80 0 1 1 0 160A80 80 0 1 1 144 0zM512 0a80 80 0 1 1 0 160A80 80 0 1 1 512 0zM0 298.7C0 239.8 47.8 192 106.7 192h42.7c15.9 0 31 3.5 44.6 9.7c-1.3 7.2-1.9 14.7-1.9 22.3c0 38.2 16.8 72.5 43.3 96c-.2 0-.4 0-.7 0H21.3C9.6 320 0 310.4 0 298.7zM405.3 320c-.2 0-.4 0-.7 0c26.6-23.5 43.3-57.8 43.3-96c0-7.6-.7-15-1.9-22.3c13.6-6.3 28.7-9.7 44.6-9.7h42.7C592.2 192 640 239.8 640 298.7c0 11.8-9.6 21.3-21.3 21.3H405.3zM224 224a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zM128 485.3C128 411.7 187.7 352 261.3 352H378.7C452.3 352 512 411.7 512 485.3c0 14.7-11.9 26.7-26.7 26.7H154.7c-14.7 0-26.7-11.9-26.7-26.7z"/></svg>
-          </span>
-          <span class="radio-label">All: {{ tri.personas }}</span>
-          <span class="radio-label">Choferes: {{ tri.choferes.length }}</span>
-        </span>
-      </label>
-    </div>
-    
-    <div class="d-flex justify-content-center">
-      <button class="btn text-light mx-1 w-50" type="button" style="background-color: #541b2b;" (click)="limpiar()">
-        Cancelar
-      </button>
-      <button class="btn btn-success mx-1 w-50" type="submit">
-        Insertar
-      </button>
-    </div>
-  </form>
-</div>
+      formControlName="codigo"/>
+      <input style="background-color: #5d77bea4;" class="form-control mb-3" type="text" placeholder="Origen" formControlName="origen"
+        />
+        <input style="background-color: #5d77bea4;" class="form-control mb-3" type="text" placeholder="Destino"
+          formControlName="destino"/>
+          <input style="background-color: #5d77bea4;" class="form-control mb-3" type="time" placeholder="Hora" formControlName="hora"
+            />
+            <input style="background-color: #5d77bea4;" class="form-control mb-3" type="date" placeholder="Fecha" formControlName="fecha"
+              />
+              <h6>Buses Disponibles:</h6>
+              <div #radios class="radio-inputs overflow-x-auto">
+                @for (bus of listBus; track bus; let i = $index) {
+                  <label>
+                    <input class="radio-input" type="radio" name="engine" (change)="busSelect(bus)" [value]="bus.codigo"
+                      [checked]="isBusSelected(bus)">
+                      <span class="radio-tile">
+                        <span class="radio-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" height="1em"
+                            viewBox="0 0 576 512">
+                            <path
+                              d="M288 0C422.4 0 512 35.2 512 80V96l0 32c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32l0 160c0 17.7-14.3 32-32 32v32c0 17.7-14.3 32-32 32H416c-17.7 0-32-14.3-32-32V448H192v32c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32l0-32c-17.7 0-32-14.3-32-32l0-160c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h0V96h0V80C64 35.2 153.6 0 288 0zM128 160v96c0 17.7 14.3 32 32 32H272V128H160c-17.7 0-32 14.3-32 32zM304 288H416c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32H304V288zM144 400a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm288 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM384 80c0-8.8-7.2-16-16-16H208c-8.8 0-16 7.2-16 16s7.2 16 16 16H368c8.8 0 16-7.2 16-16z" />
+                            </svg>
+                          </span>
+                          <span class="radio-label">{{ bus.placa }}</span>
+                          <span class="radio-label">{{ bus.tipo }}</span>
+                        </span>
+                      </label>
+                    }
+                  </div>
+                  <h6>Tripulación:</h6>
+                  <div #radios class="radio-inputs overflow-x-auto">
+                    @for (tri of listTripulacion; track tri; let i = $index) {
+                      <label>
+                        <input class="radio-input" type="radio" name="engine1" (change)="tripulacionSelect(tri)" [value]="tri.codigo"
+                          [checked]="isTripulacionSelected(tri)">
+                          <span class="radio-tile">
+                            <span class="radio-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M144 0a80 80 0 1 1 0 160A80 80 0 1 1 144 0zM512 0a80 80 0 1 1 0 160A80 80 0 1 1 512 0zM0 298.7C0 239.8 47.8 192 106.7 192h42.7c15.9 0 31 3.5 44.6 9.7c-1.3 7.2-1.9 14.7-1.9 22.3c0 38.2 16.8 72.5 43.3 96c-.2 0-.4 0-.7 0H21.3C9.6 320 0 310.4 0 298.7zM405.3 320c-.2 0-.4 0-.7 0c26.6-23.5 43.3-57.8 43.3-96c0-7.6-.7-15-1.9-22.3c13.6-6.3 28.7-9.7 44.6-9.7h42.7C592.2 192 640 239.8 640 298.7c0 11.8-9.6 21.3-21.3 21.3H405.3zM224 224a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zM128 485.3C128 411.7 187.7 352 261.3 352H378.7C452.3 352 512 411.7 512 485.3c0 14.7-11.9 26.7-26.7 26.7H154.7c-14.7 0-26.7-11.9-26.7-26.7z"/></svg>
+                            </span>
+                            <span class="radio-label">All: {{ tri.personas }}</span>
+                            <span class="radio-label">Choferes: {{ tri.choferes.length }}</span>
+                          </span>
+                        </label>
+                      }
+                    </div>
 
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div  #liveToast class="toast bg-dark text-light" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header bg-dark text-light">
-      <img src="assets/img/viaje.png" class="rounded me-2" alt="..." width="20" height="20">
-      <strong class="me-auto">{{ title }}</strong>
-      <small>{{ tipoT }}</small>
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-      {{ description }}
-    </div>
-  </div>
-</div>
+                    <div class="d-flex justify-content-center">
+                      <button class="btn text-light mx-1 w-50" type="button" style="background-color: #541b2b;" (click)="limpiar()">
+                        Cancelar
+                      </button>
+                      <button class="btn btn-success mx-1 w-50" type="submit">
+                        Insertar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                  <div  #liveToast class="toast bg-dark text-light" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header bg-dark text-light">
+                      <img src="assets/img/viaje.png" class="rounded me-2" alt="..." width="20" height="20">
+                      <strong class="me-auto">{{ title }}</strong>
+                      <small>{{ tipoT }}</small>
+                      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                      {{ description }}
+                    </div>
+                  </div>
+                </div>

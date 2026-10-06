@@ -3,12 +3,16 @@
     <div class="col w-100 my-auto">
       <h1 class="text-center p-3 fst-italic" style="font-size: 60px;">Administración <br> de <br> Choferes</h1>
     </div>
-    <div class="col" *ngIf="!update">
-      <app-agregar [Nuevo]="newchofer" [tipo]="false"></app-agregar>
-    </div>
-    <div class="col" *ngIf="update">
-      <app-agregar [Nuevo]="newchofer" [tipo]="true"></app-agregar>
-    </div>
+    @if (!update) {
+      <div class="col">
+        <app-agregar [Nuevo]="newchofer" [tipo]="false"></app-agregar>
+      </div>
+    }
+    @if (update) {
+      <div class="col">
+        <app-agregar [Nuevo]="newchofer" [tipo]="true"></app-agregar>
+      </div>
+    }
   </div>
   <h3 class="text-center">Registros</h3>
   <table class="table table table-hover table-striped">
@@ -25,22 +29,24 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let chofer of ListaChoferes">
-        <td>{{ chofer.codigo }}</td>
-        <td>{{ chofer.cedula }}</td>
-        <td>{{ chofer.nombres }}</td>
-        <td>{{ chofer.apellidos }}</td>
-        <td>{{ chofer.fechaNacimiento | date:'dd-MM-yyyy' }}</td>
-        <td>{{ chofer.aniosConduccion }} Años</td>
-        <td>
-          <button type="button" class="btn mx-1 text-light" (click)="editarChofer(chofer)"
+      @for (chofer of ListaChoferes; track chofer) {
+        <tr>
+          <td>{{ chofer.codigo }}</td>
+          <td>{{ chofer.cedula }}</td>
+          <td>{{ chofer.nombres }}</td>
+          <td>{{ chofer.apellidos }}</td>
+          <td>{{ chofer.fechaNacimiento | date:'dd-MM-yyyy' }}</td>
+          <td>{{ chofer.aniosConduccion }} Años</td>
+          <td>
+            <button type="button" class="btn mx-1 text-light" (click)="editarChofer(chofer)"
             style="background-color: #2B4162;">Actualizar</button>
-        </td>
-        <td>
-          <button type="button" class="btn text-light" (click)="eliminarChofer(chofer)"
+          </td>
+          <td>
+            <button type="button" class="btn text-light" (click)="eliminarChofer(chofer)"
             style="background-color: #541b2b;">Eliminar</button>
-        </td>
-      </tr>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 

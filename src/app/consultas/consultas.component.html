@@ -13,43 +13,42 @@
   <div class="w-50 p-3 mx-auto">
     <input style="background-color: #5d77bea4;" class="form-control" placeholder="Filtrar" type="text" name="buscarBus"
       [(ngModel)]="buscarPlaca">
-  </div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th class="text-light" style="background-color: #2B4162;">Código</th>
-        <th class="text-light" style="background-color: #2B4162;">Buses</th>
-        <th class="text-light" style="background-color: #2B4162;">Promedio de Viajes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let bus of filtrarPorPlaca()">
-        <td style="width: 10%;">{{ bus.codigo }}</td>
-        <td style="width: 30%;">
-          <div class="stats shadow">
-
-            <div class="stat row">
-              <div class="col text-center">
-                <img class="text-center p-1 bg-light rounded" src="assets/img/bus.png" alt="" width="40" height="40">
-                <div class="stat-desc text-center">{{ bus.placa }}</div>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="text-light" style="background-color: #2B4162;">Código</th>
+          <th class="text-light" style="background-color: #2B4162;">Buses</th>
+          <th class="text-light" style="background-color: #2B4162;">Promedio de Viajes</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (bus of filtrarPorPlaca(); track bus) {
+          <tr>
+            <td style="width: 10%;">{{ bus.codigo }}</td>
+            <td style="width: 30%;">
+              <div class="stats shadow">
+                <div class="stat row">
+                  <div class="col text-center">
+                    <img class="text-center p-1 bg-light rounded" src="assets/img/bus.png" alt="" width="40" height="40">
+                    <div class="stat-desc text-center">{{ bus.placa }}</div>
+                  </div>
+                  <div class="col">
+                    <div class="stat-title text-center">Total Viajes</div>
+                    <div class="stat-value text-center">{{ bus.num_viajes }}</div>
+                  </div>
+                </div>
               </div>
-              <div class="col">
-                <div class="stat-title text-center">Total Viajes</div>
-                <div class="stat-value text-center">{{ bus.num_viajes }}</div>
-
-              </div>
-            </div>
-
-          </div>
-        </td>
-        <td class="td-center">
-          <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0"
-            aria-valuemax="100" style="height: 35px;">
-            <div class="progress-bar progress-bar-striped bg-primary fs-6"
-              [style.width.%]="bus.num_viajes / numViajes() * 100"><b>{{ calcularPromedio(bus.num_viajes) }} </b></div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+            </td>
+            <td class="td-center">
+              <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0"
+                aria-valuemax="100" style="height: 35px;">
+                <div class="progress-bar progress-bar-striped bg-primary fs-6"
+                  [style.width.%]="bus.num_viajes / numViajes() * 100"><b>{{ calcularPromedio(bus.num_viajes) }} </b></div>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
