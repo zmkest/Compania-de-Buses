@@ -1,13 +1,14 @@
-import { Tripulacion } from 'src/app/Models/Tripulacion';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Bus } from 'src/app/Models/Buses';
-import { BusesService } from 'src/app/services/buses.service';
+import { Tripulacion } from '../../Models/Tripulacion';
+import { Component, ElementRef, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Bus } from '../../Models/Buses';
+import { BusesService } from '../../services/buses.service';
 import { Toast } from 'bootstrap';
 
 @Component({
   selector: 'app-listar',
   standalone: false,
   templateUrl: './listar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./listar.component.css']
 })
 export class ListarComponent implements OnInit {

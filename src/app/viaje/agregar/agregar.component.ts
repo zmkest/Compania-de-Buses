@@ -1,10 +1,10 @@
-import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { Bus } from 'src/app/Models/Buses';
-import { Tripulacion } from 'src/app/Models/Tripulacion';
-import { Viaje } from 'src/app/Models/Viaje';
-import { BusesService } from 'src/app/services/buses.service';
-import { TripulacionService } from 'src/app/services/tripulacion.service';
-import { ViajeService } from 'src/app/services/viaje.service';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Bus } from '../../Models/Buses';
+import { Tripulacion } from '../../Models/Tripulacion';
+import { Viaje } from '../../Models/Viaje';
+import { BusesService } from '../../services/buses.service';
+import { TripulacionService } from '../../services/tripulacion.service';
+import { ViajeService } from '../../services/viaje.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Toast } from 'bootstrap';
 
@@ -12,6 +12,7 @@ import { Toast } from 'bootstrap';
   selector: 'app-agregar',
   standalone: false,
   templateUrl: './agregar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./agregar.component.css']
 })
 export class AgregarComponent implements OnChanges{

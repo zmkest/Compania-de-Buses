@@ -1,12 +1,13 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Chofer } from 'src/app/Models/Chofer';
-import { ChoferService } from 'src/app/services/chofer.service';
+import { Component, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Chofer } from '../../Models/Chofer';
+import { ChoferService } from '../../services/chofer.service';
 import { Toast } from 'bootstrap';
 
 @Component({
   selector: 'app-listar',
   standalone: false,
   templateUrl: './listar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./listar.component.css']
 })
 export class ListarComponent {

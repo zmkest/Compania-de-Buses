@@ -1,8 +1,8 @@
-import { ChoferService } from 'src/app/services/chofer.service';
-import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { Tripulacion } from 'src/app/Models/Tripulacion';
-import { TripulacionService } from 'src/app/services/tripulacion.service';
-import { Chofer } from 'src/app/Models/Chofer';
+import { ChoferService } from '../../services/chofer.service';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Tripulacion } from '../../Models/Tripulacion';
+import { TripulacionService } from '../../services/tripulacion.service';
+import { Chofer } from '../../Models/Chofer';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Toast } from 'bootstrap';
 
@@ -10,6 +10,7 @@ import { Toast } from 'bootstrap';
   selector: 'app-agregar',
   standalone: false,
   templateUrl: './agregar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./agregar.component.css']
 })
 export class AgregarComponent implements OnChanges{

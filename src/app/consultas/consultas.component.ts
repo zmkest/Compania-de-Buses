@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { BusesService } from '../services/buses.service';
 import { ViajeService } from '../services/viaje.service';
 
@@ -6,6 +6,7 @@ import { ViajeService } from '../services/viaje.service';
   selector: 'app-consultas',
   standalone: false,
   templateUrl: './consultas.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./consultas.component.css']
 })
 export class ConsultasComponent {
