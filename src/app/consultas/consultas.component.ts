@@ -4,6 +4,7 @@ import { ViajeService } from '../services/viaje.service';
 
 @Component({
   selector: 'app-consultas',
+  standalone: false,
   templateUrl: './consultas.component.html',
   styleUrls: ['./consultas.component.css']
 })

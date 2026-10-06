@@ -5,6 +5,7 @@ import { Toast } from 'bootstrap';
 
 @Component({
   selector: 'app-listar',
+  standalone: false,
   templateUrl: './listar.component.html',
   styleUrls: ['./listar.component.css']
 })

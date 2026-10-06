@@ -6,6 +6,7 @@ import { Toast } from 'bootstrap';
 
 @Component({
   selector: 'app-agregar',
+  standalone: false,
   templateUrl: './agregar.component.html',
   styleUrls: ['./agregar.component.css']
 })
