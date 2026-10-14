@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { UserResponse } from '../shared/models/user.dto';
+import { UpdateUserDto, UserResponse } from '../shared/models/user.dto';
 import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { PaginatedResponse } from '../core/interfaces/paginated';
 
@@ -48,5 +48,9 @@ export class UserService {
 
     countByStatus(isActive: boolean): Observable<number> {
         return this.http.get<number>(`${this.apiUrl}/count/active/${isActive}`, { context: this.context });
+    }
+
+    update(id: number, data: UpdateUserDto): Observable<UserResponse> {
+        return this.http.patch<UserResponse>(`${this.apiUrl}/${id}`, data, { context: this.context});
     }
 }

@@ -103,7 +103,6 @@ export class UserAdminComponent {
 
     onUpdated({ id, changes }: { id: number; changes: UpdateUserDto }): void {
         this.replaceUser(id, user => ({ ...user, ...changes }));
-        this.notificationService.success('Usuario actualizado.');
         this.closeForm();
     }
 

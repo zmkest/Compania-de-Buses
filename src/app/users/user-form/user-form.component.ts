@@ -6,6 +6,7 @@ import { CreateUserDto, UpdateUserDto, UserResponse } from '../../shared/models/
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { AppError } from '../../core/errors/app-error';
+import { UserService } from '../../services/user.service';
 
 @Component({
     selector: 'app-user-form',
@@ -16,6 +17,7 @@ import { AppError } from '../../core/errors/app-error';
 export class UserFormComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);
     private readonly authService = inject(AuthService);
+    private readonly userService = inject(UserService);
     private readonly notification = inject(NotificationService);
 
     readonly user = input<UserResponse | null>(null);
@@ -54,7 +56,21 @@ export class UserFormComponent implements OnInit {
         const { name, email, role } = this.form.getRawValue();
 
         if (user) {
-            this.updated.emit({ id: user.id, changes: { name, email, role } });
+            this.isSubmitting.set(true);
+            this.errorMessages.set([]);
+            const userId = user.id;
+            this.userService.update(userId, { name: name.trim(), email: email.trim(), role}).subscribe({
+                next: () => {
+                    this.isSubmitting.set(false);
+                    this.errorMessages.set([]);
+                    this.notification.success(`Usuario ${name} actualizado.`);
+                    this.updated.emit({ id: userId, changes: { name: name.trim(), email: email.trim(), role} } );
+                },
+                error: (err: AppError) => {
+                    this.isSubmitting.set(false);
+                    this.errorMessages.set(err.fieldErrors?.length ? err.fieldErrors : [err.message]);
+                },
+            });
             return;
         }
 
@@ -64,6 +80,7 @@ export class UserFormComponent implements OnInit {
         this.authService.registerByAdmin(name.trim(), email.trim(), role).subscribe({
             next: () => {
                 this.isSubmitting.set(false);
+                    this.errorMessages.set([]);
                 this.notification.success(`Usuario ${name} creado.`);
                 this.created.emit();
             },

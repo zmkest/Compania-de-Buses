@@ -41,8 +41,8 @@
       <table class="w-full text-sm text-left">
         <thead class="bg-brand-navy text-white">
           <tr>
-            <th class="px-5 py-3 font-semibold">Usuario</th>
             <th class="px-5 py-3 font-semibold">ID</th>
+            <th class="px-5 py-3 font-semibold">Usuario</th>
             <th class="px-5 py-3 font-semibold">Rol</th>
             <th class="px-5 py-3 font-semibold">Estado</th>
             <th class="px-5 py-3 font-semibold">Creado</th>
@@ -71,6 +71,7 @@
           } @else {
           @for (user of users(); track user.id) {
             <tr class="hover:bg-gray-50 transition" [class.opacity-60]="!user.isActive">
+              <td class="px-5 py-3 text-gray-500">#{{ user.id }}</td>
               <td class="px-5 py-3">
                 <div class="flex items-center gap-3">
                   <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-mint text-brand-navy font-bold">
@@ -87,7 +88,6 @@
                   </div>
                 </div>
               </td>
-              <td class="px-5 py-3 text-gray-500">#{{ user.id }}</td>
               <td class="px-5 py-3">
                 <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold" [class]="roleBadgeClasses[user.role]">
                   {{ roleLabels[user.role] }}
