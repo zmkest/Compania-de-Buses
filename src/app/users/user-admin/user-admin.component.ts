@@ -123,8 +123,17 @@ export class UserAdminComponent {
     }
 
     confirmDelete(user: UserResponse): void {
-        this.deletingUser.set(null);
-        this.notificationService.success(`Usuario ${user.name} eliminado.`);
+        this.userService.delete(user.id).subscribe({
+            next: (_) => {
+                this.deletingUser.set(null);
+                this.notificationService.success(`Usuario ${user.name} eliminado.`);
+                this.reload();
+            },
+            error: (err: AppError) => {
+                this.notificationService.error(err.message);
+                this.deletingUser.set(null);
+            }
+        })
     }
 
     private replaceUser(id: number, change: (user: UserResponse) => UserResponse): void {

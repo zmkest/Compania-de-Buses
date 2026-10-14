@@ -57,4 +57,8 @@ export class UserService {
     updateIsActive(id: number, isActive: boolean): Observable<UserResponse> {
         return this.http.patch<UserResponse>(`${this.apiUrl}/${id}/active`, { isActive }, { context: this.context});
     }
+
+    delete(id: number): Observable<UserResponse> {
+        return this.http.delete<UserResponse>(`${this.apiUrl}/${id}`, { context: this.context });
+    }
 }
