@@ -1,9 +1,11 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { catchError, finalize, map, Observable, shareReplay, throwError } from 'rxjs';
+import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { environment } from '../../environments/environment';
 import { User } from '../shared/models/User';
 import { Router } from '@angular/router';
+import { EUserRole } from '../shared/enums/user.enum';
 
 interface AuthResponse {
     access_token: string;
@@ -22,6 +24,8 @@ export class AuthService {
     private readonly tokenKey = 'access_token';
     private readonly userKey = 'user';
 
+    private refreshInFlight: Observable<string> | null = null;
+
     private readonly currentUserSignal = signal<User | null>(this.readUser());
 
     readonly currentUser = this.currentUserSignal.asReadonly();
@@ -29,6 +33,12 @@ export class AuthService {
 
     register(name: string, email: string, password: string): Observable<String> {
         return this.http.post<String>(`${this.apiUrl}/register`, { name, email, password });
+    }
+
+    registerByAdmin(name: string, email: string, role: EUserRole): Observable<unknown> {
+        return this.http.post(`${this.apiUrl}/users`, { name, email, role }, {
+            context: new HttpContext().set(SILENT_ERRORS, true),
+        });
     }
 
     login(email: string, password: string): Observable<void> {
@@ -44,20 +54,25 @@ export class AuthService {
     }
 
     refreshToken(): Observable<string> {
-        return this.http.post<Omit<AuthResponse, 'user'>>(`${this.apiUrl}/refresh`, {})
-            .pipe(
-                map(tokens => {
-                    localStorage.setItem(this.tokenKey, tokens.access_token);
-                    return tokens.access_token;
-                }),
-                catchError(error => {
-                    return throwError(error);
-                }),
-            );
+        this.refreshInFlight ??= this.http.post<Omit<AuthResponse, 'user'>>(
+            `${this.apiUrl}/refresh`, {},
+            { withCredentials: true, context: new HttpContext().set(SILENT_ERRORS, true) },
+        ).pipe(
+            map(tokens => {
+                localStorage.setItem(this.tokenKey, tokens.access_token);
+                return tokens.access_token;
+            }),
+            finalize(() => this.refreshInFlight = null),
+            shareReplay(1),
+        );
+        return this.refreshInFlight;
     }
 
     logout(): void {
-        this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).subscribe({ error: () => {} });
+        this.http.post(`${this.apiUrl}/logout`, {}, {
+            withCredentials: true,
+            context: new HttpContext().set(SILENT_ERRORS, true),
+        }).subscribe({ error: () => {} });
         localStorage.removeItem(this.tokenKey);
         localStorage.removeItem(this.userKey);
         this.currentUserSignal.set(null);

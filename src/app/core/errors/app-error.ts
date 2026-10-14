@@ -11,6 +11,7 @@ export function toAppError(err: HttpErrorResponse): AppError {
     const body = err.error;
 
     const defaults: Record<number, string> = {
+        0: 'No se pudo conectar con el servidor. Revisa tu conexión.',
         400: 'La solicitud no es válida.',
         401: 'Tu sesión expiró. Inicia sesión nuevamente.',
         403: 'No tienes permisos para realizar esta acción.',
@@ -25,7 +26,7 @@ export function toAppError(err: HttpErrorResponse): AppError {
     let fieldErrors: string[] | undefined;
     let message = defaults[err.status] ?? 'Ocurrió un error inesperado.';
 
-    if (err.status < 500) {
+    if (err.status > 0 && err.status < 500) {
         if (Array.isArray(body?.message)) {
             fieldErrors = [];
             for (const msg of body.message as string[]) {

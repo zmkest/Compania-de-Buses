@@ -1,0 +1,219 @@
+<section class="max-w-7xl mx-auto space-y-6">
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand-blue mb-1">Administración</p>
+      <h1 class="font-brand text-4xl text-brand-navy mb-1">Usuarios</h1>
+      <p class="text-sm text-gray-500 mb-0">Gestiona las cuentas, roles y accesos al sistema.</p>
+    </div>
+    <button
+      type="button"
+      (click)="openCreate()"
+      class="inline-flex items-center gap-2 bg-brand-navy text-white font-semibold px-5 py-2.5 rounded-lg shadow hover:bg-brand-navy transition"
+    >
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+      </svg>
+      Nuevo usuario
+    </button>
+  </header>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+    <div class="border-2 border-brand-navy bg-white rounded-2xl p-2 text-center">
+      <p class="text-sm mb-1 font-bold">Total de usuarios</p>
+      <p class="text-3xl font-bold text-brand-navy mb-0">{{ stats()?.total ?? "—" }}</p>
+    </div>
+    <div class="border-2 border-emerald-600 bg-white rounded-2xl p-2 text-center">
+      <p class="text-sm mb-1 font-bold">Activos</p>
+      <p class="text-3xl font-bold text-emerald-600 mb-0">{{ stats()?.active ?? "—" }}</p>
+    </div>
+    <div class="border-2 border-gray-400 bg-white rounded-2xl p-2 text-center">
+      <p class="text-sm mb-1 font-bold">Inactivos</p>
+      <p class="text-3xl font-bold text-gray-400 mb-0">{{ stats()?.inactive ?? "—" }}</p>
+    </div>
+  </div>
+
+  <div class="overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-100">
+      <app-user-search class="block w-full sm:w-80" (searched)="onSearch($event)" />
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-brand-navy text-white">
+          <tr>
+            <th class="px-5 py-3 font-semibold">Usuario</th>
+            <th class="px-5 py-3 font-semibold">ID</th>
+            <th class="px-5 py-3 font-semibold">Rol</th>
+            <th class="px-5 py-3 font-semibold">Estado</th>
+            <th class="px-5 py-3 font-semibold">Creado</th>
+            <th class="px-5 py-3 font-semibold text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @if (usersResource.isLoading()) {
+            <tr>
+              <td colspan="6" class="px-5 py-12 text-center text-gray-500">
+                <div class="inline-flex items-center gap-2">
+                  <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+                  Cargando usuarios...
+                </div>
+              </td>
+            </tr>
+          } @else if (usersResource.error()) {
+            <tr>
+              <td colspan="6" class="px-5 py-12 text-center" role="alert">
+                <p class="font-semibold text-red-600 mb-3">No se pudieron cargar los usuarios</p>
+                <button type="button" (click)="reload()" class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition">
+                  Reintentar
+                </button>
+              </td>
+            </tr>
+          } @else {
+          @for (user of users(); track user.id) {
+            <tr class="hover:bg-gray-50 transition" [class.opacity-60]="!user.isActive">
+              <td class="px-5 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-mint text-brand-navy font-bold">
+                    {{ initials(user.name) }}
+                  </div>
+                  <div class="min-w-0">
+                    <p class="font-semibold text-gray-800 truncate mb-0">
+                      {{ user.name }}
+                      @if (isCurrentUser(user)) {
+                        <span class="ml-1 text-xs font-normal text-brand-blue">(tú)</span>
+                      }
+                    </p>
+                    <p class="text-gray-500 truncate mb-0">{{ user.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-5 py-3 text-gray-500">#{{ user.id }}</td>
+              <td class="px-5 py-3">
+                <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold" [class]="roleBadgeClasses[user.role]">
+                  {{ roleLabels[user.role] }}
+                </span>
+              </td>
+              <td class="px-5 py-3">
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    role="switch"
+                    [attr.aria-checked]="user.isActive"
+                    [attr.aria-label]="(user.isActive ? 'Desactivar a ' : 'Activar a ') + user.name"
+                    [disabled]="isCurrentUser(user)"
+                    (click)="toggleActive(user)"
+                    class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition disabled:cursor-not-allowed disabled:opacity-50"
+                    [class]="user.isActive ? 'bg-emerald-500' : 'bg-gray-300'"
+                  >
+                    <span
+                      class="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform"
+                      [class]="user.isActive ? 'translate-x-5' : 'translate-x-1'"
+                    ></span>
+                  </button>
+                  <span class="text-xs font-semibold" [class]="user.isActive ? 'text-emerald-600' : 'text-gray-400'">
+                    {{ user.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-5 py-3 text-gray-500">{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
+              <td class="px-5 py-3">
+                <div class="flex justify-end gap-1">
+                  <button
+                    type="button"
+                    (click)="openEdit(user)"
+                    class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
+                    [attr.aria-label]="'Editar a ' + user.name"
+                    title="Editar"
+                  >
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="deletingUser.set(user)"
+                    [disabled]="isCurrentUser(user)"
+                    class="rounded-lg p-2 text-red-600 hover:bg-red-50 transition disabled:cursor-not-allowed disabled:opacity-40"
+                    [attr.aria-label]="'Eliminar a ' + user.name"
+                    title="Eliminar"
+                  >
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="px-5 py-12 text-center">
+                <p class="font-semibold text-gray-700 mb-1">
+                  {{ search() ? 'No se encontró ningún usuario' : 'Aún no hay usuarios registrados' }}
+                </p>
+                <p class="text-sm text-gray-500 mb-0">
+                  {{ search() ? 'Revisa el valor buscado e inténtalo de nuevo.' : 'Crea el primero con el botón "Nuevo usuario".' }}
+                </p>
+              </td>
+            </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav class="flex items-center justify-end gap-1 px-5 py-3 border-t border-gray-100" aria-label="Paginación">
+        <button
+          type="button"
+          (click)="goToPage(page() - 1)"
+          [disabled]="page() === 1"
+          class="flex h-8 w-8 items-center justify-center rounded-lg text-brand-navy hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+          aria-label="Página anterior"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        @for (pageNumber of pages(); track pageNumber) {
+          <button
+            type="button"
+            (click)="goToPage(pageNumber)"
+            [attr.aria-current]="pageNumber === page() ? 'page' : null"
+            class="h-8 min-w-8 rounded-lg px-2 text-sm font-semibold transition"
+            [class]="pageNumber === page() ? 'bg-sky-950 text-white' : 'text-brand-navy hover:bg-brand-mint'"
+          >
+            {{ pageNumber }}
+          </button>
+        }
+        <button
+          type="button"
+          (click)="goToPage(page() + 1)"
+          [disabled]="page() === totalPages()"
+          class="flex h-8 w-8 items-center justify-center rounded-lg text-brand-navy hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+          aria-label="Página siguiente"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </nav>
+    }
+  </div>
+</section>
+
+@if (isFormOpen()) {
+  <app-user-form
+    [user]="editingUser()"
+    (created)="onCreated()"
+    (updated)="onUpdated($event)"
+    (cancelled)="closeForm()"
+  />
+}
+
+@if (deletingUser(); as user) {
+  <app-user-delete-dialog
+    [user]="user"
+    (confirmed)="confirmDelete($event)"
+    (cancelled)="deletingUser.set(null)"
+  />
+}

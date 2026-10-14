@@ -6,6 +6,8 @@ import { Router } from "@angular/router";
 import { catchError, retry, throwError, timer } from "rxjs";
 import { toAppError } from "../errors/app-error";
 
+const AUTH_ENDPOINTS = ['/auth/login', '/auth/refresh', '/auth/logout'];
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const notifications = inject(NotificationService);
     const auth = inject(AuthService);
@@ -21,7 +23,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((err: HttpErrorResponse) => {
             const appError = toAppError(err);
 
-            if (err.status === 401) {
+            const isAuthEndpoint = AUTH_ENDPOINTS.some(path => req.url.includes(path));
+            if (err.status === 401 && !isAuthEndpoint) {
                 auth.logout();
                 router.navigate(['/login']);
             }

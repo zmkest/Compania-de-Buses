@@ -5,6 +5,7 @@ import { inject } from "@angular/core";
 import { catchError, switchMap, throwError } from "rxjs";
 
 const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/auth/refresh'];
+const NO_REFRESH_ROUTES = ['/auth/logout'];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
@@ -17,16 +18,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     r.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
 
   const token = auth.getToken();
+  const canRefresh = !NO_REFRESH_ROUTES.some((r) => req.url.includes(r));
 
   return next(token ? withToken(req, token) : req).pipe(
     catchError((err: HttpErrorResponse) => {
-      if (err.status !== 401 || !token) return throwError(() => err);
+      if (err.status !== 401 || !token || !canRefresh) return throwError(() => err);
 
       return auth.refreshToken().pipe(
-        catchError((refreshErr) => {
-          auth.logout();
-          return throwError(() => refreshErr);
-        }),
         switchMap((newToken) => next(withToken(req, newToken))),
       );
     }),

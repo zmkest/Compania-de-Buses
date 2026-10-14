@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './auth/auth.guard';
+import { authGuard, guestGuard, roleGuard } from './auth/auth.guard';
+import { EUserRole } from './shared/enums/user.enum';
 
 export const routes: Routes = [
   {
@@ -19,10 +20,15 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'viajes', pathMatch: 'full' },
       { path: 'viajes', loadComponent: () => import('./viaje/principal/principal.component').then(m => m.PrincipalComponent) },
-      { path: 'buses', loadComponent: () => import('./viaje/principal/principal.component').then(m => m.PrincipalComponent) },
-      { path: 'choferes', loadComponent: () => import('./viaje/principal/principal.component').then(m => m.PrincipalComponent) },
-      { path: 'tripulacion', loadComponent: () => import('./viaje/principal/principal.component').then(m => m.PrincipalComponent) },
+      { path: 'buses', loadComponent: () => import('./buses/principal/principal.component').then(m => m.PrincipalComponent) },
+      { path: 'choferes', loadComponent: () => import('./chofer/principal/principal.component').then(m => m.PrincipalComponent) },
+      { path: 'tripulacion', loadComponent: () => import('./tripulacion/principal/principal.component').then(m => m.PrincipalComponent) },
       { path: 'consultas', loadComponent: () => import('./consultas/consultas.component').then(m => m.ConsultasComponent) },
+      {
+        path: 'usuarios',
+        loadComponent: () => import('./users/user-admin/user-admin.component').then(m => m.UserAdminComponent),
+        canActivate: [roleGuard(EUserRole.ADMIN)],
+      },
     ],
   },
 ];
