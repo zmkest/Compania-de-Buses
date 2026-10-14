@@ -9,6 +9,7 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { UserSearchComponent } from '../user-search/user-search.component';
 import { UserFormComponent } from '../user-form/user-form.component';
 import { UserDeleteDialogComponent } from '../user-delete-dialog/user-delete-dialog.component';
+import { AppError } from '../../core/errors/app-error';
 
 const PAGE_SIZE = 5;
 
@@ -108,8 +109,17 @@ export class UserAdminComponent {
 
     toggleActive(user: UserResponse): void {
         const isActive = !user.isActive;
-        this.replaceUser(user.id, current => ({ ...current, isActive }));
-        this.notificationService.success(`Usuario ${isActive ? 'activado' : 'desactivado'}.`);
+        this.userService.updateIsActive(user.id, isActive).subscribe({
+            next: (_) => {
+                this.replaceUser(user.id, current => ({ ...current, isActive }));
+                this.notificationService.success(`Usuario ${isActive ? 'activado' : 'desactivado'}.`);
+
+                this.statsResource.reload();
+            },
+            error: (err: AppError) => {
+                this.notificationService.error(err.message);
+            }
+        })
     }
 
     confirmDelete(user: UserResponse): void {

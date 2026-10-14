@@ -53,4 +53,8 @@ export class UserService {
     update(id: number, data: UpdateUserDto): Observable<UserResponse> {
         return this.http.patch<UserResponse>(`${this.apiUrl}/${id}`, data, { context: this.context});
     }
+
+    updateIsActive(id: number, isActive: boolean): Observable<UserResponse> {
+        return this.http.patch<UserResponse>(`${this.apiUrl}/${id}/active`, { isActive }, { context: this.context});
+    }
 }
