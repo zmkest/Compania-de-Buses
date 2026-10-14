@@ -49,6 +49,15 @@
                 </a>
             </li>
         </ul>
+        <hr>
+        <div class="px-2">
+            @if (currentUser()) {
+                <p class="text-white-50 small mb-2">{{ currentUser()?.name }}</p>
+            }
+            <button type="button" (click)="logout()" class="btn btn-outline-light w-100 fw-bold">
+                Cerrar sesión
+            </button>
+        </div>
     </div>
     <div class="b-example-divider"></div>
 </main>

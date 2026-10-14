@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { Tripulacion } from '../../Models/Tripulacion';
+import { Tripulacion } from '../../shared/models/Tripulacion';
 import { TripulacionService } from '../../services/tripulacion.service';
 import { Toast } from 'bootstrap';
 import { AgregarComponent } from '../agregar/agregar.component';

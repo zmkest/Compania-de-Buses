@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { Bus } from '../../Models/Buses';
-import { Tripulacion } from '../../Models/Tripulacion';
-import { Viaje } from '../../Models/Viaje';
+import { Bus } from '../../shared/models/Buses';
+import { Tripulacion } from '../../shared/models/Tripulacion';
+import { Viaje } from '../../shared/models/Viaje';
 import { BusesService } from '../../services/buses.service';
 import { TripulacionService } from '../../services/tripulacion.service';
 import { ViajeService } from '../../services/viaje.service';

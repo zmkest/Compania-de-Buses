@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { Bus } from '../../Models/Buses';
-import { Chofer } from '../../Models/Chofer';
-import { Tripulacion } from '../../Models/Tripulacion';
-import { Viaje } from '../../Models/Viaje';
+import { Bus } from '../../shared/models/Buses';
+import { Chofer } from '../../shared/models/Chofer';
+import { Tripulacion } from '../../shared/models/Tripulacion';
+import { Viaje } from '../../shared/models/Viaje';
 import { BusesService } from '../../services/buses.service';
 import { ViajeService } from '../../services/viaje.service';
 import { Toast } from 'bootstrap';

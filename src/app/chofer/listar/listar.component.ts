@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { Chofer } from '../../Models/Chofer';
+import { Chofer } from '../../shared/models/Chofer';
 import { ChoferService } from '../../services/chofer.service';
 import { Toast } from 'bootstrap';
 import { AgregarComponent } from '../agregar/agregar.component';

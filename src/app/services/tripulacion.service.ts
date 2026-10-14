@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Tripulacion } from '../Models/Tripulacion';
-import { Chofer } from '../Models/Chofer';
+import { Tripulacion } from '../shared/models/Tripulacion';
+import { Chofer } from '../shared/models/Chofer';
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Chofer } from '../Models/Chofer';
+import { Chofer } from '../shared/models/Chofer';
 
 @Injectable({
   providedIn: 'root'

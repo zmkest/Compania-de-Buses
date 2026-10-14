@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Toast } from 'bootstrap';
-import { Bus } from '../../Models/Buses';
+import { Bus } from '../../shared/models/Buses';
 import { BusesService } from '../../services/buses.service';
 
 @Component({

@@ -1,6 +1,6 @@
-import { Tripulacion } from '../../Models/Tripulacion';
+import { Tripulacion } from '../../shared/models/Tripulacion';
 import { Component, ElementRef, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { Bus } from '../../Models/Buses';
+import { Bus } from '../../shared/models/Buses';
 import { BusesService } from '../../services/buses.service';
 import { Toast } from 'bootstrap';
 import { AgregarComponent } from '../agregar/agregar.component';

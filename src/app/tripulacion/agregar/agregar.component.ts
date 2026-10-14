@@ -1,8 +1,8 @@
 import { ChoferService } from '../../services/chofer.service';
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { Tripulacion } from '../../Models/Tripulacion';
+import { Tripulacion } from '../../shared/models/Tripulacion';
 import { TripulacionService } from '../../services/tripulacion.service';
-import { Chofer } from '../../Models/Chofer';
+import { Chofer } from '../../shared/models/Chofer';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Toast } from 'bootstrap';
 
