@@ -1,0 +1,28 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cancelled.emit()">
+  <div
+    class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 text-center"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="bus-delete-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+      <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
+    <h2 id="bus-delete-title" class="font-brand text-2xl text-brand-navy mb-2">Eliminar bus</h2>
+    <p class="text-sm text-gray-500 mb-6">
+      Vas a eliminar el bus <span class="font-semibold text-gray-700">{{ bus().plate }}</span>
+      ({{ bus().model }}). Esta acción no se puede deshacer.
+    </p>
+    <div class="flex justify-center gap-2">
+      <button type="button" (click)="cancelled.emit()" class="border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+        Cancelar
+      </button>
+      <button type="button" (click)="confirmed.emit(bus())" class="bg-red-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-red-700 transition">
+        Sí, eliminar
+      </button>
+    </div>
+  </div>
+</div>

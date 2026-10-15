@@ -1,0 +1,27 @@
+<div class="relative">
+  <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" stroke-linecap="round" />
+  </svg>
+  <input
+    type="text"
+    [formControl]="query"
+    placeholder="Buscar por placa o modelo"
+    aria-label="Buscar buses"
+    (keydown.escape)="clear()"
+    class="w-full rounded-lg border-2 border-gray-200 pl-10 pr-10 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+  >
+  @if (hasValue()) {
+    <button
+      type="button"
+      (click)="clear()"
+      class="absolute right-2 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+      aria-label="Limpiar búsqueda"
+      title="Limpiar"
+    >
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+      </svg>
+    </button>
+  }
+</div>

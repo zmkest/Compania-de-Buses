@@ -1,0 +1,146 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cancelled.emit()">
+  <div
+    class="w-full max-w-lg bg-white rounded-2xl shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="bus-form-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="bus-form-title" class="font-brand text-2xl text-brand-navy mb-0">
+          {{ isEdit() ? 'Editar bus' : 'Nuevo bus' }}
+        </h2>
+        @if (bus(); as current) {
+          <p class="text-xs text-gray-500 mt-1 mb-0">ID #{{ current.id }} · registrado el {{ current.createdAt | date:'dd/MM/yyyy' }}</p>
+        } @else {
+          <p class="text-xs text-gray-500 mt-1 mb-0">Completa los datos para registrar un nuevo bus en la flota.</p>
+        }
+      </div>
+      <button type="button" (click)="cancelled.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="px-6 py-3 space-y-4">
+      @if (errorMessages().length) {
+        <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
+          @if (errorMessages().length === 1) {
+            {{ errorMessages()[0] }}
+          } @else {
+            <ul class="list-disc pl-4 mb-0">
+              @for (message of errorMessages(); track $index) {
+                <li>{{ message }}</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="bus-plate" class="block text-sm font-semibold text-brand-navy mb-1">Placa</label>
+          <input
+            id="bus-plate"
+            type="text"
+            formControlName="plate"
+            placeholder="ABC-1234"
+            autocomplete="off"
+            (blur)="normalizePlate()"
+            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 uppercase focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          >
+          @if (form.controls.plate.invalid && form.controls.plate.touched) {
+            <p class="text-xs text-red-600 mt-1 mb-0">
+              @if (form.controls.plate.errors?.['required']) {
+                Ingresa la placa del bus.
+              } @else {
+                Formato no válido (ej. ABC-1234).
+              }
+            </p>
+          }
+        </div>
+
+        <div>
+          <label for="bus-model" class="block text-sm font-semibold text-brand-navy mb-1">Modelo</label>
+          <input
+            id="bus-model"
+            type="text"
+            formControlName="model"
+            placeholder="Mercedes-Benz O500"
+            autocomplete="off"
+            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          >
+          @if (form.controls.model.invalid && form.controls.model.touched) {
+            <p class="text-xs text-red-600 mt-1 mb-0">Ingresa el modelo del bus.</p>
+          }
+        </div>
+
+        <div>
+          <label for="bus-year" class="block text-sm font-semibold text-brand-navy mb-1">Año</label>
+          <input
+            id="bus-year"
+            type="number"
+            formControlName="year"
+            [min]="minYear"
+            [max]="maxYear"
+            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          >
+          @if (form.controls.year.invalid && form.controls.year.touched) {
+            <p class="text-xs text-red-600 mt-1 mb-0">Ingresa un año entre {{ minYear }} y {{ maxYear }}.</p>
+          }
+        </div>
+
+        <div>
+          <label for="bus-odometer" class="block text-sm font-semibold text-brand-navy mb-1">Kilometraje</label>
+          <div class="relative">
+            <input
+              id="bus-odometer"
+              type="number"
+              formControlName="odometerKm"
+              min="0"
+              class="w-full rounded-lg border-2 border-gray-200 pl-4 pr-12 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            >
+            <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">km</span>
+          </div>
+          @if (form.controls.odometerKm.invalid && form.controls.odometerKm.touched) {
+            <p class="text-xs text-red-600 mt-1 mb-0">El kilometraje no puede ser negativo.</p>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label for="bus-status" class="block text-sm font-semibold text-brand-navy mb-1">Estado</label>
+        @if (isOnRoute()) {
+          <p id="bus-status" class="w-full rounded-lg border-2 border-gray-200 bg-gray-50 px-4 py-2 text-gray-500 mb-0">
+            {{ statusLabels[form.controls.status.value] }}
+          </p>
+          <p class="text-xs text-gray-500 mt-1 mb-0">Se liberará al concluir el viaje.</p>
+        } @else {
+          <select
+            id="bus-status"
+            formControlName="status"
+            class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          >
+            @for (status of statuses; track status) {
+              <option [value]="status">{{ statusLabels[status] }}</option>
+            }
+          </select>
+        }
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" (click)="cancelled.emit()" class="border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="isSubmitting()" class="bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-wait disabled:opacity-60">
+          @if (isSubmitting()) {
+            Guardando...
+          } @else {
+            {{ isEdit() ? 'Guardar cambios' : 'Crear bus' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

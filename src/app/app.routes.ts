@@ -20,7 +20,14 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'viajes', pathMatch: 'full' },
       { path: 'viajes', loadComponent: () => import('./viaje/principal/principal.component').then(m => m.PrincipalComponent) },
-      { path: 'buses', loadComponent: () => import('./buses/principal/principal.component').then(m => m.PrincipalComponent) },
+      {
+        path: 'flota',
+        canActivate: [roleGuard(EUserRole.ADMIN)],
+        children: [
+          { path: '', redirectTo: 'buses', pathMatch: 'full' },
+          { path: 'buses', loadComponent: () => import('./buses/bus-admin/bus-admin.component').then(m => m.BusAdminComponent) },
+        ],
+      },
       { path: 'choferes', loadComponent: () => import('./chofer/principal/principal.component').then(m => m.PrincipalComponent) },
       { path: 'tripulacion', loadComponent: () => import('./tripulacion/principal/principal.component').then(m => m.PrincipalComponent) },
       { path: 'consultas', loadComponent: () => import('./consultas/consultas.component').then(m => m.ConsultasComponent) },
