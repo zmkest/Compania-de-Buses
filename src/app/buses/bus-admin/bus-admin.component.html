@@ -32,7 +32,7 @@
 
   <div class="overflow-hidden">
     <div class="px-5 py-4 border-b border-gray-100">
-      <app-bus-search class="block w-full sm:w-80" (searched)="onSearch($event)" />
+      <app-bus-search class="block w-full sm:w-80" [value]="search()" (searched)="onSearch($event)" />
     </div>
 
     <div class="overflow-x-auto">

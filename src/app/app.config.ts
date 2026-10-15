@@ -1,5 +1,5 @@
 import { ApplicationConfig, ErrorHandler, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
 import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule } from "@angular/forms";
@@ -12,7 +12,7 @@ export const appConfig: ApplicationConfig = {
     providers: [
         provideBrowserGlobalErrorListeners(),
         provideHttpClient(withInterceptors([errorInterceptor, authInterceptor])),
-        provideRouter(routes),
+        provideRouter(routes, withComponentInputBinding()),
         importProvidersFrom(BrowserModule, FormsModule),
         provideZoneChangeDetection(),
         { provide: ErrorHandler, useClass: GlobalErrorHandler },

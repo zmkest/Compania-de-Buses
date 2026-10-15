@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { EUserRole, USER_ROLE_LABELS } from '../../shared/enums/user.enum';
@@ -10,6 +11,7 @@ import { UserSearchComponent } from '../user-search/user-search.component';
 import { UserFormComponent } from '../user-form/user-form.component';
 import { UserDeleteDialogComponent } from '../user-delete-dialog/user-delete-dialog.component';
 import { AppError } from '../../core/errors/app-error';
+import { toPage, toSearch } from '../../core/routing/query-params';
 
 const PAGE_SIZE = 5;
 
@@ -31,12 +33,14 @@ export class UserAdminComponent {
     private readonly authService = inject(AuthService);
     private readonly userService = inject(UserService);
     private readonly notificationService = inject(NotificationService);
+    private readonly router = inject(Router);
 
     readonly roleLabels = USER_ROLE_LABELS;
     readonly roleBadgeClasses = ROLE_BADGE_CLASSES;
 
-    readonly page = signal(1);
-    readonly search = signal('');
+    // Enlazados a los query params ?page=&search= (withComponentInputBinding).
+    readonly page = input(1, { transform: toPage });
+    readonly search = input('', { transform: toSearch });
 
     readonly isFormOpen = signal(false);
     readonly editingUser = signal<UserResponse | null>(null);
@@ -58,6 +62,16 @@ export class UserAdminComponent {
     readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
     readonly stats = computed(() => this.statsResource.hasValue() ? this.statsResource.value() : undefined);
 
+    constructor() {
+        // Una URL vieja o eliminar el último usuario de una página puede dejar la página fuera de rango.
+        effect(() => {
+            const totalPages = this.totalPages();
+            if (this.usersResource.hasValue() && this.page() > totalPages) {
+                this.navigate({ page: totalPages === 1 ? null : totalPages }, true);
+            }
+        });
+    }
+
     isCurrentUser(user: UserResponse): boolean {
         return this.authService.currentUser()?.id === user.id;
     }
@@ -67,13 +81,16 @@ export class UserAdminComponent {
     }
 
     onSearch(search: string): void {
-        this.search.set(search);
-        this.page.set(1);
+        if (search === this.search()) {
+            return;
+        }
+        // replaceUrl: cada tecla buscada no debe llenar el historial del navegador.
+        this.navigate({ search: search || null, page: null }, true);
     }
 
     goToPage(page: number): void {
-        if (page >= 1 && page <= this.totalPages()) {
-            this.page.set(page);
+        if (page >= 1 && page <= this.totalPages() && page !== this.page()) {
+            this.navigate({ page: page === 1 ? null : page });
         }
     }
 
@@ -141,5 +158,9 @@ export class UserAdminComponent {
             ...response,
             items: response.items.map(user => user.id === id ? change(user) : user),
         });
+    }
+
+    private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {
+        this.router.navigate([], { queryParams, queryParamsHandling: 'merge', replaceUrl });
     }
 }

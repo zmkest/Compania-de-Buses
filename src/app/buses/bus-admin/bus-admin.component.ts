@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { BUS_STATUS_LABELS, EBusStatus } from '../../shared/enums/bus.enum';
@@ -9,6 +10,7 @@ import { BusSearchComponent } from '../bus-search/bus-search.component';
 import { BusFormComponent } from '../bus-form/bus-form.component';
 import { BusDeleteDialogComponent } from '../bus-delete-dialog/bus-delete-dialog.component';
 import { AppError } from '../../core/errors/app-error';
+import { toPage, toSearch } from '../../core/routing/query-params';
 
 const PAGE_SIZE = 5;
 
@@ -35,13 +37,15 @@ const STATUS_CARDS: { status: EBusStatus; border: string; text: string }[] = [
 export class BusAdminComponent {
     private readonly busesService = inject(BusesService);
     private readonly notificationService = inject(NotificationService);
+    private readonly router = inject(Router);
 
     readonly statusLabels = BUS_STATUS_LABELS;
     readonly statusBadgeClasses = STATUS_BADGE_CLASSES;
     readonly statusCards = STATUS_CARDS;
 
-    readonly page = signal(1);
-    readonly search = signal('');
+    // Enlazados a los query params ?page=&search= (withComponentInputBinding).
+    readonly page = input(1, { transform: toPage });
+    readonly search = input('', { transform: toSearch });
 
     readonly isFormOpen = signal(false);
     readonly editingBus = signal<BusResponse | null>(null);
@@ -63,18 +67,31 @@ export class BusAdminComponent {
     readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
     readonly stats = computed(() => this.statsResource.hasValue() ? this.statsResource.value() : undefined);
 
+    constructor() {
+        // Una URL vieja o eliminar el último bus de una página puede dejar la página fuera de rango.
+        effect(() => {
+            const totalPages = this.totalPages();
+            if (this.busesResource.hasValue() && this.page() > totalPages) {
+                this.navigate({ page: totalPages === 1 ? null : totalPages }, true);
+            }
+        });
+    }
+
     isOnRoute(bus: BusResponse): boolean {
         return bus.status === EBusStatus.ON_ROUTE;
     }
 
     onSearch(search: string): void {
-        this.search.set(search);
-        this.page.set(1);
+        if (search === this.search()) {
+            return;
+        }
+        // replaceUrl: cada tecla buscada no debe llenar el historial del navegador.
+        this.navigate({ search: search || null, page: null }, true);
     }
 
     goToPage(page: number): void {
-        if (page >= 1 && page <= this.totalPages()) {
-            this.page.set(page);
+        if (page >= 1 && page <= this.totalPages() && page !== this.page()) {
+            this.navigate({ page: page === 1 ? null : page });
         }
     }
 
@@ -128,5 +145,9 @@ export class BusAdminComponent {
             ...response,
             items: response.items.map(bus => bus.id === id ? change(bus) : bus),
         });
+    }
+
+    private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {
+        this.router.navigate([], { queryParams, queryParamsHandling: 'merge', replaceUrl });
     }
 }
