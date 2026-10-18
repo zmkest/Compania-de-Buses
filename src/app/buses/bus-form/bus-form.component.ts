@@ -6,6 +6,7 @@ import { BusResponse, UpdateBusDto } from '../../shared/models/bus.dto';
 import { BusesService } from '../../services/buses.service';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { AppError } from '../../core/errors/app-error';
+import { obtenerCamposModificados } from '../../shared/utils/form-util';
 
 // Mismo formato que valida la API (IsPlate).
 const PLATE_PATTERN = /^([A-Z]{3}-?\d{3,4}|[A-Z]{2}-?\d{3}[A-Z])$/;
@@ -35,7 +36,6 @@ export class BusFormComponent implements OnInit {
     readonly minYear = MIN_YEAR;
     readonly maxYear = MAX_YEAR;
     readonly isEdit = computed(() => this.bus() !== null);
-    readonly isOnRoute = computed(() => this.bus()?.status === EBusStatus.ON_ROUTE);
 
     readonly errorMessages = signal<string[]>([]);
     readonly isSubmitting = signal(false);
@@ -45,7 +45,6 @@ export class BusFormComponent implements OnInit {
         model: ['', [Validators.required, Validators.minLength(2)]],
         year: [MAX_YEAR - 1, [Validators.required, Validators.min(MIN_YEAR), Validators.max(MAX_YEAR)]],
         odometerKm: [0, [Validators.required, Validators.min(0)]],
-        status: [EBusStatus.AVAILABLE, [Validators.required]],
     });
 
     ngOnInit(): void {
@@ -56,11 +55,8 @@ export class BusFormComponent implements OnInit {
                 model: bus.model,
                 year: bus.year,
                 odometerKm: bus.odometerKm,
-                status: bus.status,
             });
-            if (this.isOnRoute()) {
-                this.form.controls.status.disable();
-            }
+            this.form.controls.plate.disable();
         }
     }
 
@@ -77,7 +73,7 @@ export class BusFormComponent implements OnInit {
         }
 
         const bus = this.bus();
-        const { plate, model, year, odometerKm, status } = this.form.getRawValue();
+        const { plate, model, year, odometerKm } = this.form.getRawValue();
         const data = { plate, model: model.trim(), year: Number(year), odometerKm: Number(odometerKm) };
 
         this.isSubmitting.set(true);
@@ -85,12 +81,13 @@ export class BusFormComponent implements OnInit {
 
         if (bus) {
             const busId = bus.id;
-            const changes: UpdateBusDto = this.isOnRoute() ? data : { ...data, status };
-            this.busesService.update(busId, changes).subscribe({
+            const busUpdate = obtenerCamposModificados(bus, data);
+
+            this.busesService.update(busId, busUpdate).subscribe({
                 next: () => {
                     this.isSubmitting.set(false);
                     this.notification.success(`Bus ${plate} actualizado.`);
-                    this.updated.emit({ id: busId, changes });
+                    this.updated.emit({ id: busId, changes: data });
                 },
                 error: (err: AppError) => {
                     this.isSubmitting.set(false);
@@ -100,7 +97,7 @@ export class BusFormComponent implements OnInit {
             return;
         }
 
-        this.busesService.create({ ...data, status }).subscribe({
+        this.busesService.create(data).subscribe({
             next: () => {
                 this.isSubmitting.set(false);
                 this.notification.success(`Bus ${plate} creado.`);

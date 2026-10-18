@@ -16,7 +16,6 @@ export interface CreateBusDto {
     model: string;
     year: number;
     odometerKm: number;
-    status?: EBusStatus;
 }
 
 export type UpdateBusDto = Partial<CreateBusDto>;
