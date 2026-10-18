@@ -63,7 +63,7 @@ export class AuthService {
                 return tokens.access_token;
             }),
             finalize(() => this.refreshInFlight = null),
-            shareReplay(1),
+            shareReplay({ bufferSize: 1, refCount: true }),
         );
         return this.refreshInFlight;
     }
