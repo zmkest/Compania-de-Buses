@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { IsActiveMatchOptions, NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { EUserRole } from '../shared/enums/user.enum';
@@ -35,7 +35,7 @@ const menu: MenuItem[] =[
             children: [
                 { route: 'flota/buses', title: 'Buses', icon: 'M6 17V6a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v11M6 17h12M6 17v2m12-2v2M6 11h12' },
                 { title: 'Asientos', icon: 'M7 4v9h10M7 13l-1 7M17 13v7M10 9h7' },
-                { title: 'Historial', icon: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 3' },
+                { route: 'flota/buses/historial', title: 'Historial', icon: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 3' },
                 { title: 'Mantenimiento', icon: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z' },
             ]
         },
@@ -62,6 +62,9 @@ const menu: MenuItem[] =[
 export class SidebarComponent {
     private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
+
+    // "Buses" no debe quedar activo dentro de "Buses > Historial"; los filtros (?page=...) no cuentan.
+    readonly exactPath: IsActiveMatchOptions = { paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' };
 
     readonly currentUser = this.authService.currentUser;
     readonly role = computed(() => this.currentUser()?.role);

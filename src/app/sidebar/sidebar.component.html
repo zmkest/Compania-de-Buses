@@ -25,7 +25,7 @@
                     @for (child of item.children; track child.title) {
                     <li>
                         @if (child.route) {
-                        <a [routerLink]="child.route" routerLinkActive="bg-sky-950" [title]="child.title"
+                        <a [routerLink]="child.route" routerLinkActive="bg-sky-950" [routerLinkActiveOptions]="exactPath" [title]="child.title"
                             class="flex items-center justify-center md:justify-start gap-3 rounded px-2 py-1.5 text-sm text-white/90 no-underline hover:bg-sky-900 hover:text-white transition">
                             <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path [attr.d]="child.icon" stroke-linecap="round" stroke-linejoin="round" />

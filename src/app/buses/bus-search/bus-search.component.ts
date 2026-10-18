@@ -12,6 +12,7 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 export class BusSearchComponent {
     // Valor actual (viene de la URL); mantiene la caja sincronizada al recargar o usar atrás/adelante.
     readonly value = input('');
+    readonly placeholder = input('Buscar por placa o modelo');
     readonly searched = output<string>();
 
     readonly query = new FormControl('', { nonNullable: true });

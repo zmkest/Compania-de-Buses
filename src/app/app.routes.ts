@@ -25,7 +25,13 @@ export const routes: Routes = [
         canActivate: [roleGuard(EUserRole.ADMIN)],
         children: [
           { path: '', redirectTo: 'buses', pathMatch: 'full' },
-          { path: 'buses', loadComponent: () => import('./buses/bus-admin/bus-admin.component').then(m => m.BusAdminComponent) },
+          {
+            path: 'buses',
+            children: [
+              { path: '', loadComponent: () => import('./buses/bus-admin/bus-admin.component').then(m => m.BusAdminComponent) },
+              { path: 'historial', loadComponent: () => import('./buses/bus-status-history/bus-status-history.component').then(m => m.BusStatusHistoryComponent) },
+            ],
+          },
         ],
       },
       { path: 'choferes', loadComponent: () => import('./chofer/principal/principal.component').then(m => m.PrincipalComponent) },

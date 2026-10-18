@@ -20,6 +20,18 @@ export interface CreateBusDto {
 
 export type UpdateBusDto = Partial<CreateBusDto>;
 
+export interface BusStatusHistoryResponse {
+    id: number;
+    busId: number;
+    busPlate: string | null;
+    fromStatus: EBusStatus | null;
+    toStatus: EBusStatus;
+    reason: string | null;
+    changedById: number | null;
+    changedByName: string | null;
+    createdAt: Date;
+}
+
 export interface UpdateBusStatusDto {
     status: EBusStatus;
     reason?: string;

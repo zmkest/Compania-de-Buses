@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { BUS_STATUS_LABELS, EBusStatus } from '../../shared/enums/bus.enum';
+import { BUS_STATUS_BADGE_CLASSES, BUS_STATUS_LABELS, EBusStatus } from '../../shared/enums/bus.enum';
 import { BusResponse, UpdateBusDto } from '../../shared/models/bus.dto';
 import { BusesService } from '../../services/buses.service';
 import { NotificationService } from '../../core/notifications/notification.service';
@@ -15,13 +15,6 @@ import { toPage, toSearch } from '../../core/routing/query-params';
 
 const PAGE_SIZE = 5;
 
-const STATUS_BADGE_CLASSES: Record<EBusStatus, string> = {
-    [EBusStatus.AVAILABLE]: 'bg-emerald-100 text-emerald-700',
-    [EBusStatus.ON_ROUTE]: 'bg-blue-100 text-blue-700',
-    [EBusStatus.MAINTENANCE]: 'bg-amber-100 text-amber-700',
-    [EBusStatus.OUT_OF_SERVICE]: 'bg-red-100 text-red-700',
-};
-
 const STATUS_CARDS: { status: EBusStatus; border: string; text: string }[] = [
     { status: EBusStatus.AVAILABLE, border: 'border-emerald-600', text: 'text-emerald-600' },
     { status: EBusStatus.ON_ROUTE, border: 'border-blue-600', text: 'text-blue-600' },
@@ -33,7 +26,7 @@ const STATUS_CARDS: { status: EBusStatus; border: string; text: string }[] = [
     selector: 'app-bus-admin',
     templateUrl: './bus-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, DecimalPipe, BusSearchComponent, BusFormComponent, BusDeleteDialogComponent, BusStatusDialogComponent]
+    imports: [RouterLink, DatePipe, DecimalPipe, BusSearchComponent, BusFormComponent, BusDeleteDialogComponent, BusStatusDialogComponent]
 })
 export class BusAdminComponent {
     private readonly busesService = inject(BusesService);
@@ -41,7 +34,7 @@ export class BusAdminComponent {
     private readonly router = inject(Router);
 
     readonly statusLabels = BUS_STATUS_LABELS;
-    readonly statusBadgeClasses = STATUS_BADGE_CLASSES;
+    readonly statusBadgeClasses = BUS_STATUS_BADGE_CLASSES;
     readonly statusCards = STATUS_CARDS;
 
     // Enlazados a los query params ?page=&search= (withComponentInputBinding).
