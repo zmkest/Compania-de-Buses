@@ -19,3 +19,8 @@ export interface CreateBusDto {
 }
 
 export type UpdateBusDto = Partial<CreateBusDto>;
+
+export interface UpdateBusStatusDto {
+    status: EBusStatus;
+    reason?: string;
+}

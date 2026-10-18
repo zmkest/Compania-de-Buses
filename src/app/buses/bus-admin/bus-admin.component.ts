@@ -9,6 +9,7 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { BusSearchComponent } from '../bus-search/bus-search.component';
 import { BusFormComponent } from '../bus-form/bus-form.component';
 import { BusDeleteDialogComponent } from '../bus-delete-dialog/bus-delete-dialog.component';
+import { BusStatusDialogComponent } from '../bus-status-dialog/bus-status-dialog.component';
 import { AppError } from '../../core/errors/app-error';
 import { toPage, toSearch } from '../../core/routing/query-params';
 
@@ -32,7 +33,7 @@ const STATUS_CARDS: { status: EBusStatus; border: string; text: string }[] = [
     selector: 'app-bus-admin',
     templateUrl: './bus-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, DecimalPipe, BusSearchComponent, BusFormComponent, BusDeleteDialogComponent]
+    imports: [DatePipe, DecimalPipe, BusSearchComponent, BusFormComponent, BusDeleteDialogComponent, BusStatusDialogComponent]
 })
 export class BusAdminComponent {
     private readonly busesService = inject(BusesService);
@@ -50,6 +51,7 @@ export class BusAdminComponent {
     readonly isFormOpen = signal(false);
     readonly editingBus = signal<BusResponse | null>(null);
     readonly deletingBus = signal<BusResponse | null>(null);
+    readonly statusBus = signal<BusResponse | null>(null);
 
     readonly busesResource = rxResource({
         params: () => ({ page: this.page(), limit: PAGE_SIZE, search: this.search() }),
@@ -123,6 +125,12 @@ export class BusAdminComponent {
     onUpdated({ id, changes }: { id: number; changes: UpdateBusDto }): void {
         this.replaceBus(id, bus => ({ ...bus, ...changes }));
         this.closeForm();
+        this.statsResource.reload();
+    }
+
+    onStatusChanged({ id, status }: { id: number; status: EBusStatus }): void {
+        this.replaceBus(id, bus => ({ ...bus, status }));
+        this.statusBus.set(null);
         this.statsResource.reload();
     }
 

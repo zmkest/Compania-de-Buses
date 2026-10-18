@@ -11,3 +11,11 @@ export const BUS_STATUS_LABELS: Record<EBusStatus, string> = {
     [EBusStatus.MAINTENANCE]: 'Mantenimiento',
     [EBusStatus.OUT_OF_SERVICE]: 'Fuera de servicio',
 };
+
+// Cambios de estado permitidos desde cada estado actual.
+export const BUS_STATUS_TRANSITIONS: Record<EBusStatus, readonly EBusStatus[]> = {
+    [EBusStatus.AVAILABLE]: [EBusStatus.ON_ROUTE, EBusStatus.MAINTENANCE, EBusStatus.OUT_OF_SERVICE],
+    [EBusStatus.ON_ROUTE]: [EBusStatus.AVAILABLE],
+    [EBusStatus.OUT_OF_SERVICE]: [EBusStatus.AVAILABLE],
+    [EBusStatus.MAINTENANCE]: [EBusStatus.AVAILABLE],
+};

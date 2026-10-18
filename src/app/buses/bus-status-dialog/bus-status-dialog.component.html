@@ -1,0 +1,97 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cancelled.emit()">
+  <div
+    class="w-full max-w-md bg-white rounded-2xl shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="bus-status-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="bus-status-title" class="font-brand text-2xl text-brand-navy mb-0">Cambiar estado</h2>
+        <p class="text-xs text-gray-500 mt-1 mb-0">{{ bus().plate }} · {{ bus().model }}</p>
+      </div>
+      <button type="button" (click)="cancelled.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <form (submit)="$event.preventDefault(); submit()" class="px-6 py-4 space-y-5">
+      @if (errorMessages().length) {
+        <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
+          @if (errorMessages().length === 1) {
+            {{ errorMessages()[0] }}
+          } @else {
+            <ul class="list-disc pl-4 mb-0">
+              @for (message of errorMessages(); track $index) {
+                <li>{{ message }}</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      <!-- Transición visual: actual → nuevo -->
+      <div class="flex items-center justify-center gap-3">
+        <span class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold" [class]="statusStyles[bus().status].soft">
+          {{ statusLabels[bus().status] }}
+        </span>
+        <svg class="h-5 w-5 shrink-0 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M5 12h14m-5-5 5 5-5 5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        @if (selected(); as next) {
+          <span class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold" [class]="statusStyles[next].soft">
+            {{ statusLabels[next] }}
+          </span>
+        } @else {
+          <span class="inline-flex items-center rounded-full border border-dashed border-gray-300 px-3 py-1.5 text-sm text-gray-400">
+            Elige un estado
+          </span>
+        }
+      </div>
+
+      <fieldset>
+        <legend class="block text-sm font-semibold text-brand-navy mb-2">Nuevo estado</legend>
+        <div class="grid gap-2" [class]="targets().length > 1 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1'">
+          @for (status of targets(); track status) {
+            <button
+              type="button"
+              (click)="selected.set(status)"
+              [attr.aria-pressed]="selected() === status"
+              class="flex items-center gap-2 rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition"
+              [class]="selected() === status ? statusStyles[status].selected : statusStyles[status].unselected"
+            >
+              {{ statusLabels[status] }}
+            </button>
+          }
+        </div>
+      </fieldset>
+
+      <div>
+        <label for="bus-status-reason" class="block text-sm font-semibold text-brand-navy mb-1">
+          Motivo <span class="font-normal text-gray-400">(opcional)</span>
+        </label>
+        <textarea
+          id="bus-status-reason"
+          rows="2"
+          [maxLength]="maxReasonLength"
+          [value]="reason()"
+          (input)="reason.set($any($event.target).value)"
+          placeholder="Ej. Cambio de frenos programado"
+          class="w-full resize-none rounded-lg border-2 border-gray-200 px-4 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+        ></textarea>
+      </div>
+
+      <div class="flex justify-center gap-2">
+        <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="!selected() || isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60">
+          {{ isSubmitting() ? 'Guardando...' : 'Confirmar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

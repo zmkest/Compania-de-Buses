@@ -3,7 +3,7 @@ import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Bus } from '../shared/models/Buses';
-import { BusResponse, CreateBusDto, UpdateBusDto } from '../shared/models/bus.dto';
+import { BusResponse, CreateBusDto, UpdateBusDto, UpdateBusStatusDto } from '../shared/models/bus.dto';
 import { EBusStatus } from '../shared/enums/bus.enum';
 import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { PaginatedResponse } from '../core/interfaces/paginated';
@@ -54,6 +54,10 @@ export class BusesService {
 
   update(id: number, data: UpdateBusDto): Observable<BusResponse> {
     return this.http.patch<BusResponse>(`${this.apiUrl}/${id}`, data, { context: this.context });
+  }
+
+  updateStatus(id: number, data: UpdateBusStatusDto): Observable<unknown> {
+    return this.http.patch(`${this.apiUrl}/${id}/status-history`, data, { context: this.context });
   }
 
   delete(id: number): Observable<BusResponse> {

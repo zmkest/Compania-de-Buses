@@ -39,7 +39,7 @@
       <table class="w-full text-sm text-left">
         <thead class="bg-brand-navy text-white">
           <tr>
-            <th class="px-5 py-3 font-semibold">ID</th>
+            <th class="px-2 py-3 font-semibold">ID</th>
             <th class="px-5 py-3 font-semibold">Bus</th>
             <th class="px-5 py-3 font-semibold">Año</th>
             <th class="px-5 py-3 font-semibold">Kilometraje</th>
@@ -70,7 +70,7 @@
           } @else {
           @for (bus of buses(); track bus.id) {
             <tr class="hover:bg-gray-50 transition" [class.opacity-60]="bus.status === 'OUT_OF_SERVICE'">
-              <td class="px-5 py-3 text-gray-500">#{{ bus.id }}</td>
+              <td class="px-2 py-3 text-gray-500">#{{ bus.id }}</td>
               <td class="px-5 py-3">
                 <div class="flex items-center gap-3">
                   <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-mint text-brand-navy">
@@ -104,6 +104,17 @@
                   >
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                       <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="statusBus.set(bus)"
+                    class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
+                    [attr.aria-label]="'Cambiar estado del bus ' + bus.plate"
+                    title="Cambiar estado"
+                  >
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                   </button>
                   <button
@@ -184,6 +195,14 @@
     (created)="onCreated()"
     (updated)="onUpdated($event)"
     (cancelled)="closeForm()"
+  />
+}
+
+@if (statusBus(); as bus) {
+  <app-bus-status-dialog
+    [bus]="bus"
+    (changed)="onStatusChanged($event)"
+    (cancelled)="statusBus.set(null)"
   />
 }
 
