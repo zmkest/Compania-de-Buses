@@ -81,7 +81,7 @@ export class BusStatusDialogComponent {
     readonly isOpeningMaintenance = computed(() => this.selected() === EBusStatus.MAINTENANCE);
 
     readonly isClosingMaintenance = computed(
-        () => this.bus().status === EBusStatus.MAINTENANCE && this.selected() === EBusStatus.AVAILABLE,
+        () => this.bus().status === EBusStatus.MAINTENANCE && (this.selected() === EBusStatus.AVAILABLE || this.selected() === EBusStatus.OUT_OF_SERVICE),
     );
 
     readonly isCostInvalid = computed(() => {
