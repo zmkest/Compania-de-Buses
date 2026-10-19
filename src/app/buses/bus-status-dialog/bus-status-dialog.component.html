@@ -1,6 +1,6 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cancelled.emit()">
   <div
-    class="w-full max-w-md bg-white rounded-2xl shadow-2xl"
+    class="w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl"
     role="dialog"
     aria-modal="true"
     aria-labelledby="bus-status-title"
@@ -71,12 +71,18 @@
 
       <div>
         <label for="bus-status-reason" class="block text-sm font-semibold text-brand-navy mb-1">
-          Motivo <span class="font-normal text-gray-400">(opcional)</span>
+          Motivo
+          @if (isReasonRequired()) {
+            <span class="text-red-500">*</span>
+          } @else {
+            <span class="font-normal text-gray-400">(opcional)</span>
+          }
         </label>
         <textarea
           id="bus-status-reason"
           rows="2"
-          [maxLength]="maxReasonLength"
+          [required]="isReasonRequired()"
+          [maxLength]="maxTextLength"
           [value]="reason()"
           (input)="reason.set($any($event.target).value)"
           placeholder="Ej. Cambio de frenos programado"
@@ -84,11 +90,120 @@
         ></textarea>
       </div>
 
+      @if (isOpeningMaintenance()) {
+        <fieldset class="space-y-4 rounded-xl border border-amber-200 bg-amber-50/40 p-4">
+          <legend class="px-1 text-sm font-semibold text-amber-700">Registro de mantenimiento</legend>
+
+          <div>
+            <span class="block text-sm font-semibold text-brand-navy mb-1">Tipo <span class="text-red-500">*</span></span>
+            <div class="grid grid-cols-2 gap-2">
+              @for (type of maintenanceTypes; track type) {
+                <button
+                  type="button"
+                  (click)="maintenanceType.set(type)"
+                  [attr.aria-pressed]="maintenanceType() === type"
+                  class="rounded-lg border-2 px-3 py-2 text-sm font-semibold transition"
+                  [class]="maintenanceType() === type ? 'border-amber-400 bg-amber-500 text-white' : 'border-amber-400 bg-white text-amber-700'"
+                >
+                  {{ maintenanceTypeLabels[type] }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div>
+            <label for="maintenance-started-at" class="block text-sm font-semibold text-brand-navy mb-1">
+              Fecha de inicio <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="maintenance-started-at"
+              type="datetime-local"
+              required
+              [value]="startedAt()"
+              (input)="startedAt.set($any($event.target).value)"
+              class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            />
+          </div>
+
+          <div>
+            <label for="maintenance-description" class="block text-sm font-semibold text-brand-navy mb-1">
+              Descripción <span class="font-normal text-gray-400">(opcional)</span>
+            </label>
+            <textarea
+              id="maintenance-description"
+              rows="2"
+              [maxLength]="maxTextLength"
+              [value]="description()"
+              (input)="description.set($any($event.target).value)"
+              placeholder="Ej. Revisión de los 50 000 km"
+              class="w-full resize-none rounded-lg border-2 border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            ></textarea>
+          </div>
+        </fieldset>
+      }
+
+      @if (isClosingMaintenance()) {
+        <fieldset class="space-y-4 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+          <legend class="px-1 text-sm font-semibold text-emerald-700">Cierre de mantenimiento</legend>
+
+          <div>
+            <label for="maintenance-finished-at" class="block text-sm font-semibold text-brand-navy mb-1">
+              Fecha de finalización <span class="font-normal text-gray-400">(opcional)</span>
+            </label>
+            <input
+              id="maintenance-finished-at"
+              type="datetime-local"
+              [value]="finishedAt()"
+              (input)="finishedAt.set($any($event.target).value)"
+              class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            />
+          </div>
+
+          <div>
+            <label for="maintenance-cost" class="block text-sm font-semibold text-brand-navy mb-1">
+              Costo <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="maintenance-cost"
+              type="number"
+              required
+              min="0"
+              step="0.01"
+              inputmode="decimal"
+              [value]="cost()"
+              (input)="cost.set($any($event.target).value)"
+              placeholder="0.00"
+              [attr.aria-invalid]="isCostInvalid()"
+              class="w-full rounded-lg border-2 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 transition"
+              [class]="isCostInvalid() ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-brand-blue focus:ring-brand-blue/20'"
+            />
+            @if (isCostInvalid()) {
+              <p class="text-xs text-red-500 mt-1 mb-0">Ingresa un monto positivo con máximo 2 decimales.</p>
+            }
+          </div>
+
+          <div>
+            <label for="maintenance-close-description" class="block text-sm font-semibold text-brand-navy mb-1">
+              Descripción <span class="font-normal text-gray-400">(opcional)</span>
+            </label>
+            <textarea
+              id="maintenance-close-description"
+              rows="2"
+              [maxLength]="maxTextLength"
+              [value]="description()"
+              (input)="description.set($any($event.target).value)"
+              placeholder="Ej. Se reemplazaron pastillas de freno"
+              class="w-full resize-none rounded-lg border-2 border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            ></textarea>
+          </div>
+        </fieldset>
+      }
+
       <div class="flex justify-center gap-2">
         <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
           Cancelar
         </button>
-        <button type="submit" [disabled]="!selected() || isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60">
+        <button type="submit" [disabled]="!canSubmit()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60">
           {{ isSubmitting() ? 'Guardando...' : 'Confirmar' }}
         </button>
       </div>

@@ -26,3 +26,13 @@ export const BUS_STATUS_TRANSITIONS: Record<EBusStatus, readonly EBusStatus[]> =
     [EBusStatus.OUT_OF_SERVICE]: [EBusStatus.AVAILABLE],
     [EBusStatus.MAINTENANCE]: [EBusStatus.AVAILABLE],
 };
+
+export enum EMaintenanceType {
+    PREVENTIVE = 'PREVENTIVE',
+    CORRECTIVE = 'CORRECTIVE'
+}
+
+export const MAINTENANCE_TYPE_LABELS: Record<EMaintenanceType, string> = {
+    [EMaintenanceType.PREVENTIVE]: 'Preventivo',
+    [EMaintenanceType.CORRECTIVE]: 'Correctivo',
+};

@@ -1,4 +1,4 @@
-import { EBusStatus } from '../enums/bus.enum';
+import { EBusStatus, EMaintenanceType } from '../enums/bus.enum';
 
 export interface BusResponse {
     id: number;
@@ -35,4 +35,12 @@ export interface BusStatusHistoryResponse {
 export interface UpdateBusStatusDto {
     status: EBusStatus;
     reason?: string;
+    // Apertura de mantenimiento
+    type?: EMaintenanceType;
+    startedAt?: string;
+    // Apertura o cierre de mantenimiento
+    description?: string;
+    // Cierre de mantenimiento
+    cost?: number;
+    finishedAt?: string;
 }
