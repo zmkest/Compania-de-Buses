@@ -44,6 +44,9 @@
         @if (form.controls.password.invalid && form.controls.password.touched) {
           <p class="text-xs text-red-600 mt-1">Ingresa tu contraseña.</p>
         }
+        <div class="text-right mt-1">
+          <a routerLink="/forgot-password" class="text-xs text-brand-blue font-semibold hover:underline">¿Olvidaste tu contraseña?</a>
+        </div>
       </div>
 
       <button

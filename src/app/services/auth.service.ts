@@ -12,6 +12,10 @@ interface AuthResponse {
     user: User;
 }
 
+interface MessageResponse {
+    message: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -51,6 +55,12 @@ export class AuthService {
                     return throwError(error);
                 }),
             );
+    }
+
+    forgotPassword(email: string): Observable<MessageResponse> {
+        return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { email }, {
+            context: new HttpContext().set(SILENT_ERRORS, true),
+        });
     }
 
     refreshToken(): Observable<string> {
