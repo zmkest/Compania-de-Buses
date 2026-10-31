@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard, roleGuard } from './auth/auth.guard';
+import { authGuard, guestGuard, resetTokenGuard, roleGuard } from './auth/auth.guard';
 import { EUserRole } from './shared/enums/user.enum';
 
 export const routes: Routes = [
@@ -17,6 +17,11 @@ export const routes: Routes = [
     path: 'forgot-password',
     loadComponent: () => import('./auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
     canActivate: [guestGuard],
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
+    canActivate: [guestGuard, resetTokenGuard],
   },
   {
     path: '',

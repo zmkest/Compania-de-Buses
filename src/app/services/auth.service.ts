@@ -63,6 +63,18 @@ export class AuthService {
         });
     }
 
+    verifyResetToken(token: string): Observable<boolean> {
+        return this.http.post<{ valid: boolean }>(`${this.apiUrl}/reset-password/verify`, { token }, {
+            context: new HttpContext().set(SILENT_ERRORS, true),
+        }).pipe(map(({ valid }) => valid));
+    }
+
+    resetPassword(token: string, newPwd: string, repitNewPwd: string): Observable<MessageResponse> {
+        return this.http.post<MessageResponse>(`${this.apiUrl}/reset-password`, { token, newPwd, repitNewPwd }, {
+            context: new HttpContext().set(SILENT_ERRORS, true),
+        });
+    }
+
     refreshToken(): Observable<string> {
         this.refreshInFlight ??= this.http.post<Omit<AuthResponse, 'user'>>(
             `${this.apiUrl}/refresh`, {},
