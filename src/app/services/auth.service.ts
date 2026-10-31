@@ -79,6 +79,12 @@ export class AuthService {
         });
     }
 
+    changePassword(pwd: string, newPwd: string, repitNewPwd: string): Observable<MessageResponse> {
+        return this.http.patch<MessageResponse>(`${this.apiUrl}/password/change`, { pwd, newPwd, repitNewPwd }, {
+            context: new HttpContext().set(SILENT_ERRORS, true),
+        });
+    }
+
     refreshToken(): Observable<string> {
         this.refreshInFlight ??= this.http.post<Omit<AuthResponse, 'user'>>(
             `${this.apiUrl}/refresh`, {},

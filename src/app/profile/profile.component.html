@@ -54,16 +54,23 @@
       </dl>
     </div>
 
-    <!-- Acciones visibles pero aún sin implementar. -->
     <div class="flex flex-wrap gap-3">
+      <!-- Aún sin implementar. -->
       <button type="button" disabled title="Próximamente"
         class="bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
         Editar datos
       </button>
-      <button type="button" disabled title="Próximamente"
-        class="border-2 border-brand-navy text-brand-navy font-semibold px-5 py-2 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
+      <button type="button" (click)="isChangingPassword.set(true)"
+        class="border-2 border-brand-navy text-brand-navy font-semibold px-5 py-2 rounded-lg hover:bg-brand-mint transition">
         Cambiar contraseña
       </button>
     </div>
   }
 </section>
+
+@if (isChangingPassword()) {
+  <app-change-password-dialog
+    (changed)="isChangingPassword.set(false)"
+    (cancelled)="isChangingPassword.set(false)"
+  />
+}

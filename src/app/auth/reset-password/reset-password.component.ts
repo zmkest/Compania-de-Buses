@@ -1,14 +1,9 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AppError } from '../../core/errors/app-error';
-
-function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
-    const newPwd = control.get('newPwd')?.value;
-    const repitNewPwd = control.get('repitNewPwd')?.value;
-    return newPwd === repitNewPwd ? null : { passwordMismatch: true };
-}
+import { newPasswordMatchValidator } from '../../shared/validators/new-password-match.validator';
 
 @Component({
     selector: 'app-reset-password',
@@ -25,7 +20,7 @@ export class ResetPasswordComponent {
     readonly form = this.formBuilder.nonNullable.group({
         newPwd: ['', [Validators.required, Validators.minLength(8)]],
         repitNewPwd: ['', [Validators.required]],
-    }, { validators: passwordsMatchValidator });
+    }, { validators: newPasswordMatchValidator });
 
     readonly errorMessage = signal('');
     readonly successMessage = signal('');
