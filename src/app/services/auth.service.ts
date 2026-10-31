@@ -57,6 +57,10 @@ export class AuthService {
             );
     }
 
+    getProfile(): Observable<User> {
+        return this.http.get<User>(`${this.apiUrl}/me`);
+    }
+
     forgotPassword(email: string): Observable<MessageResponse> {
         return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { email }, {
             context: new HttpContext().set(SILENT_ERRORS, true),

@@ -47,6 +47,7 @@ export const routes: Routes = [
       { path: 'choferes', loadComponent: () => import('./chofer/principal/principal.component').then(m => m.PrincipalComponent) },
       { path: 'tripulacion', loadComponent: () => import('./tripulacion/principal/principal.component').then(m => m.PrincipalComponent) },
       { path: 'consultas', loadComponent: () => import('./consultas/consultas.component').then(m => m.ConsultasComponent) },
+      { path: 'profile', loadComponent: () => import('./profile/profile.component').then(m => m.ProfileComponent) },
       {
         path: 'usuarios',
         loadComponent: () => import('./users/user-admin/user-admin.component').then(m => m.UserAdminComponent),

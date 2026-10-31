@@ -1,0 +1,21 @@
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { DatePipe } from '@angular/common';
+import { AuthService } from '../services/auth.service';
+import { USER_ROLE_LABELS } from '../shared/enums/user.enum';
+
+@Component({
+    selector: 'app-profile',
+    templateUrl: './profile.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [DatePipe]
+})
+export class ProfileComponent {
+    private readonly authService = inject(AuthService);
+
+    readonly roleLabels = USER_ROLE_LABELS;
+
+    readonly profileResource = rxResource({
+        stream: () => this.authService.getProfile(),
+    });
+}

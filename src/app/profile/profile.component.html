@@ -1,0 +1,69 @@
+<section class="max-w-3xl mx-auto space-y-6">
+  <header>
+    <p class="text-xs font-semibold uppercase tracking-wider text-brand-blue mb-1">Cuenta</p>
+    <h1 class="font-brand text-4xl text-brand-navy mb-1">Mi perfil</h1>
+    <p class="text-sm text-gray-500 mb-0">Consulta los datos de tu cuenta.</p>
+  </header>
+
+  @if (profileResource.isLoading()) {
+    <div class="py-12 text-center text-gray-500">
+      <div class="inline-flex items-center gap-2">
+        <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+        Cargando perfil...
+      </div>
+    </div>
+  } @else if (profileResource.error()) {
+    <div class="py-12 text-center" role="alert">
+      <p class="font-semibold text-red-600 mb-3">No se pudo cargar tu perfil</p>
+      <button type="button" (click)="profileResource.reload()" class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition">
+        Reintentar
+      </button>
+    </div>
+  } @else if (profileResource.value(); as user) {
+    <div class="bg-white border-2 border-brand-navy rounded-2xl p-6">
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mb-0">
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wider text-gray-500">Nombre</dt>
+          <dd class="text-brand-navy font-semibold mb-0">{{ user.name }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wider text-gray-500">Correo electrónico</dt>
+          <dd class="text-brand-navy font-semibold mb-0 break-all">{{ user.email }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wider text-gray-500">Rol</dt>
+          <dd class="text-brand-navy font-semibold mb-0">{{ roleLabels[user.role] }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wider text-gray-500">Estado</dt>
+          <dd class="mb-0">
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+              [class]="user.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
+              {{ user.isActive ? 'Activo' : 'Inactivo' }}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wider text-gray-500">Miembro desde</dt>
+          <dd class="text-brand-navy font-semibold mb-0">{{ user.createdAt | date: 'dd/MM/yyyy' }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wider text-gray-500">Última actualización</dt>
+          <dd class="text-brand-navy font-semibold mb-0">{{ user.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Acciones visibles pero aún sin implementar. -->
+    <div class="flex flex-wrap gap-3">
+      <button type="button" disabled title="Próximamente"
+        class="bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
+        Editar datos
+      </button>
+      <button type="button" disabled title="Próximamente"
+        class="border-2 border-brand-navy text-brand-navy font-semibold px-5 py-2 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
+        Cambiar contraseña
+      </button>
+    </div>
+  }
+</section>

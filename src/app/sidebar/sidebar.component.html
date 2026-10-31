@@ -60,7 +60,8 @@
     <hr class="my-4 border-white/25">
     <div>
         @if (currentUser(); as user) {
-        <p class="hidden md:block text-white/50 text-sm mb-2 truncate">{{ user.name }}</p>
+        <a routerLink="/profile" title="Mi perfil"
+            class="hidden md:block text-white/50 text-sm mb-2 truncate no-underline hover:text-white hover:underline transition">{{ user.name }}</a>
         }
         <button type="button" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión"
             class="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-white/80 px-3 py-1.5 font-bold text-white hover:bg-white hover:text-brand-navy transition">
