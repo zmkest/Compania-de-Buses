@@ -42,6 +42,7 @@ export const routes: Routes = [
               { path: 'historial', loadComponent: () => import('./buses/bus-status-history/bus-status-history.component').then(m => m.BusStatusHistoryComponent) },
             ],
           },
+          { path: 'mantenimientos', loadComponent: () => import('./maintenances/maintenance-admin/maintenance-admin.component').then(m => m.MaintenanceAdminComponent) },
         ],
       },
       { path: 'choferes', loadComponent: () => import('./chofer/principal/principal.component').then(m => m.PrincipalComponent) },

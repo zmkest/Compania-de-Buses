@@ -36,3 +36,26 @@ export const MAINTENANCE_TYPE_LABELS: Record<EMaintenanceType, string> = {
     [EMaintenanceType.PREVENTIVE]: 'Preventivo',
     [EMaintenanceType.CORRECTIVE]: 'Correctivo',
 };
+
+export const MAINTENANCE_TYPE_TEXT_CLASSES: Record<EMaintenanceType, string> = {
+    [EMaintenanceType.PREVENTIVE]: 'text-sky-700',
+    [EMaintenanceType.CORRECTIVE]: 'text-orange-600',
+};
+
+export enum EMaintenanceStatus {
+    IN_PROGRESS = 'IN_PROGRESS',
+    COMPLETED = 'COMPLETED',
+    CANCELLED = 'CANCELLED'
+}
+
+export const MAINTENANCE_STATUS_LABELS: Record<EMaintenanceStatus, string> = {
+    [EMaintenanceStatus.IN_PROGRESS]: 'En curso',
+    [EMaintenanceStatus.COMPLETED]: 'Completado',
+    [EMaintenanceStatus.CANCELLED]: 'Cancelado',
+};
+
+export const MAINTENANCE_STATUS_TEXT_CLASSES: Record<EMaintenanceStatus, string> = {
+    [EMaintenanceStatus.IN_PROGRESS]: 'text-amber-600',
+    [EMaintenanceStatus.COMPLETED]: 'text-emerald-600',
+    [EMaintenanceStatus.CANCELLED]: 'text-gray-500',
+};

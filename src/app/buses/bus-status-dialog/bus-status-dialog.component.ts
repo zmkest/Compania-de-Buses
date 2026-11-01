@@ -4,6 +4,7 @@ import { BusResponse, UpdateBusStatusDto } from '../../shared/models/bus.dto';
 import { BusesService } from '../../services/buses.service';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { AppError } from '../../core/errors/app-error';
+import { toDateTimeLocal } from '../../shared/utils/date-util';
 
 const MAX_TEXT_LENGTH = 255;
 
@@ -32,12 +33,6 @@ const STATUS_STYLES: Record<EBusStatus, { soft: string; selected: string, unsele
         unselected: 'border-red-500 text-red-700',
     },
 };
-
-// Formato que espera <input type="datetime-local"> (hora local, sin segundos).
-function toDateTimeLocal(date: Date): string {
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
 
 @Component({
     selector: 'app-bus-status-dialog',

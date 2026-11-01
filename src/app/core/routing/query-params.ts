@@ -15,3 +15,8 @@ export function toOneOf<T extends string>(allowed: readonly T[]) {
 export function toSearch(value: string | undefined): string {
     return value?.trim() ?? '';
 }
+
+// Fecha en formato YYYY-MM-DD (el que usan <input type="date"> y la API); cualquier otro valor se descarta.
+export function toDate(value: string | undefined): string | null {
+    return value && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value)) ? value : null;
+}

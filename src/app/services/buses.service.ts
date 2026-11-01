@@ -22,7 +22,7 @@ export interface BusStatusHistoryQuery extends BusQuery {
 }
 
 // Cuántos cambios llevaron a cada estado.
-export type BusStatusHistoryStats = { total: number | null } & Record<EBusStatus, number | null>;
+export type BusStatusHistoryStats = { total: number } & Record<EBusStatus, number>;
 
 @Injectable({
   providedIn: 'root'
@@ -72,20 +72,7 @@ export class BusesService {
   }
 
   getStatusHistoryStats(): Observable<BusStatusHistoryStats> {
-    return forkJoin({
-      total: this.countStatusHistory({}),
-      [EBusStatus.AVAILABLE]: this.countStatusHistory({ toStatus: EBusStatus.AVAILABLE }),
-      [EBusStatus.ON_ROUTE]: this.countStatusHistory({ toStatus: EBusStatus.ON_ROUTE }),
-      [EBusStatus.MAINTENANCE]: this.countStatusHistory({ toStatus: EBusStatus.MAINTENANCE }),
-      [EBusStatus.OUT_OF_SERVICE]: this.countStatusHistory({ toStatus: EBusStatus.OUT_OF_SERVICE }),
-    });
-  }
-
-  private countStatusHistory(filters: Pick<BusStatusHistoryQuery, 'toStatus'>): Observable<number | null> {
-    return this.getStatusHistory({ page: 1, limit: 1, ...filters }).pipe(
-      map(response => response.meta.total),
-      catchError(() => of(null)),
-    );
+    return this.http.get<BusStatusHistoryStats>(`${this.apiUrlStatusH}/count/to-status`, { context: this.context });
   }
 
   create(data: CreateBusDto): Observable<BusResponse> {
@@ -97,7 +84,7 @@ export class BusesService {
   }
 
   updateStatus(id: number, data: UpdateBusStatusDto): Observable<unknown> {
-    return this.http.patch(`${this.apiUrl}/${id}/status-history`, data, { context: this.context });
+    return this.http.patch(`${this.apiUrl}/${id}/status`, data, { context: this.context });
   }
 
   delete(id: number): Observable<BusResponse> {

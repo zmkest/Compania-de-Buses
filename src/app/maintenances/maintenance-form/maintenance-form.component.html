@@ -1,0 +1,127 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cancelled.emit()">
+  <div
+    class="w-full max-w-lg bg-white rounded-2xl shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="maintenance-form-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="maintenance-form-title" class="font-brand text-2xl text-brand-navy mb-0">Editar mantenimiento</h2>
+        <p class="text-xs text-gray-500 mt-1 mb-0">
+          ID #{{ maintenance().id }} · {{ maintenance().busPlate ?? 'Bus #' + maintenance().busId }}
+          · registrado el {{ maintenance().createdAt | date:'dd/MM/yyyy' }}
+        </p>
+      </div>
+      <button type="button" (click)="cancelled.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="px-6 py-3 space-y-4">
+      @if (errorMessages().length) {
+        <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
+          @if (errorMessages().length === 1) {
+            {{ errorMessages()[0] }}
+          } @else {
+            <ul class="list-disc pl-4 mb-0">
+              @for (message of errorMessages(); track $index) {
+                <li>{{ message }}</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="maintenance-type" class="block text-sm font-semibold text-brand-navy mb-1">Tipo</label>
+          <select
+            id="maintenance-type"
+            formControlName="type"
+            class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          >
+            @for (type of types; track type) {
+              <option [value]="type">{{ typeLabels[type] }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label for="maintenance-cost" class="block text-sm font-semibold text-brand-navy mb-1">
+            Costo <span class="font-normal text-gray-400">(opcional)</span>
+          </label>
+          <div class="relative">
+            <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">$</span>
+            <input
+              id="maintenance-cost"
+              type="number"
+              formControlName="cost"
+              min="0"
+              step="0.01"
+              inputmode="decimal"
+              placeholder="0.00"
+              class="w-full rounded-lg border-2 border-gray-200 pl-8 pr-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            >
+          </div>
+          @if (form.controls.cost.invalid && form.controls.cost.touched) {
+            <p class="text-xs text-red-600 mt-1 mb-0">Ingresa un monto positivo con máximo 2 decimales.</p>
+          }
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="maintenance-started-at" class="block text-sm font-semibold text-brand-navy mb-1">Inicio</label>
+          <input
+            id="maintenance-started-at"
+            type="datetime-local"
+            formControlName="startedAt"
+            [max]="maxStartedAt"
+            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          >
+          @if (form.controls.startedAt.invalid && form.controls.startedAt.touched) {
+            <p class="text-xs text-red-600 mt-1 mb-0">
+              @if (form.controls.startedAt.errors?.['required']) {
+                Ingresa la fecha de inicio.
+              } @else if (form.controls.startedAt.errors?.['future']) {
+                La fecha de inicio no puede ser futura.
+              } @else {
+                La fecha de inicio no puede ser posterior al fin ({{ maintenance().finishedAt | date:'dd/MM/yyyy HH:mm' }}).
+              }
+            </p>
+          }
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="maintenance-description" class="block text-sm font-semibold text-brand-navy mb-1">
+            Descripción <span class="font-normal text-gray-400">(opcional)</span>
+          </label>
+          <textarea
+            id="maintenance-description"
+            rows="3"
+            formControlName="description"
+            [maxLength]="maxTextLength"
+            placeholder="Trabajos realizados, repuestos, observaciones..."
+            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          ></textarea>
+          <p class="text-xs text-gray-400 text-right mt-1 mb-0">{{ form.controls.description.value.length }}/{{ maxTextLength }}</p>
+        </div>
+      </div>
+
+      <div class="flex justify-center gap-2 pt-2">
+        <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-wait disabled:opacity-60">
+          @if (isSubmitting()) {
+            Guardando...
+          } @else {
+            Guardar cambios
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

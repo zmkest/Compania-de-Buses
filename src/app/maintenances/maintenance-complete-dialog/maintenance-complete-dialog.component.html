@@ -1,0 +1,72 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cancelled.emit()">
+  <div
+    class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="maintenance-complete-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="text-center">
+      <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="m5 12 5 5L20 7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <h2 id="maintenance-complete-title" class="font-brand text-2xl text-brand-navy mb-2">Completar mantenimiento</h2>
+      <p class="text-sm text-gray-500 mb-4">
+        Mantenimiento {{ typeLabels[maintenance().type].toLowerCase() }} #{{ maintenance().id }} del bus
+        <span class="font-semibold text-gray-700">{{ maintenance().busPlate ?? '#' + maintenance().busId }}</span>,
+        iniciado el {{ maintenance().startedAt | date:'dd/MM/yyyy HH:mm' }}. El bus quedará disponible.
+      </p>
+    </div>
+
+    @if (errorMessages().length) {
+      <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2 mb-4" role="alert">
+        @if (errorMessages().length === 1) {
+          {{ errorMessages()[0] }}
+        } @else {
+          <ul class="list-disc pl-4 mb-0">
+            @for (message of errorMessages(); track $index) {
+              <li>{{ message }}</li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <div class="mb-6">
+      <label for="maintenance-finished-at" class="block text-sm font-semibold text-brand-navy mb-1">
+        Fecha de finalización <span class="text-red-500">*</span>
+      </label>
+      <input
+        id="maintenance-finished-at"
+        type="datetime-local"
+        required
+        [value]="finishedAt()"
+        [min]="minFinishedAt()"
+        [max]="maxFinishedAt"
+        (input)="finishedAt.set($any($event.target).value)"
+        [attr.aria-invalid]="!!finishedAtError()"
+        class="w-full rounded-lg border-2 px-4 py-2 text-sm focus:outline-none focus:ring-4 transition"
+        [class]="finishedAtError() ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-brand-blue focus:ring-brand-blue/20'"
+      >
+      @if (finishedAtError(); as error) {
+        <p class="text-xs text-red-600 mt-1 mb-0">{{ error }}</p>
+      }
+    </div>
+
+    <div class="flex justify-center gap-2">
+      <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+        Volver
+      </button>
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="!!finishedAtError() || isSubmitting()"
+        class="w-full bg-emerald-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-emerald-700 transition disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{ isSubmitting() ? 'Completando...' : 'Completar' }}
+      </button>
+    </div>
+  </div>
+</div>
