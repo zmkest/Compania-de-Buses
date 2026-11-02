@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, inject, input, output, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, input, output, signal, OnInit } from '@angular/core';
 import { BUS_STATUS_LABELS, BUS_STATUS_TRANSITIONS, EBusStatus, EMaintenanceType, MAINTENANCE_TYPE_LABELS } from '../../shared/enums/bus.enum';
 import { BusResponse, UpdateBusStatusDto } from '../../shared/models/bus.dto';
 import { BusesService } from '../../services/buses.service';
@@ -39,7 +39,7 @@ const STATUS_STYLES: Record<EBusStatus, { soft: string; selected: string, unsele
     templateUrl: './bus-status-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
 })
-export class BusStatusDialogComponent {
+export class BusStatusDialogComponent implements OnInit {
     private readonly busesService = inject(BusesService);
     private readonly notification = inject(NotificationService);
 
@@ -64,7 +64,6 @@ export class BusStatusDialogComponent {
     // Datos del registro de mantenimiento
     readonly maintenanceType = signal<EMaintenanceType | null>(null);
     readonly startedAt = signal(toDateTimeLocal(new Date()));
-    readonly finishedAt = signal(toDateTimeLocal(new Date()));
     readonly description = signal('');
     readonly cost = signal('');
 
@@ -74,10 +73,6 @@ export class BusStatusDialogComponent {
     });
 
     readonly isOpeningMaintenance = computed(() => this.selected() === EBusStatus.MAINTENANCE);
-
-    readonly isClosingMaintenance = computed(
-        () => this.bus().status === EBusStatus.MAINTENANCE && (this.selected() === EBusStatus.AVAILABLE || this.selected() === EBusStatus.OUT_OF_SERVICE),
-    );
 
     readonly isCostInvalid = computed(() => {
         const value = this.cost().trim();
@@ -94,8 +89,16 @@ export class BusStatusDialogComponent {
         if (this.isOpeningMaintenance() && (!this.maintenanceType() || !this.startedAt())) {
             return false;
         }
-        return !(this.isClosingMaintenance() && (!this.cost().trim() || this.isCostInvalid()));
+        return true;
     });
+
+    ngOnInit() {
+        const status = this.bus().status;
+        if (status === EBusStatus.MAINTENANCE) {
+            this.notification.error('El bus ya está en mantenimiento. Debe cerrarlo antes de cambiar a otro estado.');
+            this.cancelled.emit();
+        }
+    }
 
     submit(): void {
         const status = this.selected();
@@ -136,16 +139,6 @@ export class BusStatusDialogComponent {
             payload.startedAt = new Date(this.startedAt()).toISOString();
             if (description) {
                 payload.description = description;
-            }
-        }
-
-        if (this.isClosingMaintenance()) {
-            payload.cost = Number(this.cost().trim());
-            if (description) {
-                payload.description = description;
-            }
-            if (this.finishedAt()) {
-                payload.finishedAt = new Date(this.finishedAt()).toISOString();
             }
         }
 
