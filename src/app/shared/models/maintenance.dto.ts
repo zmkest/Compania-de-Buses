@@ -3,7 +3,7 @@ import { EMaintenanceStatus, EMaintenanceType } from '../enums/bus.enum';
 export interface MaintenanceResponse {
     id: number;
     busId: number;
-    // Solo lo trae el listado; el reporte de costos y las respuestas de los PATCH no lo incluyen.
+    // Solo lo trae el listado; el detalle, el reporte de costos y las respuestas de los PATCH no lo incluyen.
     busPlate?: string | null;
     type: EMaintenanceType;
     status: EMaintenanceStatus;

@@ -46,6 +46,10 @@ export class MaintenancesService {
     return this.http.get<PaginatedResponse<MaintenanceResponse>>(this.apiUrl, { params, context: this.context });
   }
 
+  getById(id: number): Observable<MaintenanceResponse> {
+    return this.http.get<MaintenanceResponse>(`${this.apiUrl}/${id}`, { context: this.context });
+  }
+
   getStatusStats(): Observable<MaintenanceStatusStats> {
     return this.http.get<MaintenanceStatusStats>(`${this.apiUrl}/count/status`, { context: this.context });
   }

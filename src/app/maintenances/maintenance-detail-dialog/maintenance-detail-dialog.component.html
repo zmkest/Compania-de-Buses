@@ -1,0 +1,88 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="closed.emit()">
+  <div
+    class="w-full max-w-lg bg-white rounded-2xl shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="maintenance-detail-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="maintenance-detail-title" class="font-brand text-2xl text-brand-navy mb-0">Mantenimiento #{{ maintenanceId() }}</h2>
+        <p class="text-xs text-gray-500 mt-1 mb-0">Bus {{ busPlate() }}</p>
+      </div>
+      <button type="button" (click)="closed.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="px-6 py-4">
+      @if (maintenanceResource.isLoading()) {
+        <div class="py-8 text-center text-gray-500">
+          <div class="inline-flex items-center gap-2">
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+            Cargando mantenimiento...
+          </div>
+        </div>
+      } @else if (maintenanceResource.error()) {
+        <div class="py-8 text-center" role="alert">
+          <p class="font-semibold text-red-600 mb-3">No se pudo cargar el mantenimiento</p>
+          <button
+            type="button"
+            (click)="maintenanceResource.reload()"
+            class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition"
+          >
+            Reintentar
+          </button>
+        </div>
+      } @else if (maintenance(); as data) {
+        <dl class="grid grid-cols-2 gap-4 text-sm mb-0">
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Tipo</dt>
+            <dd class="font-semibold mb-0" [class]="typeTextClasses[data.type]">{{ typeLabels[data.type] }}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Estado</dt>
+            <dd class="font-semibold mb-0" [class]="statusTextClasses[data.status]">{{ statusLabels[data.status] }}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Inicio</dt>
+            <dd class="text-gray-700 mb-0">{{ data.startedAt | date: "dd/MM/yyyy HH:mm" }}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Fin</dt>
+            <dd class="text-gray-700 mb-0">
+              @if (data.finishedAt) {
+                {{ data.finishedAt | date: "dd/MM/yyyy HH:mm" }}
+              } @else {
+                <span class="text-gray-400">—</span>
+              }
+            </dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Costo</dt>
+            <dd class="text-gray-700 mb-0">
+              @if (data.cost !== null) {
+                {{ data.cost | currency: "USD" }}
+              } @else {
+                <span class="text-gray-400">Sin registrar</span>
+              }
+            </dd>
+          </div>
+          <div class="col-span-2">
+            <dt class="font-semibold text-brand-navy mb-1">Descripción</dt>
+            <dd class="text-gray-700 break-words mb-0">
+              @if (data.description) {
+                {{ data.description }}
+              } @else {
+                <span class="text-gray-400">Sin descripción</span>
+              }
+            </dd>
+          </div>
+        </dl>
+      }
+    </div>
+  </div>
+</div>

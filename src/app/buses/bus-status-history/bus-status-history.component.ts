@@ -1,10 +1,11 @@
-import { Component, ChangeDetectionStrategy, computed, effect, inject, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { BUS_STATUS_BADGE_CLASSES, BUS_STATUS_LABELS, EBusStatus } from '../../shared/enums/bus.enum';
 import { BusesService } from '../../services/buses.service';
 import { BusSearchComponent } from '../bus-search/bus-search.component';
+import { MaintenanceDetailDialogComponent } from '../../maintenances/maintenance-detail-dialog/maintenance-detail-dialog.component';
 import { toOneOf, toPage, toSearch } from '../../core/routing/query-params';
 
 const PAGE_SIZE = 10;
@@ -35,7 +36,7 @@ const FILTER_CLASSES: Record<EBusStatus, string> = {
     selector: 'app-bus-status-history',
     templateUrl: './bus-status-history.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, BusSearchComponent]
+    imports: [DatePipe, BusSearchComponent, MaintenanceDetailDialogComponent]
 })
 export class BusStatusHistoryComponent {
     private readonly busesService = inject(BusesService);
@@ -55,6 +56,8 @@ export class BusStatusHistoryComponent {
     readonly direction = input<StatusDirection, string | undefined>('to', {
         transform: value => toOneOf<StatusDirection>(['from', 'to'])(value) ?? 'to',
     });
+
+    readonly viewingMaintenance = signal<{ id: number; busPlate: string } | null>(null);
 
     readonly historyResource = rxResource({
         params: () => ({
