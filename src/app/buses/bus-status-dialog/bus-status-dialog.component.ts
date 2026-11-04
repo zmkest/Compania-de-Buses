@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, inject, input, output, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, input, output, signal } from '@angular/core';
 import { BUS_STATUS_LABELS, BUS_STATUS_TRANSITIONS, EBusStatus, EMaintenanceType, MAINTENANCE_TYPE_LABELS } from '../../shared/enums/bus.enum';
 import { BusResponse, UpdateBusStatusDto } from '../../shared/models/bus.dto';
 import { BusesService } from '../../services/buses.service';
@@ -39,7 +39,7 @@ const STATUS_STYLES: Record<EBusStatus, { soft: string; selected: string, unsele
     templateUrl: './bus-status-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
 })
-export class BusStatusDialogComponent implements OnInit {
+export class BusStatusDialogComponent {
     private readonly busesService = inject(BusesService);
     private readonly notification = inject(NotificationService);
 
@@ -91,14 +91,6 @@ export class BusStatusDialogComponent implements OnInit {
         }
         return true;
     });
-
-    ngOnInit() {
-        const status = this.bus().status;
-        if (status === EBusStatus.MAINTENANCE) {
-            this.notification.error('El bus ya está en mantenimiento. Debe cerrarlo antes de cambiar a otro estado.');
-            this.cancelled.emit();
-        }
-    }
 
     submit(): void {
         const status = this.selected();

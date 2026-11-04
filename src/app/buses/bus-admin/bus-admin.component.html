@@ -205,11 +205,15 @@
                     </button>
                     <button
                       type="button"
-                      /* [disabled]="bus.status === 'MAINTENANCE'" */
+                      [disabled]="isInMaintenance(bus)"
                       (click)="statusBus.set(bus)"
-                      class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
+                      class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                       [attr.aria-label]="'Cambiar estado del bus ' + bus.plate"
-                      title="Cambiar estado"
+                      [title]="
+                        isInMaintenance(bus)
+                          ? 'Complétalo o cancélalo desde Mantenimiento para cambiar el estado'
+                          : 'Cambiar estado'
+                      "
                     >
                       <svg
                         class="h-5 w-5"

@@ -24,7 +24,8 @@ export const BUS_STATUS_TRANSITIONS: Record<EBusStatus, readonly EBusStatus[]> =
     [EBusStatus.AVAILABLE]: [EBusStatus.ON_ROUTE, EBusStatus.MAINTENANCE, EBusStatus.OUT_OF_SERVICE],
     [EBusStatus.ON_ROUTE]: [EBusStatus.AVAILABLE],
     [EBusStatus.OUT_OF_SERVICE]: [EBusStatus.AVAILABLE, EBusStatus.MAINTENANCE],
-    [EBusStatus.MAINTENANCE]: [EBusStatus.AVAILABLE, EBusStatus.OUT_OF_SERVICE],
+    // Solo se sale de mantenimiento completándolo o cancelándolo: la API rechaza el cambio directo.
+    [EBusStatus.MAINTENANCE]: [],
 };
 
 export enum EMaintenanceType {

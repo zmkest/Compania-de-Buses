@@ -76,6 +76,10 @@ export class BusAdminComponent {
         return bus.status === EBusStatus.ON_ROUTE;
     }
 
+    isInMaintenance(bus: BusResponse): boolean {
+        return bus.status === EBusStatus.MAINTENANCE;
+    }
+
     onSearch(search: string): void {
         if (search === this.search()) {
             return;
