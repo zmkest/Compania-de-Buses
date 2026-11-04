@@ -38,7 +38,5 @@ export interface UpdateBusStatusDto {
     // Apertura de mantenimiento
     type?: EMaintenanceType;
     startedAt?: string;
-    // Apertura o cierre de mantenimiento
     description?: string;
-    cost?: number;
 }

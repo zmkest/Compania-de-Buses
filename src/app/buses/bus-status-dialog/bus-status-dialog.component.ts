@@ -65,7 +65,6 @@ export class BusStatusDialogComponent {
     readonly maintenanceType = signal<EMaintenanceType | null>(null);
     readonly startedAt = signal(toDateTimeLocal(new Date()));
     readonly description = signal('');
-    readonly cost = signal('');
 
     readonly isReasonRequired = computed(() => {
         const status = this.selected();
@@ -73,11 +72,6 @@ export class BusStatusDialogComponent {
     });
 
     readonly isOpeningMaintenance = computed(() => this.selected() === EBusStatus.MAINTENANCE);
-
-    readonly isCostInvalid = computed(() => {
-        const value = this.cost().trim();
-        return value !== '' && !/^\d+(\.\d{1,2})?$/.test(value);
-    });
 
     readonly canSubmit = computed(() => {
         if (!this.selected() || this.isSubmitting()) {

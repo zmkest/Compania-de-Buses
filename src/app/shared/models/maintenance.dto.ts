@@ -3,7 +3,7 @@ import { EMaintenanceStatus, EMaintenanceType } from '../enums/bus.enum';
 export interface MaintenanceResponse {
     id: number;
     busId: number;
-    // Opcional hasta que la API lo incluya; mientras tanto se muestra el busId.
+    // Solo lo trae el listado; el reporte de costos y las respuestas de los PATCH no lo incluyen.
     busPlate?: string | null;
     type: EMaintenanceType;
     status: EMaintenanceStatus;
@@ -31,6 +31,8 @@ export interface CompleteMaintenanceDto {
 }
 
 export type MaintenanceStatusStats = { total: number } & Record<EMaintenanceStatus, number>;
+
+export type MaintenanceTypeStats = { total: number } & Record<EMaintenanceType, number>;
 
 export interface MaintenanceCostReportResponse {
     bus: { id: number; plate: string };

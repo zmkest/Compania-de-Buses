@@ -4,6 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import {
     EMaintenanceStatus,
+    EMaintenanceType,
     MAINTENANCE_STATUS_LABELS,
     MAINTENANCE_STATUS_TEXT_CLASSES,
     MAINTENANCE_TYPE_TEXT_CLASSES,
@@ -27,6 +28,11 @@ const STATUS_CARDS: { status: EMaintenanceStatus; border: string; text: string }
     { status: EMaintenanceStatus.CANCELLED, border: 'border-gray-400', text: 'text-gray-500' },
 ];
 
+const TYPE_CARDS: { type: EMaintenanceType; border: string }[] = [
+    { type: EMaintenanceType.PREVENTIVE, border: 'border-sky-700' },
+    { type: EMaintenanceType.CORRECTIVE, border: 'border-orange-600' },
+];
+
 @Component({
     selector: 'app-maintenance-admin',
     templateUrl: './maintenance-admin.component.html',
@@ -43,6 +49,7 @@ export class MaintenanceAdminComponent {
     readonly statusLabels = MAINTENANCE_STATUS_LABELS;
     readonly statusTextClasses = MAINTENANCE_STATUS_TEXT_CLASSES;
     readonly statusCards = STATUS_CARDS;
+    readonly typeCards = TYPE_CARDS;
 
     // Enlazados a los query params ?page=&search=&startDate=&endDate= (withComponentInputBinding).
     readonly page = input(1, { transform: toPage });
@@ -69,6 +76,10 @@ export class MaintenanceAdminComponent {
         stream: () => this.maintenancesService.getStatusStats(),
     });
 
+    readonly typeStatsResource = rxResource({
+        stream: () => this.maintenancesService.getTypeStats(),
+    });
+
     private readonly maintenancesPage = computed(() => this.maintenancesResource.hasValue() ? this.maintenancesResource.value() : undefined);
 
     readonly maintenances = computed(() => this.maintenancesPage()?.items ?? []);
@@ -76,6 +87,7 @@ export class MaintenanceAdminComponent {
     readonly totalPages = computed(() => this.maintenancesPage()?.meta.totalPages ?? 1);
     readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
     readonly stats = computed(() => this.statsResource.hasValue() ? this.statsResource.value() : undefined);
+    readonly typeStats = computed(() => this.typeStatsResource.hasValue() ? this.typeStatsResource.value() : undefined);
     readonly hasFilters = computed(() => !!this.search() || !!this.startDate() || !!this.endDate());
 
     constructor() {
@@ -119,6 +131,7 @@ export class MaintenanceAdminComponent {
     reload(): void {
         this.maintenancesResource.reload();
         this.statsResource.reload();
+        this.typeStatsResource.reload();
     }
 
     isInProgress(maintenance: MaintenanceResponse): boolean {
@@ -133,6 +146,9 @@ export class MaintenanceAdminComponent {
     onUpdated({ id, changes }: { id: number; changes: Partial<MaintenanceResponse> }): void {
         this.replaceMaintenance(id, changes);
         this.editingMaintenance.set(null);
+        if (changes.type) {
+            this.typeStatsResource.reload();
+        }
     }
 
     onCompleted({ id, finishedAt }: { id: number; finishedAt: Date }): void {
