@@ -1,7 +1,7 @@
-import { Component, ChangeDetectionStrategy, OnInit, inject, input, output, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { EMaintenanceType, MAINTENANCE_TYPE_LABELS } from '../../shared/enums/bus.enum';
+import { EMaintenanceStatus, EMaintenanceType, MAINTENANCE_TYPE_LABELS } from '../../shared/enums/bus.enum';
 import { MaintenanceResponse, UpdateMaintenanceDto } from '../../shared/models/maintenance.dto';
 import { MaintenancesService } from '../../services/maintenances.service';
 import { NotificationService } from '../../core/notifications/notification.service';
@@ -39,6 +39,8 @@ export class MaintenanceFormComponent implements OnInit {
 
     readonly maintenance = input.required<MaintenanceResponse>();
 
+    readonly isFinal = computed(() => this.maintenance().status !== EMaintenanceStatus.IN_PROGRESS);
+
     readonly updated = output<{ id: number; changes: Partial<MaintenanceResponse> }>();
     readonly cancelled = output<void>();
 
@@ -61,6 +63,12 @@ export class MaintenanceFormComponent implements OnInit {
         const maintenance = this.maintenance();
         this.form.patchValue(this.toFormValue(maintenance));
         this.form.controls.startedAt.addValidators(startedAtValidator(maintenance.finishedAt));
+
+        // En un mantenimiento finalizado la API solo acepta costo y descripción.
+        if (this.isFinal()) {
+            this.form.controls.type.disable();
+            this.form.controls.startedAt.disable();
+        }
     }
 
     submit(): void {

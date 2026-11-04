@@ -202,29 +202,31 @@
                 </td>
                 <td class="px-5 py-3">
                   <div class="flex justify-end gap-1">
-                    <button
-                      type="button"
-                      (click)="editingMaintenance.set(maintenance)"
-                      class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
-                      [attr.aria-label]="
-                        'Editar mantenimiento #' + maintenance.id
-                      "
-                      title="Editar"
-                    >
-                      <svg
-                        class="h-5 w-5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        aria-hidden="true"
+                    @if (canEdit(maintenance)) {
+                      <button
+                        type="button"
+                        (click)="editingMaintenance.set(maintenance)"
+                        class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
+                        [attr.aria-label]="
+                          'Editar mantenimiento #' + maintenance.id
+                        "
+                        title="Editar"
                       >
-                        <path
-                          d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                    </button>
+                        <svg
+                          class="h-5 w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    }
                     @if (isInProgress(maintenance)) {
                       <button
                         type="button"

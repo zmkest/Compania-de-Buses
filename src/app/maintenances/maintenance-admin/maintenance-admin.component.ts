@@ -10,7 +10,9 @@ import {
     MAINTENANCE_TYPE_LABELS,
 } from '../../shared/enums/bus.enum';
 import { MaintenanceResponse } from '../../shared/models/maintenance.dto';
+import { EUserRole } from '../../shared/enums/user.enum';
 import { MaintenancesService } from '../../services/maintenances.service';
+import { AuthService } from '../../services/auth.service';
 import { BusSearchComponent } from '../../buses/bus-search/bus-search.component';
 import { MaintenanceFormComponent } from '../maintenance-form/maintenance-form.component';
 import { MaintenanceCompleteDialogComponent } from '../maintenance-complete-dialog/maintenance-complete-dialog.component';
@@ -33,6 +35,7 @@ const STATUS_CARDS: { status: EMaintenanceStatus; border: string; text: string }
 })
 export class MaintenanceAdminComponent {
     private readonly maintenancesService = inject(MaintenancesService);
+    private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
 
     readonly typeLabels = MAINTENANCE_TYPE_LABELS;
@@ -120,6 +123,11 @@ export class MaintenanceAdminComponent {
 
     isInProgress(maintenance: MaintenanceResponse): boolean {
         return maintenance.status === EMaintenanceStatus.IN_PROGRESS;
+    }
+
+    // Un mantenimiento finalizado solo lo puede editar un administrador.
+    canEdit(maintenance: MaintenanceResponse): boolean {
+        return this.isInProgress(maintenance) || this.authService.currentUser()?.role === EUserRole.ADMIN;
     }
 
     onUpdated({ id, changes }: { id: number; changes: Partial<MaintenanceResponse> }): void {

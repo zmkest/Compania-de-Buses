@@ -36,13 +36,20 @@
         </div>
       }
 
+      @if (isFinal()) {
+        <p class="rounded-lg border-2 border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 mb-0">
+          Este mantenimiento está finalizado: solo se pueden editar el costo y la descripción.
+        </p>
+      }
+
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label for="maintenance-type" class="block text-sm font-semibold text-brand-navy mb-1">Tipo</label>
           <select
             id="maintenance-type"
             formControlName="type"
-            class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            [class.bg-white]="!isFinal()"
+            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
           >
             @for (type of types; track type) {
               <option [value]="type">{{ typeLabels[type] }}</option>
@@ -79,7 +86,7 @@
             type="datetime-local"
             formControlName="startedAt"
             [max]="maxStartedAt"
-            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
           >
           @if (form.controls.startedAt.invalid && form.controls.startedAt.touched) {
             <p class="text-xs text-red-600 mt-1 mb-0">
