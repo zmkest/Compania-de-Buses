@@ -42,7 +42,13 @@ export const routes: Routes = [
               { path: 'historial', loadComponent: () => import('./buses/bus-status-history/bus-status-history.component').then(m => m.BusStatusHistoryComponent) },
             ],
           },
-          { path: 'mantenimientos', loadComponent: () => import('./maintenances/maintenance-admin/maintenance-admin.component').then(m => m.MaintenanceAdminComponent) },
+          {
+            path: 'mantenimientos',
+            children: [
+              { path: '', loadComponent: () => import('./maintenances/maintenance-admin/maintenance-admin.component').then(m => m.MaintenanceAdminComponent) },
+              { path: 'costos', loadComponent: () => import('./maintenances/maintenance-cost-report/maintenance-cost-report.component').then(m => m.MaintenanceCostReportComponent) },
+            ],
+          },
         ],
       },
       { path: 'choferes', loadComponent: () => import('./chofer/principal/principal.component').then(m => m.PrincipalComponent) },

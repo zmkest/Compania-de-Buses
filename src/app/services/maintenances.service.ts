@@ -2,9 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CompleteMaintenanceDto, MaintenanceResponse, MaintenanceStatusStats, UpdateMaintenanceDto } from '../shared/models/maintenance.dto';
+import { CompleteMaintenanceDto, MaintenanceCostReportResponse, MaintenanceResponse, MaintenanceStatusStats, UpdateMaintenanceDto } from '../shared/models/maintenance.dto';
 import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { PaginatedResponse } from '../core/interfaces/paginated';
+import { startOfLocalDayIso } from '../shared/utils/date-util';
 
 export interface MaintenanceQuery {
   page: number;
@@ -14,6 +15,13 @@ export interface MaintenanceQuery {
   // YYYY-MM-DD, filtran por startedAt (endDate incluye el día completo).
   startDate?: string | null;
   endDate?: string | null;
+}
+
+export interface MaintenanceCostReportQuery {
+  busId: number;
+  // YYYY-MM-DD en hora local; endDate debe ser posterior a startDate e incluye el día completo.
+  startDate: string;
+  endDate: string;
 }
 
 @Injectable({
@@ -40,6 +48,15 @@ export class MaintenancesService {
 
   getStatusStats(): Observable<MaintenanceStatusStats> {
     return this.http.get<MaintenanceStatusStats>(`${this.apiUrl}/count/status`, { context: this.context });
+  }
+
+  // Solo cuenta mantenimientos completados cuyo finishedAt cae en el rango.
+  getCostReport({ busId, startDate, endDate }: MaintenanceCostReportQuery): Observable<MaintenanceCostReportResponse> {
+    // La API toma [startDate, endDate + 24 h): con el inicio del día local, el rango respeta la zona horaria del usuario.
+    const params = new HttpParams()
+      .set('startDate', startOfLocalDayIso(startDate))
+      .set('endDate', startOfLocalDayIso(endDate));
+    return this.http.get<MaintenanceCostReportResponse>(`${this.apiUrl}/bus/${busId}/report/cost`, { params, context: this.context });
   }
 
   update(id: number, data: UpdateMaintenanceDto): Observable<MaintenanceResponse> {

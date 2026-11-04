@@ -31,3 +31,16 @@ export interface CompleteMaintenanceDto {
 }
 
 export type MaintenanceStatusStats = { total: number } & Record<EMaintenanceStatus, number>;
+
+export interface MaintenanceCostReportResponse {
+    bus: { id: number; plate: string };
+    period: { from: Date; to: Date };
+    summary: {
+        // Prisma serializa los Decimal como texto.
+        totalCost: string | number;
+        // Promedia solo los mantenimientos que tienen costo registrado.
+        averageCost: string | number;
+        totalMaintenances: number;
+    };
+    items: MaintenanceResponse[];
+}

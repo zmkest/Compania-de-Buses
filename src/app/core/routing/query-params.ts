@@ -12,6 +12,10 @@ export function toOneOf<T extends string>(allowed: readonly T[]) {
         allowed.includes(value as T) ? value as T : null;
 }
 
+export function toId(value: string | undefined): number | null {
+    return value && /^[1-9]\d*$/.test(value) ? Number(value) : null;
+}
+
 export function toSearch(value: string | undefined): string {
     return value?.trim() ?? '';
 }
