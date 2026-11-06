@@ -1,0 +1,104 @@
+<section class="max-w-7xl mx-auto space-y-6">
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand-blue mb-1">
+        Flota
+      </p>
+      <h1 class="font-brand text-4xl text-brand-navy mb-1">Buses disponibles</h1>
+      <p class="text-sm text-gray-500 mb-0">
+        Buses disponibles y sin viajes programados o en curso dentro del rango.
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <label class="flex items-center gap-2 text-xs font-semibold text-gray-500">
+        Desde
+        <input
+          type="datetime-local"
+          [value]="start()"
+          (change)="setStart($any($event.target).value)"
+          class="rounded-lg border-2 border-gray-200 px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+        />
+      </label>
+      <label class="flex items-center gap-2 text-xs font-semibold text-gray-500">
+        Hasta
+        <input
+          type="datetime-local"
+          [value]="finish()"
+          [min]="start()"
+          (change)="setFinish($any($event.target).value)"
+          class="rounded-lg border-2 border-gray-200 px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+        />
+      </label>
+    </div>
+  </header>
+
+  @if (!isRangeValid()) {
+    <p class="rounded-lg border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 mb-0" role="alert">
+      La fecha "Hasta" debe ser posterior a la fecha "Desde".
+    </p>
+  } @else {
+    <div class="overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-brand-navy text-white">
+            <tr>
+              <th class="px-2 py-3 font-semibold">ID</th>
+              <th class="px-5 py-3 font-semibold">Bus</th>
+              <th class="px-5 py-3 font-semibold">Año</th>
+              <th class="px-5 py-3 font-semibold">Kilometraje</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @if (availableResource.isLoading()) {
+              <tr>
+                <td colspan="4" class="px-5 py-12 text-center text-gray-500">
+                  <div class="inline-flex items-center gap-2">
+                    <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+                    Buscando buses disponibles...
+                  </div>
+                </td>
+              </tr>
+            } @else if (availableResource.error()) {
+              <tr>
+                <td colspan="4" class="px-5 py-12 text-center" role="alert">
+                  <p class="font-semibold text-red-600 mb-3">No se pudieron cargar los buses disponibles</p>
+                  <button
+                    type="button"
+                    (click)="availableResource.reload()"
+                    class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition"
+                  >
+                    Reintentar
+                  </button>
+                </td>
+              </tr>
+            } @else {
+              @for (bus of buses(); track bus.id) {
+                <tr class="hover:bg-gray-50 transition">
+                  <td class="px-2 py-3 text-gray-500">#{{ bus.id }}</td>
+                  <td class="px-5 py-3">
+                    <p class="font-semibold tracking-wide text-gray-800 mb-0">{{ bus.plate }}</p>
+                    <p class="text-gray-500 mb-0">{{ bus.model }}</p>
+                  </td>
+                  <td class="px-5 py-3 text-gray-700">{{ bus.year }}</td>
+                  <td class="px-5 py-3 text-gray-700 whitespace-nowrap">{{ bus.odometerKm | number: "1.0-0" }} km</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="px-5 py-12 text-center">
+                    <p class="font-semibold text-gray-700 mb-1">No hay buses disponibles en este rango</p>
+                    <p class="text-sm text-gray-500 mb-0">Prueba con otras fechas.</p>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (availableResource.hasValue() && buses().length) {
+        <p class="px-5 py-3 border-t border-gray-100 text-xs text-gray-500 mb-0">
+          {{ buses().length }} {{ buses().length === 1 ? 'bus disponible' : 'buses disponibles' }}
+        </p>
+      }
+    </div>
+  }
+</section>

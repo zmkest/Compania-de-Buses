@@ -21,6 +21,11 @@ export interface BusStatusHistoryQuery extends BusQuery {
   toStatus?: EBusStatus | null;
 }
 
+export interface BusAvailabilityQuery {
+  startDate: string;
+  finishDate: string;
+}
+
 // Cuántos cambios llevaron a cada estado.
 export type BusStatusHistoryStats = { total: number } & Record<EBusStatus, number>;
 
@@ -73,6 +78,12 @@ export class BusesService {
 
   getStatusHistoryStats(): Observable<BusStatusHistoryStats> {
     return this.http.get<BusStatusHistoryStats>(`${this.apiUrlStatusH}/count/to-status`, { context: this.context });
+  }
+
+  // Buses AVAILABLE sin viajes activos que se crucen con el rango (fechas en ISO, finishDate > startDate).
+  getAvailable({ startDate, finishDate }: BusAvailabilityQuery): Observable<BusResponse[]> {
+    const params = new HttpParams().set('startDate', startDate).set('finishDate', finishDate);
+    return this.http.get<BusResponse[]>(`${this.apiUrl}/available`, { params, context: this.context });
   }
 
   create(data: CreateBusDto): Observable<BusResponse> {

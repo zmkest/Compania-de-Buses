@@ -33,6 +33,7 @@ const menu: MenuItem[] =[
             roles: [EUserRole.ADMIN],
             children: [
                 { route: 'flota/buses', title: 'Buses', icon: 'M6 17V6a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v11M6 17h12M6 17v2m12-2v2M6 11h12' },
+                { route: 'flota/buses/disponibles', title: 'Disponibles', icon: 'M8 3v4M16 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM9 15l2 2 4-4' },
                 { route: 'flota/asientos', title: 'Asientos', icon: 'M7 4v9h10M7 13l-1 7M17 13v7M10 9h7' },
                 { route: 'flota/buses/historial', title: 'Historial', icon: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 3' },
                 { route: 'flota/mantenimientos', title: 'Mantenimiento', icon: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z' },

@@ -40,6 +40,7 @@ export const routes: Routes = [
             children: [
               { path: '', loadComponent: () => import('./buses/bus-admin/bus-admin.component').then(m => m.BusAdminComponent) },
               { path: 'historial', loadComponent: () => import('./buses/bus-status-history/bus-status-history.component').then(m => m.BusStatusHistoryComponent) },
+              { path: 'disponibles', loadComponent: () => import('./buses/bus-availability/bus-availability.component').then(m => m.BusAvailabilityComponent) },
             ],
           },
           { path: 'asientos', loadComponent: () => import('./seats/seat-admin/seat-admin.component').then(m => m.SeatAdminComponent) },
