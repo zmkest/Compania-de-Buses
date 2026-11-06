@@ -1,0 +1,91 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="closed.emit()">
+  <div
+    class="flex w-full max-w-md max-h-[90vh] flex-col bg-white rounded-2xl shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="seat-map-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="seat-map-title" class="font-brand text-2xl text-brand-navy mb-0">Mapa de asientos</h2>
+        <p class="text-xs text-gray-500 mt-1 mb-0">Bus {{ busPlate() }}</p>
+      </div>
+      <button type="button" (click)="closed.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="overflow-y-auto px-6 py-4">
+      @if (seatMapResource.isLoading()) {
+        <div class="py-8 text-center text-gray-500">
+          <div class="inline-flex items-center gap-2">
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+            Cargando asientos...
+          </div>
+        </div>
+      } @else if (seatMapResource.error()) {
+        <div class="py-8 text-center" role="alert">
+          <p class="font-semibold text-red-600 mb-3">No se pudo cargar el mapa de asientos</p>
+          <button
+            type="button"
+            (click)="seatMapResource.reload()"
+            class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition"
+          >
+            Reintentar
+          </button>
+        </div>
+      } @else if (seats().length === 0) {
+        <div class="py-8 text-center">
+          <p class="font-semibold text-gray-700 mb-1">Este bus aún no tiene asientos</p>
+          <p class="text-sm text-gray-500 mb-0">Cuando se registren, aparecerán aquí.</p>
+        </div>
+      } @else {
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <p class="text-gray-600 mb-0">
+            <span class="font-semibold text-brand-navy">{{ operationalCount() }}</span> de {{ seats().length }} operativos
+          </p>
+          <div class="flex items-center gap-3 text-gray-600">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="h-3 w-3 rounded border-2 border-brand-navy bg-brand-mint" aria-hidden="true"></span>
+              Operativo
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <span class="h-3 w-3 rounded border-2 border-gray-300 bg-gray-100" aria-hidden="true"></span>
+              No operativo
+            </span>
+          </div>
+        </div>
+
+        <div class="mx-auto w-fit rounded-2xl border-2 border-gray-200 px-4 pb-4 pt-3">
+          <p class="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-gray-400">Frente</p>
+          <ul class="flex flex-col gap-2 list-none p-0 m-0" aria-label="Asientos">
+            @for (row of rows(); track $index) {
+              <li class="flex items-center gap-2">
+                @for (seat of row.left; track seat.id) {
+                  <ng-container *ngTemplateOutlet="seatCell; context: { $implicit: seat }" />
+                }
+                <span class="w-6" aria-hidden="true"></span>
+                @for (seat of row.right; track seat.id) {
+                  <ng-container *ngTemplateOutlet="seatCell; context: { $implicit: seat }" />
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<ng-template #seatCell let-seat>
+  <span
+    class="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold"
+    [class]="seat.isOperational ? 'border-brand-navy bg-brand-mint text-brand-navy' : 'border-gray-300 bg-gray-100 text-gray-400 line-through'"
+    [title]="'Asiento ' + seat.number + (seat.isOperational ? '' : ' (no operativo)')"
+  >
+    {{ seat.number }}
+  </span>
+</ng-template>

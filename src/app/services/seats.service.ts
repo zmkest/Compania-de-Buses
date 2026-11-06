@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { PaginatedResponse } from '../core/interfaces/paginated';
-import { BusSeatCount } from '../shared/models/seat.dto';
+import { BusSeatCount, BusSeatMap } from '../shared/models/seat.dto';
 
 export interface SeatBusQuery {
   page: number;
@@ -35,5 +35,9 @@ export class SeatsService {
         items: response.items.map(({ _count, ...bus }) => ({ ...bus, seatCount: _count })),
       })),
     );
+  }
+
+  getSeatMap(busId: number): Observable<BusSeatMap> {
+    return this.http.get<BusSeatMap>(`${this.apiUrl}/bus/${busId}`, { context: this.context });
   }
 }

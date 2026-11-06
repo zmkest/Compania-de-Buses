@@ -4,3 +4,15 @@ export interface BusSeatCount {
     plate: string;
     seatCount: number;
 }
+
+export interface Seat {
+    id: number;
+    number: number;
+    isOperational: boolean;
+}
+
+// Mapa de asientos de un bus (GET /seats/bus/:id), ordenados por número.
+export interface BusSeatMap {
+    bus: { id: number; plate: string };
+    seats: Seat[];
+}
