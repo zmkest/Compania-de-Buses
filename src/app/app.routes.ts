@@ -42,6 +42,7 @@ export const routes: Routes = [
               { path: 'historial', loadComponent: () => import('./buses/bus-status-history/bus-status-history.component').then(m => m.BusStatusHistoryComponent) },
             ],
           },
+          { path: 'asientos', loadComponent: () => import('./seats/seat-admin/seat-admin.component').then(m => m.SeatAdminComponent) },
           {
             path: 'mantenimientos',
             children: [

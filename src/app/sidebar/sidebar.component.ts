@@ -8,8 +8,7 @@ import { EUserRole } from '../shared/enums/user.enum';
 interface SubMenuItem {
     title: string;
     icon: string;
-    // Sin ruta: el módulo aún no está implementado y se muestra deshabilitado.
-    route?: string;
+    route: string;
 }
 
 interface MenuItem {
@@ -34,7 +33,7 @@ const menu: MenuItem[] =[
             roles: [EUserRole.ADMIN],
             children: [
                 { route: 'flota/buses', title: 'Buses', icon: 'M6 17V6a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v11M6 17h12M6 17v2m12-2v2M6 11h12' },
-                { title: 'Asientos', icon: 'M7 4v9h10M7 13l-1 7M17 13v7M10 9h7' },
+                { route: 'flota/asientos', title: 'Asientos', icon: 'M7 4v9h10M7 13l-1 7M17 13v7M10 9h7' },
                 { route: 'flota/buses/historial', title: 'Historial', icon: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 3' },
                 { route: 'flota/mantenimientos', title: 'Mantenimiento', icon: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z' },
                 { route: 'flota/mantenimientos/costos', title: 'Costos', icon: 'M12 3v18M16.5 7.5C16.5 5.6 14.5 5 12 5S7.5 6 7.5 8.3 9.5 11.2 12 12s4.5 1.7 4.5 3.9S14.5 19 12 19s-4.5-.8-4.5-2.7' },

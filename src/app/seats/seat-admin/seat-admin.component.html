@@ -1,0 +1,148 @@
+<section class="max-w-7xl mx-auto space-y-6">
+  <header>
+    <p class="text-xs font-semibold uppercase tracking-wider text-brand-blue mb-1">
+      Flota
+    </p>
+    <h1 class="font-brand text-4xl text-brand-navy mb-1">Asientos</h1>
+    <p class="text-sm text-gray-500 mb-0">
+      Revisa cuántos asientos tiene registrados cada bus.
+    </p>
+  </header>
+
+  <div class="overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-100">
+      <app-bus-search
+        class="block w-full sm:w-80"
+        placeholder="Buscar por placa"
+        [value]="search()"
+        (searched)="onSearch($event)"
+      />
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-brand-navy text-white">
+          <tr>
+            <th class="px-2 py-3 font-semibold">ID</th>
+            <th class="px-5 py-3 font-semibold">Bus</th>
+            <th class="px-5 py-3 font-semibold">Asientos</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @if (busesResource.isLoading()) {
+            <tr>
+              <td colspan="3" class="px-5 py-12 text-center text-gray-500">
+                <div class="inline-flex items-center gap-2">
+                  <span
+                    class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent"
+                    aria-hidden="true"
+                  ></span>
+                  Cargando buses...
+                </div>
+              </td>
+            </tr>
+          } @else if (busesResource.error()) {
+            <tr>
+              <td colspan="3" class="px-5 py-12 text-center" role="alert">
+                <p class="font-semibold text-red-600 mb-3">
+                  No se pudieron cargar los asientos
+                </p>
+                <button
+                  type="button"
+                  (click)="busesResource.reload()"
+                  class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition"
+                >
+                  Reintentar
+                </button>
+              </td>
+            </tr>
+          } @else {
+            @for (bus of buses(); track bus.id) {
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-2 py-3 text-gray-500">#{{ bus.id }}</td>
+                <td class="px-5 py-3 font-semibold tracking-wide text-gray-800">
+                  {{ bus.plate }}
+                </td>
+                <td class="px-5 py-3">
+                  @if (bus.seatCount > 0) {
+                    <span class="text-gray-700">{{ bus.seatCount }}</span>
+                  } @else {
+                    <span
+                      class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 whitespace-nowrap"
+                    >
+                      Sin asientos
+                    </span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="px-5 py-12 text-center">
+                  <p class="font-semibold text-gray-700 mb-1">
+                    {{
+                      search()
+                        ? "No se encontró ningún bus"
+                        : "Aún no hay buses registrados"
+                    }}
+                  </p>
+                  <p class="text-sm text-gray-500 mb-0">
+                    {{
+                      search()
+                        ? "Revisa la placa buscada e inténtalo de nuevo."
+                        : "Registra buses desde Flota > Buses."
+                    }}
+                  </p>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav
+        class="flex items-center justify-end gap-1 px-5 py-3 border-t border-gray-100"
+        aria-label="Paginación"
+      >
+        <button
+          type="button"
+          (click)="goToPage(page() - 1)"
+          [disabled]="page() === 1"
+          class="flex h-8 w-8 items-center justify-center rounded-lg text-brand-navy hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+          aria-label="Página anterior"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        @for (pageNumber of pages(); track pageNumber) {
+          <button
+            type="button"
+            (click)="goToPage(pageNumber)"
+            [attr.aria-current]="pageNumber === page() ? 'page' : null"
+            class="h-8 min-w-8 rounded-lg px-2 text-sm font-semibold transition"
+            [class]="
+              pageNumber === page()
+                ? 'bg-sky-950 text-white'
+                : 'text-brand-navy hover:bg-brand-mint'
+            "
+          >
+            {{ pageNumber }}
+          </button>
+        }
+        <button
+          type="button"
+          (click)="goToPage(page() + 1)"
+          [disabled]="page() === totalPages()"
+          class="flex h-8 w-8 items-center justify-center rounded-lg text-brand-navy hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+          aria-label="Página siguiente"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </nav>
+    }
+  </div>
+</section>
