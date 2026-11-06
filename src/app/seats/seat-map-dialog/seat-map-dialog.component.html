@@ -111,7 +111,8 @@
         </div>
 
         <div class="mx-auto w-fit rounded-2xl border-2 border-gray-200 px-4 pb-4 pt-3">
-          <p class="mb-3 text-center text-[10px] font-semibold uppercase tracking-wider text-gray-400">Frente</p>
+          <p class="mb-1 text-center text-[10px] font-semibold uppercase tracking-wider text-gray-400">Frente</p>
+          <p class="mb-3 text-center text-xs text-gray-500">Haz clic en un asiento para cambiar su estado.</p>
           <ul class="flex flex-col gap-2 list-none p-0 m-0" aria-label="Asientos">
             @for (row of rows(); track $index) {
               <li class="flex items-center gap-2">
@@ -132,11 +133,16 @@
 </div>
 
 <ng-template #seatCell let-seat>
-  <span
-    class="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold"
+  <button
+    type="button"
+    (click)="toggleOperational(seat)"
+    [disabled]="updatingSeatIds().has(seat.id)"
+    [attr.aria-pressed]="!seat.isOperational"
+    [attr.aria-label]="'Asiento ' + seat.number + (seat.isOperational ? ', operativo. Marcar como no operativo' : ', no operativo. Marcar como operativo')"
+    [title]="seat.isOperational ? 'Marcar como no operativo' : 'Marcar como operativo'"
+    class="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold transition hover:ring-4 hover:ring-brand-blue/20 disabled:cursor-wait disabled:opacity-50"
     [class]="seat.isOperational ? 'border-brand-navy bg-brand-mint text-brand-navy' : 'border-gray-300 bg-gray-100 text-gray-400 line-through'"
-    [title]="'Asiento ' + seat.number + (seat.isOperational ? '' : ' (no operativo)')"
   >
     {{ seat.number }}
-  </span>
+  </button>
 </ng-template>

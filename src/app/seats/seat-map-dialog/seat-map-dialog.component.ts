@@ -56,6 +56,8 @@ export class SeatMapDialogComponent {
     readonly totalSeats = signal('');
     readonly isTotalSeatsTouched = signal(false);
     readonly isCreating = signal(false);
+    // Asientos con un cambio de estado en curso.
+    readonly updatingSeatIds = signal(new Set<number>());
     readonly createErrors = signal<string[]>([]);
 
     readonly totalSeatsError = computed(() => {
@@ -76,6 +78,31 @@ export class SeatMapDialogComponent {
             if (this.seatMapResource.hasValue()) {
                 this.seatCountChanged.emit(this.seatMapResource.value().seats.length);
             }
+        });
+    }
+
+    toggleOperational(seat: Seat): void {
+        if (this.updatingSeatIds().has(seat.id)) {
+            return;
+        }
+        this.setUpdating(seat.id, true);
+
+        this.seatsService.updateOperational(seat.id, !seat.isOperational).subscribe({
+            next: ({ id, isOperational }) => {
+                this.setUpdating(id, false);
+                this.seatMapResource.value.update(map => map && {
+                    ...map,
+                    seats: map.seats.map(s => s.id === id ? { ...s, isOperational } : s),
+                });
+            },
+            error: (err: AppError) => {
+                this.setUpdating(seat.id, false);
+                this.notification.error(err.message);
+                // 404: el asiento ya no existe (p. ej. se redujo el bus); el mapa se pone al día.
+                if (err.status === 404) {
+                    this.seatMapResource.reload();
+                }
+            },
         });
     }
 
@@ -104,6 +131,14 @@ export class SeatMapDialogComponent {
                 }
                 this.createErrors.set(err.fieldErrors?.length ? err.fieldErrors : [err.message]);
             },
+        });
+    }
+
+    private setUpdating(id: number, isUpdating: boolean): void {
+        this.updatingSeatIds.update(ids => {
+            const next = new Set(ids);
+            isUpdating ? next.add(id) : next.delete(id);
+            return next;
         });
     }
 }

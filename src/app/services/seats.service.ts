@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { PaginatedResponse } from '../core/interfaces/paginated';
-import { BusSeatCount, BusSeatMap, SeatsCreatedResponse } from '../shared/models/seat.dto';
+import { BusSeatCount, BusSeatMap, Seat, SeatsCreatedResponse } from '../shared/models/seat.dto';
 
 export interface SeatBusQuery {
   page: number;
@@ -39,6 +39,10 @@ export class SeatsService {
 
   getSeatMap(busId: number): Observable<BusSeatMap> {
     return this.http.get<BusSeatMap>(`${this.apiUrl}/bus/${busId}`, { context: this.context });
+  }
+
+  updateOperational(id: number, operational: boolean): Observable<Pick<Seat, 'id' | 'isOperational'>> {
+    return this.http.patch<Pick<Seat, 'id' | 'isOperational'>>(`${this.apiUrl}/${id}/operational`, { operational }, { context: this.context });
   }
 
   // Numera los asientos de 1 a totalSeats; la API responde 409 si el bus ya tiene asientos.
