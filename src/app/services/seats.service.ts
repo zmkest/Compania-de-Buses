@@ -45,6 +45,11 @@ export class SeatsService {
     return this.http.patch<Pick<Seat, 'id' | 'isOperational'>>(`${this.apiUrl}/${id}/operational`, { operational }, { context: this.context });
   }
 
+  // Agrega el asiento siguiente al número más alto; la API responde 409 al llegar a 80.
+  addOne(busId: number): Observable<SeatsCreatedResponse> {
+    return this.http.post<SeatsCreatedResponse>(`${this.apiUrl}/bus/${busId}`, null, { context: this.context });
+  }
+
   // Numera los asientos de 1 a totalSeats; la API responde 409 si el bus ya tiene asientos.
   createMany(busId: number, totalSeats: number): Observable<SeatsCreatedResponse> {
     return this.http.post<SeatsCreatedResponse>(`${this.apiUrl}/bus/${busId}/seats`, { totalSeats }, { context: this.context });

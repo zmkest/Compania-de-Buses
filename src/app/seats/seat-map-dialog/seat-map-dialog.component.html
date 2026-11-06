@@ -19,7 +19,8 @@
     </div>
 
     <div class="overflow-y-auto px-6 py-4">
-      @if (seatMapResource.isLoading()) {
+      <!-- Solo en la primera carga: al recargar se mantiene el mapa actual para no parpadear. -->
+      @if (seatMapResource.isLoading() && !seatMapResource.hasValue()) {
         <div class="py-8 text-center text-gray-500">
           <div class="inline-flex items-center gap-2">
             <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
@@ -126,6 +127,21 @@
               </li>
             }
           </ul>
+        </div>
+
+        <div class="mt-4 flex justify-center">
+          <button
+            type="button"
+            (click)="addSeat()"
+            [disabled]="isAtMaxSeats() || isAdding()"
+            [title]="isAtMaxSeats() ? 'El bus ya tiene el máximo de ' + maxSeats + ' asientos' : 'Agregar el asiento ' + nextSeatNumber()"
+            class="inline-flex items-center gap-2 border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+            </svg>
+            {{ isAdding() ? 'Agregando...' : 'Agregar asiento' }}
+          </button>
         </div>
       }
     </div>

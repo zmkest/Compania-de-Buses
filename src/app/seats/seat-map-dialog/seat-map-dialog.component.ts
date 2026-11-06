@@ -41,6 +41,9 @@ export class SeatMapDialogComponent {
 
     readonly seats = computed(() => this.seatMapResource.hasValue() ? this.seatMapResource.value().seats : []);
     readonly operationalCount = computed(() => this.seats().filter(seat => seat.isOperational).length);
+    // Los asientos vienen ordenados por número; la API limita por el número más alto.
+    readonly nextSeatNumber = computed(() => (this.seats().at(-1)?.number ?? 0) + 1);
+    readonly isAtMaxSeats = computed(() => this.nextSeatNumber() > MAX_SEATS);
 
     readonly rows = computed(() => {
         const seats = this.seats();
@@ -56,6 +59,7 @@ export class SeatMapDialogComponent {
     readonly totalSeats = signal('');
     readonly isTotalSeatsTouched = signal(false);
     readonly isCreating = signal(false);
+    readonly isAdding = signal(false);
     // Asientos con un cambio de estado en curso.
     readonly updatingSeatIds = signal(new Set<number>());
     readonly createErrors = signal<string[]>([]);
@@ -100,6 +104,31 @@ export class SeatMapDialogComponent {
                 this.notification.error(err.message);
                 // 404: el asiento ya no existe (p. ej. se redujo el bus); el mapa se pone al día.
                 if (err.status === 404) {
+                    this.seatMapResource.reload();
+                }
+            },
+        });
+    }
+
+    addSeat(): void {
+        if (this.isAtMaxSeats() || this.isAdding()) {
+            return;
+        }
+        const number = this.nextSeatNumber();
+        this.isAdding.set(true);
+
+        this.seatsService.addOne(this.busId()).subscribe({
+            next: () => {
+                this.isAdding.set(false);
+                this.notification.success(`Asiento ${number} agregado al bus ${this.busPlate()}.`);
+                // Se recarga para obtener el id del asiento nuevo.
+                this.seatMapResource.reload();
+            },
+            error: (err: AppError) => {
+                this.isAdding.set(false);
+                this.notification.error(err.message);
+                // 409: el mapa pudo quedar desactualizado (otro usuario agregó o redujo asientos).
+                if (err.status === 409) {
                     this.seatMapResource.reload();
                 }
             },
