@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { PaginatedResponse } from '../core/interfaces/paginated';
-import { BusSeatCount, BusSeatMap, Seat, SeatsCreatedResponse } from '../shared/models/seat.dto';
+import { BusSeatCount, BusSeatMap, Seat, SeatsCreatedResponse, SeatsDeletedResponse } from '../shared/models/seat.dto';
 
 export interface SeatBusQuery {
   page: number;
@@ -48,6 +48,11 @@ export class SeatsService {
   // Agrega el asiento siguiente al número más alto; la API responde 409 al llegar a 80.
   addOne(busId: number): Observable<SeatsCreatedResponse> {
     return this.http.post<SeatsCreatedResponse>(`${this.apiUrl}/bus/${busId}`, null, { context: this.context });
+  }
+
+  // Elimina los asientos con número mayor a keep; la API responde 409 si alguno tiene tickets.
+  trim(busId: number, keep: number): Observable<SeatsDeletedResponse> {
+    return this.http.delete<SeatsDeletedResponse>(`${this.apiUrl}/bus/${busId}/seats`, { body: { keep }, context: this.context });
   }
 
   // Numera los asientos de 1 a totalSeats; la API responde 409 si el bus ya tiene asientos.

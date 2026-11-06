@@ -44,6 +44,8 @@ export class SeatMapDialogComponent {
     // Los asientos vienen ordenados por número; la API limita por el número más alto.
     readonly nextSeatNumber = computed(() => (this.seats().at(-1)?.number ?? 0) + 1);
     readonly isAtMaxSeats = computed(() => this.nextSeatNumber() > MAX_SEATS);
+    readonly lastSeatNumber = computed(() => this.nextSeatNumber() - 1);
+    readonly canTrim = computed(() => this.lastSeatNumber() > MIN_SEATS);
 
     readonly rows = computed(() => {
         const seats = this.seats();
@@ -75,6 +77,32 @@ export class SeatMapDialogComponent {
         }
         return total < MIN_SEATS || total > MAX_SEATS ? `Debe estar entre ${MIN_SEATS} y ${MAX_SEATS}.` : null;
     });
+
+    readonly isTrimOpen = signal(false);
+    // Texto crudo del input: '' mientras está vacío.
+    readonly keep = signal('');
+    readonly isTrimming = signal(false);
+    readonly trimErrors = signal<string[]>([]);
+
+    readonly keepError = computed(() => {
+        const value = this.keep().trim();
+        if (!value) {
+            return 'Ingresa cuántos asientos conservar.';
+        }
+        const keep = Number(value);
+        if (!Number.isInteger(keep)) {
+            return 'Debe ser un número entero.';
+        }
+        const max = this.lastSeatNumber() - 1;
+        return keep < MIN_SEATS || keep > max ? `Debe estar entre ${MIN_SEATS} y ${max}.` : null;
+    });
+
+    // Asientos que la API eliminaría (número mayor a keep); se resaltan en el mapa.
+    readonly seatsToDelete = computed(() => {
+        const keep = Number(this.keep());
+        return this.keepError() ? [] : this.seats().filter(seat => seat.number > keep);
+    });
+    readonly seatIdsToDelete = computed(() => new Set(this.isTrimOpen() ? this.seatsToDelete().map(seat => seat.id) : []));
 
     constructor() {
         // Cada carga del mapa trae el total real; el listado se sincroniza con él.
@@ -131,6 +159,43 @@ export class SeatMapDialogComponent {
                 if (err.status === 409) {
                     this.seatMapResource.reload();
                 }
+            },
+        });
+    }
+
+    openTrim(): void {
+        this.keep.set(String(this.lastSeatNumber() - 1));
+        this.trimErrors.set([]);
+        this.isTrimOpen.set(true);
+    }
+
+    closeTrim(): void {
+        this.isTrimOpen.set(false);
+        this.trimErrors.set([]);
+    }
+
+    trimSeats(): void {
+        if (this.keepError() || this.isTrimming()) {
+            return;
+        }
+        const keep = Number(this.keep());
+        this.isTrimming.set(true);
+        this.trimErrors.set([]);
+
+        this.seatsService.trim(this.busId(), keep).subscribe({
+            next: ({ deleted }) => {
+                this.isTrimming.set(false);
+                this.isTrimOpen.set(false);
+                this.notification.success(
+                    deleted === 1
+                        ? `Se eliminó 1 asiento del bus ${this.busPlate()}.`
+                        : `Se eliminaron ${deleted} asientos del bus ${this.busPlate()}.`,
+                );
+                this.seatMapResource.reload();
+            },
+            error: (err: AppError) => {
+                this.isTrimming.set(false);
+                this.trimErrors.set(err.fieldErrors?.length ? err.fieldErrors : [err.message]);
             },
         });
     }

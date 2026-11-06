@@ -129,20 +129,96 @@
           </ul>
         </div>
 
-        <div class="mt-4 flex justify-center">
-          <button
-            type="button"
-            (click)="addSeat()"
-            [disabled]="isAtMaxSeats() || isAdding()"
-            [title]="isAtMaxSeats() ? 'El bus ya tiene el máximo de ' + maxSeats + ' asientos' : 'Agregar el asiento ' + nextSeatNumber()"
-            class="inline-flex items-center gap-2 border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-          >
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" stroke-linecap="round" />
-            </svg>
-            {{ isAdding() ? 'Agregando...' : 'Agregar asiento' }}
-          </button>
-        </div>
+        @if (isTrimOpen()) {
+          <form class="mt-4 rounded-xl border-2 border-red-100 bg-red-50/50 p-4" (submit)="$event.preventDefault(); trimSeats()" novalidate>
+            <p class="font-semibold text-red-700 mb-3">Reducir asientos</p>
+
+            @if (trimErrors().length) {
+              <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2 mb-3" role="alert">
+                @if (trimErrors().length === 1) {
+                  {{ trimErrors()[0] }}
+                } @else {
+                  <ul class="list-disc pl-4 mb-0">
+                    @for (message of trimErrors(); track $index) {
+                      <li>{{ message }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+
+            <label for="seat-keep" class="block text-sm font-semibold text-brand-navy mb-1">
+              Asientos a conservar <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="seat-keep"
+              type="number"
+              inputmode="numeric"
+              required
+              [min]="minSeats"
+              [max]="lastSeatNumber() - 1"
+              step="1"
+              [value]="keep()"
+              (input)="keep.set($any($event.target).value)"
+              [attr.aria-invalid]="!!keepError()"
+              class="w-full rounded-lg border-2 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 transition"
+              [class]="keepError() ? 'border-red-300 focus:border-red-400 focus:ring-red-100' : 'border-gray-200 focus:border-brand-blue focus:ring-brand-blue/20'"
+            >
+            @if (keepError(); as error) {
+              <p class="text-xs text-red-600 mt-1 mb-0">{{ error }}</p>
+            } @else {
+              <p class="text-xs text-gray-600 mt-1 mb-0">
+                @if (seatsToDelete().length === 1) {
+                  Se eliminará el asiento {{ seatsToDelete()[0].number }} (resaltado en el mapa).
+                } @else {
+                  Se eliminarán los asientos del {{ seatsToDelete()[0].number }} al {{ lastSeatNumber() }}
+                  ({{ seatsToDelete().length }} asientos, resaltados en el mapa).
+                }
+                No se puede si alguno tiene tickets.
+              </p>
+            }
+
+            <div class="mt-4 flex gap-2">
+              <button type="button" (click)="closeTrim()" class="w-full border-2 border-gray-200 bg-white text-gray-600 font-semibold px-4 py-1.5 rounded-lg hover:bg-gray-50 transition">
+                Volver
+              </button>
+              <button
+                type="submit"
+                [disabled]="!!keepError() || isTrimming()"
+                class="w-full bg-red-600 text-white font-semibold px-4 py-1.5 rounded-lg hover:bg-red-700 transition disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {{ isTrimming() ? 'Eliminando...' : 'Eliminar asientos' }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <div class="mt-4 flex flex-wrap justify-center gap-2">
+            <button
+              type="button"
+              (click)="addSeat()"
+              [disabled]="isAtMaxSeats() || isAdding()"
+              [title]="isAtMaxSeats() ? 'El bus ya tiene el máximo de ' + maxSeats + ' asientos' : 'Agregar el asiento ' + nextSeatNumber()"
+              class="inline-flex items-center gap-2 border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+              </svg>
+              {{ isAdding() ? 'Agregando...' : 'Agregar asiento' }}
+            </button>
+            <button
+              type="button"
+              (click)="openTrim()"
+              [disabled]="!canTrim() || isAdding()"
+              [title]="canTrim() ? 'Eliminar los últimos asientos' : 'El bus debe conservar al menos ' + minSeats + ' asientos'"
+              class="inline-flex items-center gap-2 border-2 border-red-600 text-red-600 font-semibold px-4 py-1.5 rounded-lg hover:bg-red-50 transition disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M5 12h14" stroke-linecap="round" />
+              </svg>
+              Reducir asientos
+            </button>
+          </div>
+        }
       }
     </div>
   </div>
@@ -158,6 +234,8 @@
     [title]="seat.isOperational ? 'Marcar como no operativo' : 'Marcar como operativo'"
     class="flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold transition hover:ring-4 hover:ring-brand-blue/20 disabled:cursor-wait disabled:opacity-50"
     [class]="seat.isOperational ? 'border-brand-navy bg-brand-mint text-brand-navy' : 'border-gray-300 bg-gray-100 text-gray-400 line-through'"
+    [class.ring-4]="seatIdsToDelete().has(seat.id)"
+    [class.ring-red-400]="seatIdsToDelete().has(seat.id)"
   >
     {{ seat.number }}
   </button>

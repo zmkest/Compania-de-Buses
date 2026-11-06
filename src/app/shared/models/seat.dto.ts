@@ -16,6 +16,11 @@ export interface SeatsCreatedResponse {
     created: number;
 }
 
+export interface SeatsDeletedResponse {
+    busId: number;
+    deleted: number;
+}
+
 // Mapa de asientos de un bus (GET /seats/bus/:id), ordenados por número.
 export interface BusSeatMap {
     bus: { id: number; plate: string };
