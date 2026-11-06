@@ -46,6 +46,13 @@ export class SeatAdminComponent {
         });
     }
 
+    onSeatCountChanged(id: number, seatCount: number): void {
+        this.busesResource.value.update(response => response && {
+            ...response,
+            items: response.items.map(bus => bus.id === id && bus.seatCount !== seatCount ? { ...bus, seatCount } : bus),
+        });
+    }
+
     onSearch(search: string): void {
         if (search === this.search()) {
             return;

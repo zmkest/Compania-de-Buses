@@ -167,6 +167,7 @@
   <app-seat-map-dialog
     [busId]="bus.id"
     [busPlate]="bus.plate"
+    (seatCountChanged)="onSeatCountChanged(bus.id, $event)"
     (closed)="mapBus.set(null)"
   />
 }

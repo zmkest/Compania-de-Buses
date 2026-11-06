@@ -1,11 +1,17 @@
-import { Component, ChangeDetectionStrategy, computed, inject, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, output, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { SeatsService } from '../../services/seats.service';
+import { NotificationService } from '../../core/notifications/notification.service';
+import { AppError } from '../../core/errors/app-error';
 import { Seat } from '../../shared/models/seat.dto';
 
 // Distribución 2 + pasillo + 2.
 const SEATS_PER_ROW = 4;
+
+// Límites de CreateManySeatsDto en la API.
+const MIN_SEATS = 2;
+const MAX_SEATS = 80;
 
 @Component({
     selector: 'app-seat-map-dialog',
@@ -15,12 +21,18 @@ const SEATS_PER_ROW = 4;
 })
 export class SeatMapDialogComponent {
     private readonly seatsService = inject(SeatsService);
+    private readonly notification = inject(NotificationService);
 
     readonly busId = input.required<number>();
     // Se muestra en el encabezado mientras carga el mapa.
     readonly busPlate = input.required<string>();
 
     readonly closed = output<void>();
+    // Nuevo total de asientos del bus, para actualizar la fila del listado.
+    readonly seatCountChanged = output<number>();
+
+    readonly minSeats = MIN_SEATS;
+    readonly maxSeats = MAX_SEATS;
 
     readonly seatMapResource = rxResource({
         params: () => this.busId(),
@@ -39,4 +51,59 @@ export class SeatMapDialogComponent {
         }
         return rows;
     });
+
+    // Texto crudo del input: '' mientras está vacío.
+    readonly totalSeats = signal('');
+    readonly isTotalSeatsTouched = signal(false);
+    readonly isCreating = signal(false);
+    readonly createErrors = signal<string[]>([]);
+
+    readonly totalSeatsError = computed(() => {
+        const value = this.totalSeats().trim();
+        if (!value) {
+            return 'Ingresa el número de asientos.';
+        }
+        const total = Number(value);
+        if (!Number.isInteger(total)) {
+            return 'Debe ser un número entero.';
+        }
+        return total < MIN_SEATS || total > MAX_SEATS ? `Debe estar entre ${MIN_SEATS} y ${MAX_SEATS}.` : null;
+    });
+
+    constructor() {
+        // Cada carga del mapa trae el total real; el listado se sincroniza con él.
+        effect(() => {
+            if (this.seatMapResource.hasValue()) {
+                this.seatCountChanged.emit(this.seatMapResource.value().seats.length);
+            }
+        });
+    }
+
+    createSeats(): void {
+        this.isTotalSeatsTouched.set(true);
+        if (this.totalSeatsError() || this.isCreating()) {
+            return;
+        }
+
+        this.isCreating.set(true);
+        this.createErrors.set([]);
+
+        this.seatsService.createMany(this.busId(), Number(this.totalSeats())).subscribe({
+            next: ({ created }) => {
+                this.isCreating.set(false);
+                this.notification.success(`Se crearon ${created} asientos para el bus ${this.busPlate()}.`);
+                this.seatMapResource.reload();
+            },
+            error: (err: AppError) => {
+                this.isCreating.set(false);
+                // 409: otro usuario ya registró los asientos; se recarga el mapa y el formulario desaparece.
+                if (err.status === 409) {
+                    this.notification.error(err.message);
+                    this.seatMapResource.reload();
+                    return;
+                }
+                this.createErrors.set(err.fieldErrors?.length ? err.fieldErrors : [err.message]);
+            },
+        });
+    }
 }

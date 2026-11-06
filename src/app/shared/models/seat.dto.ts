@@ -11,6 +11,11 @@ export interface Seat {
     isOperational: boolean;
 }
 
+export interface SeatsCreatedResponse {
+    busId: number;
+    created: number;
+}
+
 // Mapa de asientos de un bus (GET /seats/bus/:id), ordenados por número.
 export interface BusSeatMap {
     bus: { id: number; plate: string };
