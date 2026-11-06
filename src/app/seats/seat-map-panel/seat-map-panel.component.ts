@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { SeatsService } from '../../services/seats.service';
@@ -6,64 +6,69 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { AppError } from '../../core/errors/app-error';
 import { Seat } from '../../shared/models/seat.dto';
 
-// Distribución 2 + pasillo + 2.
-const SEATS_PER_ROW = 4;
+// Cada columna del bus (visto de lado, frente a la izquierda) tiene 2 + pasillo + 2 asientos.
+const SEATS_PER_COLUMN = 4;
 
-// Límites de CreateManySeatsDto en la API.
+// Límites de CreateManySeatsDto / DeleteManySeatsDto en la API.
 const MIN_SEATS = 2;
 const MAX_SEATS = 80;
 
+// Columnas del bus de muestra que se ve como marca de agua sin bus seleccionado.
+const PLACEHOLDER_COLUMNS = 10;
+
 @Component({
-    selector: 'app-seat-map-dialog',
-    templateUrl: './seat-map-dialog.component.html',
+    selector: 'app-seat-map-panel',
+    templateUrl: './seat-map-panel.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgTemplateOutlet]
 })
-export class SeatMapDialogComponent {
+export class SeatMapPanelComponent {
     private readonly seatsService = inject(SeatsService);
     private readonly notification = inject(NotificationService);
 
-    readonly busId = input.required<number>();
-    // Se muestra en el encabezado mientras carga el mapa.
-    readonly busPlate = input.required<string>();
+    // null: ningún bus seleccionado, se muestra la marca de agua.
+    readonly busId = input.required<number | null>();
 
-    readonly closed = output<void>();
-    // Nuevo total de asientos del bus, para actualizar la fila del listado.
-    readonly seatCountChanged = output<number>();
+    readonly cleared = output<void>();
+    // Total real de asientos del bus cargado, para actualizar su fila en la tabla.
+    readonly seatCountChanged = output<{ busId: number; seatCount: number }>();
 
     readonly minSeats = MIN_SEATS;
     readonly maxSeats = MAX_SEATS;
+    readonly placeholderColumns = Array.from({ length: PLACEHOLDER_COLUMNS }, (_, index) => index);
 
     readonly seatMapResource = rxResource({
-        params: () => this.busId(),
+        params: () => this.busId() ?? undefined,
         stream: ({ params }) => this.seatsService.getSeatMap(params),
     });
 
+    readonly busPlate = computed(() => this.seatMapResource.hasValue() ? this.seatMapResource.value().bus.plate : null);
     readonly seats = computed(() => this.seatMapResource.hasValue() ? this.seatMapResource.value().seats : []);
     readonly operationalCount = computed(() => this.seats().filter(seat => seat.isOperational).length);
     // Los asientos vienen ordenados por número; la API limita por el número más alto.
-    readonly nextSeatNumber = computed(() => (this.seats().at(-1)?.number ?? 0) + 1);
+    readonly lastSeatNumber = computed(() => this.seats().at(-1)?.number ?? 0);
+    readonly nextSeatNumber = computed(() => this.lastSeatNumber() + 1);
     readonly isAtMaxSeats = computed(() => this.nextSeatNumber() > MAX_SEATS);
-    readonly lastSeatNumber = computed(() => this.nextSeatNumber() - 1);
     readonly canTrim = computed(() => this.lastSeatNumber() > MIN_SEATS);
 
-    readonly rows = computed(() => {
+    readonly columns = computed(() => {
         const seats = this.seats();
-        const rows: { left: Seat[]; right: Seat[] }[] = [];
-        for (let i = 0; i < seats.length; i += SEATS_PER_ROW) {
-            const row = seats.slice(i, i + SEATS_PER_ROW);
-            rows.push({ left: row.slice(0, SEATS_PER_ROW / 2), right: row.slice(SEATS_PER_ROW / 2) });
+        const columns: { top: Seat[]; bottom: Seat[] }[] = [];
+        for (let i = 0; i < seats.length; i += SEATS_PER_COLUMN) {
+            const column = seats.slice(i, i + SEATS_PER_COLUMN);
+            columns.push({ top: column.slice(0, SEATS_PER_COLUMN / 2), bottom: column.slice(SEATS_PER_COLUMN / 2) });
         }
-        return rows;
+        return columns;
     });
 
-    // Texto crudo del input: '' mientras está vacío.
+    // Asientos con un cambio de estado en curso.
+    readonly updatingSeatIds = signal(new Set<number>());
+    readonly isAdding = signal(false);
+
+    // Crear en lote. Texto crudo del input: '' mientras está vacío.
     readonly totalSeats = signal('');
     readonly isTotalSeatsTouched = signal(false);
     readonly isCreating = signal(false);
-    readonly isAdding = signal(false);
-    // Asientos con un cambio de estado en curso.
-    readonly updatingSeatIds = signal(new Set<number>());
     readonly createErrors = signal<string[]>([]);
 
     readonly totalSeatsError = computed(() => {
@@ -78,8 +83,8 @@ export class SeatMapDialogComponent {
         return total < MIN_SEATS || total > MAX_SEATS ? `Debe estar entre ${MIN_SEATS} y ${MAX_SEATS}.` : null;
     });
 
+    // Reducir. Texto crudo del input: '' mientras está vacío.
     readonly isTrimOpen = signal(false);
-    // Texto crudo del input: '' mientras está vacío.
     readonly keep = signal('');
     readonly isTrimming = signal(false);
     readonly trimErrors = signal<string[]>([]);
@@ -105,10 +110,17 @@ export class SeatMapDialogComponent {
     readonly seatIdsToDelete = computed(() => new Set(this.isTrimOpen() ? this.seatsToDelete().map(seat => seat.id) : []));
 
     constructor() {
-        // Cada carga del mapa trae el total real; el listado se sincroniza con él.
+        // Al cambiar de bus, los formularios abiertos del anterior no aplican.
+        effect(() => {
+            this.busId();
+            untracked(() => this.resetForms());
+        });
+
+        // Cada carga del mapa trae el total real; la tabla se sincroniza con él.
         effect(() => {
             if (this.seatMapResource.hasValue()) {
-                this.seatCountChanged.emit(this.seatMapResource.value().seats.length);
+                const { bus, seats } = this.seatMapResource.value();
+                this.seatCountChanged.emit({ busId: bus.id, seatCount: seats.length });
             }
         });
     }
@@ -139,13 +151,14 @@ export class SeatMapDialogComponent {
     }
 
     addSeat(): void {
-        if (this.isAtMaxSeats() || this.isAdding()) {
+        const busId = this.busId();
+        if (!busId || this.isAtMaxSeats() || this.isAdding()) {
             return;
         }
         const number = this.nextSeatNumber();
         this.isAdding.set(true);
 
-        this.seatsService.addOne(this.busId()).subscribe({
+        this.seatsService.addOne(busId).subscribe({
             next: () => {
                 this.isAdding.set(false);
                 this.notification.success(`Asiento ${number} agregado al bus ${this.busPlate()}.`);
@@ -175,14 +188,15 @@ export class SeatMapDialogComponent {
     }
 
     trimSeats(): void {
-        if (this.keepError() || this.isTrimming()) {
+        const busId = this.busId();
+        if (!busId || this.keepError() || this.isTrimming()) {
             return;
         }
         const keep = Number(this.keep());
         this.isTrimming.set(true);
         this.trimErrors.set([]);
 
-        this.seatsService.trim(this.busId(), keep).subscribe({
+        this.seatsService.trim(busId, keep).subscribe({
             next: ({ deleted }) => {
                 this.isTrimming.set(false);
                 this.isTrimOpen.set(false);
@@ -201,15 +215,16 @@ export class SeatMapDialogComponent {
     }
 
     createSeats(): void {
+        const busId = this.busId();
         this.isTotalSeatsTouched.set(true);
-        if (this.totalSeatsError() || this.isCreating()) {
+        if (!busId || this.totalSeatsError() || this.isCreating()) {
             return;
         }
 
         this.isCreating.set(true);
         this.createErrors.set([]);
 
-        this.seatsService.createMany(this.busId(), Number(this.totalSeats())).subscribe({
+        this.seatsService.createMany(busId, Number(this.totalSeats())).subscribe({
             next: ({ created }) => {
                 this.isCreating.set(false);
                 this.notification.success(`Se crearon ${created} asientos para el bus ${this.busPlate()}.`);
@@ -226,6 +241,13 @@ export class SeatMapDialogComponent {
                 this.createErrors.set(err.fieldErrors?.length ? err.fieldErrors : [err.message]);
             },
         });
+    }
+
+    private resetForms(): void {
+        this.totalSeats.set('');
+        this.isTotalSeatsTouched.set(false);
+        this.createErrors.set([]);
+        this.closeTrim();
     }
 
     private setUpdating(id: number, isUpdating: boolean): void {
