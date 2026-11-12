@@ -43,4 +43,9 @@ export class TerminalsService {
   update(id: number, data: UpdateTerminalDto): Observable<TerminalDetail> {
     return this.http.patch<TerminalDetail>(`${this.apiUrl}/${id}`, data, { context: this.context });
   }
+
+  // 409 si alguna ruta usa el terminal como origen o destino.
+  delete(id: number): Observable<TerminalResponse> {
+    return this.http.delete<TerminalResponse>(`${this.apiUrl}/${id}`, { context: this.context });
+  }
 }

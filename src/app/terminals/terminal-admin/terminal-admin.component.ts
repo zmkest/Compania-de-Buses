@@ -5,9 +5,12 @@ import { SortOrder, TerminalsService } from '../../services/terminals.service';
 import { CitiesService } from '../../services/cities.service';
 import { AuthService } from '../../services/auth.service';
 import { EUserRole } from '../../shared/enums/user.enum';
-import { TerminalDetail } from '../../shared/models/terminal.dto';
+import { TerminalDetail, TerminalResponse } from '../../shared/models/terminal.dto';
+import { NotificationService } from '../../core/notifications/notification.service';
+import { AppError } from '../../core/errors/app-error';
 import { BusSearchComponent } from '../../buses/bus-search/bus-search.component';
 import { TerminalFormComponent } from '../terminal-form/terminal-form.component';
+import { TerminalDeleteDialogComponent } from '../terminal-delete-dialog/terminal-delete-dialog.component';
 import { toOneOf, toPage, toSearch } from '../../core/routing/query-params';
 
 const PAGE_SIZE = 10;
@@ -17,13 +20,14 @@ const SORT_ORDERS: SortOrder[] = ['asc', 'desc'];
     selector: 'app-terminal-admin',
     templateUrl: './terminal-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [BusSearchComponent, TerminalFormComponent]
+    imports: [BusSearchComponent, TerminalFormComponent, TerminalDeleteDialogComponent]
 })
 export class TerminalAdminComponent {
     private readonly terminalsService = inject(TerminalsService);
     private readonly citiesService = inject(CitiesService);
     private readonly router = inject(Router);
     private readonly authService = inject(AuthService);
+    private readonly notificationService = inject(NotificationService);
 
     // Enlazados a los query params ?page=&search=&order= (withComponentInputBinding).
     readonly page = input(1, { transform: toPage });
@@ -37,6 +41,8 @@ export class TerminalAdminComponent {
 
     readonly isFormOpen = signal(false);
     readonly editingId = signal<number | null>(null);
+    readonly deletingTerminal = signal<TerminalResponse | null>(null);
+    readonly isDeleting = signal(false);
 
     readonly terminalsResource = rxResource({
         params: () => ({ page: this.page(), limit: PAGE_SIZE, search: this.search(), order: this.order() }),
@@ -122,6 +128,23 @@ export class TerminalAdminComponent {
             items: response.items.map(item => item.id === terminal.id ? terminal : item),
         });
         this.closeForm();
+    }
+
+    confirmDelete(terminal: TerminalResponse): void {
+        this.isDeleting.set(true);
+        this.terminalsService.delete(terminal.id).subscribe({
+            next: () => {
+                this.isDeleting.set(false);
+                this.deletingTerminal.set(null);
+                this.notificationService.success(`Terminal ${terminal.name} eliminado.`);
+                this.terminalsResource.reload();
+            },
+            error: (err: AppError) => {
+                this.isDeleting.set(false);
+                this.deletingTerminal.set(null);
+                this.notificationService.error(err.message);
+            },
+        });
     }
 
     private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {
