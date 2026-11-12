@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { BusesService } from '../../fleet/buses/buses.service';
+import { BusLocalService } from '../services/bus-local.service';
 import { ViajeService } from '../services/viaje.service';
 import { FormsModule } from '@angular/forms';
 
@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 export class ConsultasComponent {
   buscarPlaca: string = '';
 
-  constructor(private busService: BusesService, private viajesServ: ViajeService) { }
+  constructor(private busService: BusLocalService, private viajesServ: ViajeService) { }
   
   get ListaBuses() {
     return this.busService.getListaBuses;

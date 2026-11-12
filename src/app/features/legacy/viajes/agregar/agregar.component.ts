@@ -2,7 +2,7 @@ import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChi
 import { Bus } from '../../models/Buses';
 import { Tripulacion } from '../../models/Tripulacion';
 import { Viaje } from '../../models/Viaje';
-import { BusesService } from '../../../fleet/buses/buses.service';
+import { BusLocalService } from '../../services/bus-local.service';
 import { TripulacionService } from '../../services/tripulacion.service';
 import { ViajeService } from '../../services/viaje.service';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -28,7 +28,7 @@ export class AgregarComponent implements OnChanges{
 
   @ViewChild('radios', { read: ElementRef, static: false }) radiosRef!: ElementRef;
 
-  constructor(private fb: FormBuilder, private viajeService: ViajeService,  private busServ: BusesService, private tripulaiconServ: TripulacionService) {
+  constructor(private fb: FormBuilder, private viajeService: ViajeService,  private busServ: BusLocalService, private tripulaiconServ: TripulacionService) {
     this.miForm = this.fb.group({
       codigo: ['', Validators.required],
       origen: ['', Validators.required],

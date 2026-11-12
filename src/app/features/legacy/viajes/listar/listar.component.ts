@@ -3,7 +3,7 @@ import { Bus } from '../../models/Buses';
 import { Chofer } from '../../models/Chofer';
 import { Tripulacion } from '../../models/Tripulacion';
 import { Viaje } from '../../models/Viaje';
-import { BusesService } from '../../../fleet/buses/buses.service';
+import { BusLocalService } from '../../services/bus-local.service';
 import { ViajeService } from '../../services/viaje.service';
 import { Toast } from 'bootstrap';
 import { AgregarComponent } from '../agregar/agregar.component';
@@ -39,7 +39,7 @@ export class ListarComponent  implements OnInit {
     return this.viajeService.getListaViajes;
   }
 
-  constructor(private viajeService: ViajeService, private busServ: BusesService) { }
+  constructor(private viajeService: ViajeService, private busServ: BusLocalService) { }
 
   ngOnInit() {
     this.update = false;
