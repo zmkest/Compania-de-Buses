@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { PaginatedResponse } from '../core/interfaces/paginated';
-import { TerminalResponse } from '../shared/models/terminal.dto';
+import { CreateTerminalDto, TerminalResponse } from '../shared/models/terminal.dto';
 
 export type SortOrder = 'asc' | 'desc';
 
@@ -30,5 +30,9 @@ export class TerminalsService {
       params = params.set('search', search);
     }
     return this.http.get<PaginatedResponse<TerminalResponse>>(this.apiUrl, { params, context: this.context });
+  }
+
+  create(data: CreateTerminalDto): Observable<TerminalResponse> {
+    return this.http.post<TerminalResponse>(this.apiUrl, data, { context: this.context });
   }
 }

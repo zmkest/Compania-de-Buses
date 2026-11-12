@@ -10,3 +10,9 @@ export interface TerminalResponse {
     cityId: number;
     address: string | null;
 }
+
+export interface CreateTerminalDto {
+    name: string;
+    cityId: number;
+    address?: string;
+}

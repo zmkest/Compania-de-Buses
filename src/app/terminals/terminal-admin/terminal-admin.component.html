@@ -7,6 +7,18 @@
         Gestiona los terminales de la red y la ciudad donde operan.
       </p>
     </div>
+    <button
+      type="button"
+      (click)="openCreate()"
+      [disabled]="!citiesResource.hasValue()"
+      [title]="citiesResource.error() ? 'No se pudieron cargar las ciudades' : ''"
+      class="inline-flex items-center gap-2 bg-brand-navy text-white font-semibold px-5 py-2.5 rounded-lg shadow hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+      </svg>
+      Nuevo terminal
+    </button>
   </header>
 
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
@@ -95,7 +107,7 @@
                     {{ search() ? 'No se encontró ningún terminal' : 'Aún no hay terminales registrados' }}
                   </p>
                   <p class="text-sm text-gray-500 mb-0">
-                    {{ search() ? 'Revisa el valor buscado e inténtalo de nuevo.' : 'Los terminales registrados aparecerán aquí.' }}
+                    {{ search() ? 'Revisa el valor buscado e inténtalo de nuevo.' : 'Crea el primero con el botón "Nuevo terminal".' }}
                   </p>
                 </td>
               </tr>
@@ -144,3 +156,11 @@
     }
   </div>
 </section>
+
+@if (isFormOpen()) {
+  <app-terminal-form
+    [cities]="cities()"
+    (created)="onCreated()"
+    (cancelled)="closeForm()"
+  />
+}

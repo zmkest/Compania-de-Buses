@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy, computed, effect, inject, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { SortOrder, TerminalsService } from '../../services/terminals.service';
 import { CitiesService } from '../../services/cities.service';
 import { BusSearchComponent } from '../../buses/bus-search/bus-search.component';
+import { TerminalFormComponent } from '../terminal-form/terminal-form.component';
 import { toOneOf, toPage, toSearch } from '../../core/routing/query-params';
 
 const PAGE_SIZE = 10;
@@ -13,7 +14,7 @@ const SORT_ORDERS: SortOrder[] = ['asc', 'desc'];
     selector: 'app-terminal-admin',
     templateUrl: './terminal-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [BusSearchComponent]
+    imports: [BusSearchComponent, TerminalFormComponent]
 })
 export class TerminalAdminComponent {
     private readonly terminalsService = inject(TerminalsService);
@@ -24,6 +25,8 @@ export class TerminalAdminComponent {
     readonly page = input(1, { transform: toPage });
     readonly search = input('', { transform: toSearch });
     readonly order = input<SortOrder, string | undefined>('asc', { transform: value => toOneOf(SORT_ORDERS)(value) ?? 'asc' });
+
+    readonly isFormOpen = signal(false);
 
     readonly terminalsResource = rxResource({
         params: () => ({ page: this.page(), limit: PAGE_SIZE, search: this.search(), order: this.order() }),
@@ -41,10 +44,10 @@ export class TerminalAdminComponent {
     readonly totalPages = computed(() => this.terminalsPage()?.meta.totalPages ?? 1);
     readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
 
+    readonly cities = computed(() => this.citiesResource.hasValue() ? this.citiesResource.value() : []);
+
     // El listado solo trae cityId; el nombre sale de GET /cities.
-    private readonly cityNames = computed(() => new Map(
-        (this.citiesResource.hasValue() ? this.citiesResource.value() : []).map(city => [city.id, city.name])
-    ));
+    private readonly cityNames = computed(() => new Map(this.cities().map(city => [city.id, city.name])));
 
     constructor() {
         // Una URL vieja o eliminar el último terminal de una página puede dejar la página fuera de rango.
@@ -81,6 +84,19 @@ export class TerminalAdminComponent {
     reload(): void {
         this.terminalsResource.reload();
         this.citiesResource.reload();
+    }
+
+    openCreate(): void {
+        this.isFormOpen.set(true);
+    }
+
+    closeForm(): void {
+        this.isFormOpen.set(false);
+    }
+
+    onCreated(): void {
+        this.closeForm();
+        this.terminalsResource.reload();
     }
 
     private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {
