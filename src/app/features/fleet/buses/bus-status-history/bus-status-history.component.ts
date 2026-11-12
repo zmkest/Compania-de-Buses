@@ -4,7 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { BUS_STATUS_BADGE_CLASSES, BUS_STATUS_LABELS, EBusStatus } from '../bus.enum';
 import { BusesService } from '../buses.service';
-import { BusSearchComponent } from '../../../../shared/components/search-box/bus-search.component';
+import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { MaintenanceDetailDialogComponent } from '../../maintenances/maintenance-detail-dialog/maintenance-detail-dialog.component';
 import { toOneOf, toPage, toSearch } from '../../../../core/routing/query-params';
 
@@ -36,7 +36,7 @@ const FILTER_CLASSES: Record<EBusStatus, string> = {
     selector: 'app-bus-status-history',
     templateUrl: './bus-status-history.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, BusSearchComponent, MaintenanceDetailDialogComponent]
+    imports: [DatePipe, SearchBoxComponent, MaintenanceDetailDialogComponent]
 })
 export class BusStatusHistoryComponent {
     private readonly busesService = inject(BusesService);

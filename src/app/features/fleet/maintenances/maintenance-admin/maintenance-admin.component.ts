@@ -14,7 +14,7 @@ import { MaintenanceResponse } from '../maintenance.dto';
 import { EUserRole } from '../../../../core/auth/user.enum';
 import { MaintenancesService } from '../maintenances.service';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { BusSearchComponent } from '../../../../shared/components/search-box/bus-search.component';
+import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { MaintenanceFormComponent } from '../maintenance-form/maintenance-form.component';
 import { MaintenanceCompleteDialogComponent } from '../maintenance-complete-dialog/maintenance-complete-dialog.component';
 import { MaintenanceCancelDialogComponent } from '../maintenance-cancel-dialog/maintenance-cancel-dialog.component';
@@ -37,7 +37,7 @@ const TYPE_CARDS: { type: EMaintenanceType; border: string }[] = [
     selector: 'app-maintenance-admin',
     templateUrl: './maintenance-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, CurrencyPipe, BusSearchComponent, MaintenanceFormComponent, MaintenanceCompleteDialogComponent, MaintenanceCancelDialogComponent]
+    imports: [DatePipe, CurrencyPipe, SearchBoxComponent, MaintenanceFormComponent, MaintenanceCompleteDialogComponent, MaintenanceCancelDialogComponent]
 })
 export class MaintenanceAdminComponent {
     private readonly maintenancesService = inject(MaintenancesService);

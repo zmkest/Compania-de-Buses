@@ -8,7 +8,7 @@ import { EUserRole } from '../../../../core/auth/user.enum';
 import { TerminalDetail, TerminalResponse } from '../terminal.dto';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { AppError } from '../../../../core/errors/app-error';
-import { BusSearchComponent } from '../../../../shared/components/search-box/bus-search.component';
+import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { TerminalFormComponent } from '../terminal-form/terminal-form.component';
 import { TerminalDeleteDialogComponent } from '../terminal-delete-dialog/terminal-delete-dialog.component';
 import { toOneOf, toPage, toSearch } from '../../../../core/routing/query-params';
@@ -20,7 +20,7 @@ const SORT_ORDERS: SortOrder[] = ['asc', 'desc'];
     selector: 'app-terminal-admin',
     templateUrl: './terminal-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [BusSearchComponent, TerminalFormComponent, TerminalDeleteDialogComponent]
+    imports: [SearchBoxComponent, TerminalFormComponent, TerminalDeleteDialogComponent]
 })
 export class TerminalAdminComponent {
     private readonly terminalsService = inject(TerminalsService);

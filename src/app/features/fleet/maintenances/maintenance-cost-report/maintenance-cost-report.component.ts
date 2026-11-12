@@ -6,7 +6,7 @@ import { MAINTENANCE_TYPE_LABELS, MAINTENANCE_TYPE_TEXT_CLASSES } from '../../bu
 import { BusResponse } from '../../buses/bus.dto';
 import { BusesService } from '../../buses/buses.service';
 import { MaintenancesService } from '../maintenances.service';
-import { BusSearchComponent } from '../../../../shared/components/search-box/bus-search.component';
+import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { toDate, toId } from '../../../../core/routing/query-params';
 import { toDateInput } from '../../../../shared/utils/date-util';
 
@@ -17,7 +17,7 @@ const BUS_RESULTS_LIMIT = 5;
     selector: 'app-maintenance-cost-report',
     templateUrl: './maintenance-cost-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [RouterLink, DatePipe, CurrencyPipe, BusSearchComponent]
+    imports: [RouterLink, DatePipe, CurrencyPipe, SearchBoxComponent]
 })
 export class MaintenanceCostReportComponent {
     private readonly maintenancesService = inject(MaintenancesService);

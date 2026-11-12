@@ -7,7 +7,7 @@ import { UpdateUserDto, UserResponse } from '../user.dto';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { UserService } from '../user.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
-import { UserSearchComponent } from '../user-search/user-search.component';
+import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { UserFormComponent } from '../user-form/user-form.component';
 import { UserDeleteDialogComponent } from '../user-delete-dialog/user-delete-dialog.component';
 import { AppError } from '../../../../core/errors/app-error';
@@ -27,7 +27,7 @@ const ROLE_BADGE_CLASSES: Record<EUserRole, string> = {
     selector: 'app-user-admin',
     templateUrl: './user-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, UserSearchComponent, UserFormComponent, UserDeleteDialogComponent]
+    imports: [DatePipe, SearchBoxComponent, UserFormComponent, UserDeleteDialogComponent]
 })
 export class UserAdminComponent {
     private readonly authService = inject(AuthService);

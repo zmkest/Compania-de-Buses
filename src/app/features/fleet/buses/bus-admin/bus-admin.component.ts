@@ -6,7 +6,7 @@ import { BUS_STATUS_BADGE_CLASSES, BUS_STATUS_LABELS, EBusStatus } from '../bus.
 import { BusResponse, UpdateBusDto } from '../bus.dto';
 import { BusesService } from '../buses.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
-import { BusSearchComponent } from '../../../../shared/components/search-box/bus-search.component';
+import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { BusFormComponent } from '../bus-form/bus-form.component';
 import { BusDeleteDialogComponent } from '../bus-delete-dialog/bus-delete-dialog.component';
 import { BusStatusDialogComponent } from '../bus-status-dialog/bus-status-dialog.component';
@@ -26,7 +26,7 @@ const STATUS_CARDS: { status: EBusStatus; border: string; text: string }[] = [
     selector: 'app-bus-admin',
     templateUrl: './bus-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [RouterLink, DatePipe, DecimalPipe, BusSearchComponent, BusFormComponent, BusDeleteDialogComponent, BusStatusDialogComponent]
+    imports: [RouterLink, DatePipe, DecimalPipe, SearchBoxComponent, BusFormComponent, BusDeleteDialogComponent, BusStatusDialogComponent]
 })
 export class BusAdminComponent {
     private readonly busesService = inject(BusesService);

@@ -4,15 +4,15 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 @Component({
-    selector: 'app-bus-search',
-    templateUrl: './bus-search.component.html',
+    selector: 'app-search-box',
+    templateUrl: './search-box.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ReactiveFormsModule]
 })
-export class BusSearchComponent {
+export class SearchBoxComponent {
     // Valor actual (viene de la URL); mantiene la caja sincronizada al recargar o usar atrás/adelante.
     readonly value = input('');
-    readonly placeholder = input('Buscar por placa o modelo');
+    readonly placeholder = input('Buscar');
     readonly searched = output<string>();
 
     readonly query = new FormControl('', { nonNullable: true });

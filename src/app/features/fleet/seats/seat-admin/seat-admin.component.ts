@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, computed, effect, inject, input } f
 import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { SeatsService } from '../seats.service';
-import { BusSearchComponent } from '../../../../shared/components/search-box/bus-search.component';
+import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { SeatMapPanelComponent } from '../seat-map-panel/seat-map-panel.component';
 import { BusSeatCount } from '../seat.dto';
 import { toId, toPage, toSearch } from '../../../../core/routing/query-params';
@@ -14,7 +14,7 @@ const PAGE_SIZE = 5;
     selector: 'app-seat-admin',
     templateUrl: './seat-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [BusSearchComponent, SeatMapPanelComponent]
+    imports: [SearchBoxComponent, SeatMapPanelComponent]
 })
 export class SeatAdminComponent {
     private readonly seatsService = inject(SeatsService);
