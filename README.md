@@ -112,19 +112,22 @@ Las pantallas de **Viajes**, **Choferes**, **Tripulación** y **Consultas** toda
 
 ```text
 src/app/
-├── auth/          # Login, registro, recuperar y restablecer contraseña, guards
-├── users/         # Administración de usuarios
-├── buses/         # Buses, cambio de estado, historial y disponibilidad
-├── seats/         # Tabla de buses y panel con el mapa de asientos
-├── maintenances/  # Mantenimientos y reporte de costos
-├── terminals/     # Terminales de la red (Red y horario)
-├── profile/       # Perfil y cambio de contraseña
-├── core/          # Interceptores (auth, errores), notificaciones, helpers de query params
-├── services/      # Servicios HTTP por módulo
-├── shared/        # Enums, modelos (DTOs), utilidades y validadores
-├── sidebar/       # Menú lateral filtrado por rol
-└── viaje/, chofer/, tripulacion/, consultas/   # Pantallas pendientes de migrar a la API
+├── core/                  # Singletons de la app
+│   ├── auth/              # AuthService, guards, interceptor de auth, roles y modelo de usuario
+│   ├── errors/            # AppError y ErrorHandler global
+│   ├── http/              # Interceptor de errores y respuesta paginada
+│   ├── notifications/     # Toasts
+│   └── routing/           # Helpers para query params
+├── layout/                # Shell de la app (admin) y menú lateral filtrado por rol
+├── shared/                # Componentes (search-box), utilidades y validadores reutilizables
+└── features/              # Un dominio por carpeta, como en company-api
+    ├── identity/          # auth (login, registro, contraseña), profile, users
+    ├── fleet/             # buses (estado, historial, disponibilidad), seats, maintenances
+    ├── network/           # terminals (Red y horario)
+    └── legacy/            # viajes, choferes, tripulación y consultas con datos locales
 ```
+
+Cada feature guarda juntos sus componentes, su servicio HTTP y sus DTOs/enums. Lo que usa más de un dominio va en `shared/` o `core/`.
 
 ## Roles
 
