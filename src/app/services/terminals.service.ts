@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SILENT_ERRORS } from '../core/http/error.interceptor';
 import { PaginatedResponse } from '../core/interfaces/paginated';
-import { CreateTerminalDto, TerminalResponse } from '../shared/models/terminal.dto';
+import { CreateTerminalDto, TerminalDetail, TerminalResponse, UpdateTerminalDto } from '../shared/models/terminal.dto';
 
 export type SortOrder = 'asc' | 'desc';
 
@@ -32,7 +32,15 @@ export class TerminalsService {
     return this.http.get<PaginatedResponse<TerminalResponse>>(this.apiUrl, { params, context: this.context });
   }
 
+  getById(id: number): Observable<TerminalDetail> {
+    return this.http.get<TerminalDetail>(`${this.apiUrl}/${id}`, { context: this.context });
+  }
+
   create(data: CreateTerminalDto): Observable<TerminalResponse> {
     return this.http.post<TerminalResponse>(this.apiUrl, data, { context: this.context });
+  }
+
+  update(id: number, data: UpdateTerminalDto): Observable<TerminalDetail> {
+    return this.http.patch<TerminalDetail>(`${this.apiUrl}/${id}`, data, { context: this.context });
   }
 }

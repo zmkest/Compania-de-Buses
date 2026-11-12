@@ -11,8 +11,15 @@ export interface TerminalResponse {
     address: string | null;
 }
 
+export interface TerminalDetail extends TerminalResponse {
+    city: City;
+}
+
 export interface CreateTerminalDto {
     name: string;
     cityId: number;
     address?: string;
 }
+
+// address: null borra la dirección guardada.
+export type UpdateTerminalDto = Partial<Omit<CreateTerminalDto, 'address'>> & { address?: string | null };

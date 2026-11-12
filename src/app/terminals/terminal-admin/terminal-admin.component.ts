@@ -3,6 +3,9 @@ import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { SortOrder, TerminalsService } from '../../services/terminals.service';
 import { CitiesService } from '../../services/cities.service';
+import { AuthService } from '../../services/auth.service';
+import { EUserRole } from '../../shared/enums/user.enum';
+import { TerminalDetail } from '../../shared/models/terminal.dto';
 import { BusSearchComponent } from '../../buses/bus-search/bus-search.component';
 import { TerminalFormComponent } from '../terminal-form/terminal-form.component';
 import { toOneOf, toPage, toSearch } from '../../core/routing/query-params';
@@ -20,13 +23,20 @@ export class TerminalAdminComponent {
     private readonly terminalsService = inject(TerminalsService);
     private readonly citiesService = inject(CitiesService);
     private readonly router = inject(Router);
+    private readonly authService = inject(AuthService);
 
     // Enlazados a los query params ?page=&search=&order= (withComponentInputBinding).
     readonly page = input(1, { transform: toPage });
     readonly search = input('', { transform: toSearch });
     readonly order = input<SortOrder, string | undefined>('asc', { transform: value => toOneOf(SORT_ORDERS)(value) ?? 'asc' });
 
+    // Editar y eliminar son solo para ADMIN; OPERATOR puede listar y crear.
+    readonly isAdmin = computed(() => this.authService.currentUser()?.role === EUserRole.ADMIN);
+
+    readonly columnCount = computed(() => this.isAdmin() ? 5 : 4);
+
     readonly isFormOpen = signal(false);
+    readonly editingId = signal<number | null>(null);
 
     readonly terminalsResource = rxResource({
         params: () => ({ page: this.page(), limit: PAGE_SIZE, search: this.search(), order: this.order() }),
@@ -87,16 +97,31 @@ export class TerminalAdminComponent {
     }
 
     openCreate(): void {
+        this.editingId.set(null);
+        this.isFormOpen.set(true);
+    }
+
+    openEdit(id: number): void {
+        this.editingId.set(id);
         this.isFormOpen.set(true);
     }
 
     closeForm(): void {
         this.isFormOpen.set(false);
+        this.editingId.set(null);
     }
 
     onCreated(): void {
         this.closeForm();
         this.terminalsResource.reload();
+    }
+
+    onUpdated({ city, ...terminal }: TerminalDetail): void {
+        this.terminalsResource.value.update(response => response && {
+            ...response,
+            items: response.items.map(item => item.id === terminal.id ? terminal : item),
+        });
+        this.closeForm();
     }
 
     private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {

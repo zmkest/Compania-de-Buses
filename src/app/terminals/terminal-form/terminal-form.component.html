@@ -8,8 +8,14 @@
   >
     <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
       <div>
-        <h2 id="terminal-form-title" class="font-brand text-2xl text-brand-navy mb-0">Nuevo terminal</h2>
-        <p class="text-xs text-gray-500 mt-1 mb-0">Completa los datos para registrar un terminal en la red.</p>
+        <h2 id="terminal-form-title" class="font-brand text-2xl text-brand-navy mb-0">
+          {{ isEdit() ? 'Editar terminal' : 'Nuevo terminal' }}
+        </h2>
+        @if (terminal(); as current) {
+          <p class="text-xs text-gray-500 mt-1 mb-0">ID #{{ current.id }} · {{ current.city.name }}</p>
+        } @else if (!isEdit()) {
+          <p class="text-xs text-gray-500 mt-1 mb-0">Completa los datos para registrar un terminal en la red.</p>
+        }
       </div>
       <button type="button" (click)="cancelled.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -18,6 +24,21 @@
       </button>
     </div>
 
+    @if (isLoading()) {
+      <div class="px-6 py-12 text-center text-gray-500">
+        <div class="inline-flex items-center gap-2">
+          <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+          Cargando terminal...
+        </div>
+      </div>
+    } @else if (loadError()) {
+      <div class="px-6 py-12 text-center" role="alert">
+        <p class="font-semibold text-red-600 mb-3">{{ loadError() }}</p>
+        <button type="button" (click)="load()" class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition">
+          Reintentar
+        </button>
+      </div>
+    } @else {
     <form [formGroup]="form" (ngSubmit)="submit()" class="px-6 py-3 space-y-4">
       @if (errorMessages().length) {
         <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
@@ -86,9 +107,14 @@
           Cancelar
         </button>
         <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-wait disabled:opacity-60">
-          {{ isSubmitting() ? 'Guardando...' : 'Crear terminal' }}
+          @if (isSubmitting()) {
+            Guardando...
+          } @else {
+            {{ isEdit() ? 'Guardar cambios' : 'Crear terminal' }}
+          }
         </button>
       </div>
     </form>
+    }
   </div>
 </div>
