@@ -1,7 +1,7 @@
 import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from "@angular/common/http";
 import { inject } from "@angular/core";
 import { NotificationService } from "../notifications/notification.service";
-import { AuthService } from "../../services/auth.service";
+import { AuthService } from "../auth/auth.service";
 import { Router } from "@angular/router";
 import { catchError, retry, throwError, timer } from "rxjs";
 import { toAppError } from "../errors/app-error";

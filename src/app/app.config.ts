@@ -5,7 +5,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule } from "@angular/forms";
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { errorInterceptor } from './core/http/error.interceptor';
-import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { authInterceptor } from './core/auth/auth.interceptor';
 import { GlobalErrorHandler } from './core/errors/handle-error';
 
 export const appConfig: ApplicationConfig = {
