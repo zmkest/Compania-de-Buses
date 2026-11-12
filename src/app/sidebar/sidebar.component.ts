@@ -41,6 +41,13 @@ const menu: MenuItem[] =[
             ]
         },
         {
+            route: 'red', title: 'Red y horario', imageUrl: 'assets/img/red.svg',
+            roles: [EUserRole.ADMIN, EUserRole.OPERATOR],
+            children: [
+                { route: 'red/terminales', title: 'Terminales', icon: 'M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6' },
+            ]
+        },
+        {
             route: 'tripulacion', title: 'Tripulación', imageUrl: 'assets/img/tripulacion.png',
             roles: [EUserRole.ADMIN]
         },

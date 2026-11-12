@@ -53,6 +53,14 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'red',
+        canActivate: [roleGuard(EUserRole.ADMIN, EUserRole.OPERATOR)],
+        children: [
+          { path: '', redirectTo: 'terminales', pathMatch: 'full' },
+          { path: 'terminales', loadComponent: () => import('./terminals/terminal-admin/terminal-admin.component').then(m => m.TerminalAdminComponent) },
+        ],
+      },
       { path: 'choferes', loadComponent: () => import('./chofer/principal/principal.component').then(m => m.PrincipalComponent) },
       { path: 'tripulacion', loadComponent: () => import('./tripulacion/principal/principal.component').then(m => m.PrincipalComponent) },
       { path: 'consultas', loadComponent: () => import('./consultas/consultas.component').then(m => m.ConsultasComponent) },
