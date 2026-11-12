@@ -44,10 +44,14 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
   - Los mantenimientos ya cerrados solo permiten editar el costo y la descripción.
 - **Flota > Costos**
   - Reporte de costos de mantenimiento por bus y rango de fechas.
+- **Red y horario > Terminales** (ADMIN y OPERATOR)
+  - Listado paginado con búsqueda por terminal o ciudad y orden por nombre.
+  - Crear terminales eligiendo la ciudad.
+  - Editar y eliminar (solo ADMIN). No se puede eliminar un terminal que usan rutas.
 
 ### Pendientes de conectar
 
-Las pantallas de **Viajes**, **Choferes**, **Tripulación** y **Consultas** todavía usan datos locales en memoria. Se van a conectar cuando `company-api` exponga los módulos de terminales, rutas, frecuencias, viajes y tripulación.
+Las pantallas de **Viajes**, **Choferes**, **Tripulación** y **Consultas** todavía usan datos locales en memoria. Se van a conectar cuando `company-api` exponga los módulos de rutas, frecuencias, viajes y tripulación.
 
 ## Tecnologías
 
@@ -113,6 +117,7 @@ src/app/
 ├── buses/         # Buses, cambio de estado, historial y disponibilidad
 ├── seats/         # Tabla de buses y panel con el mapa de asientos
 ├── maintenances/  # Mantenimientos y reporte de costos
+├── terminals/     # Terminales de la red (Red y horario)
 ├── profile/       # Perfil y cambio de contraseña
 ├── core/          # Interceptores (auth, errores), notificaciones, helpers de query params
 ├── services/      # Servicios HTTP por módulo
