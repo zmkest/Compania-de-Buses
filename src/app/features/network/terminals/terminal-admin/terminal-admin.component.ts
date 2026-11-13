@@ -1,8 +1,9 @@
 import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { SortOrder, TerminalsService } from '../terminals.service';
-import { CitiesService } from '../cities.service';
+import { TerminalsService } from '../terminals.service';
+import { SortOrder } from '../../../../core/http/paginated';
+import { CitiesService } from '../../cities/cities.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { EUserRole } from '../../../../core/auth/user.enum';
 import { TerminalDetail, TerminalResponse } from '../terminal.dto';

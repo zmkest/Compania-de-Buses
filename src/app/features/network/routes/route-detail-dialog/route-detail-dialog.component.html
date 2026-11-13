@@ -1,0 +1,116 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="closed.emit()">
+  <div
+    class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="route-detail-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="route-detail-title" class="font-brand text-2xl text-brand-navy mb-0">Ruta #{{ routeId() }}</h2>
+        @if (route(); as data) {
+          <p class="text-xs text-gray-500 mt-1 mb-0">{{ data.origin.city.name }} → {{ data.destination.city.name }}</p>
+        }
+      </div>
+      <button type="button" (click)="closed.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="px-6 py-4 max-h-[75vh] overflow-y-auto">
+      @if (routeResource.isLoading()) {
+        <div class="py-8 text-center text-gray-500">
+          <div class="inline-flex items-center gap-2">
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+            Cargando ruta...
+          </div>
+        </div>
+      } @else if (routeResource.error()) {
+        <div class="py-8 text-center" role="alert">
+          <p class="font-semibold text-red-600 mb-3">No se pudo cargar la ruta</p>
+          <button
+            type="button"
+            (click)="routeResource.reload()"
+            class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition"
+          >
+            Reintentar
+          </button>
+        </div>
+      } @else if (route(); as data) {
+        <dl class="grid grid-cols-2 gap-4 text-sm mb-6">
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Origen</dt>
+            <dd class="mb-0">
+              <p class="font-semibold text-gray-800 mb-0">{{ data.origin.name }}</p>
+              <p class="text-gray-500 mb-0">{{ data.origin.city.name }}</p>
+              @if (data.origin.address) {
+                <p class="text-xs text-gray-400 mb-0">{{ data.origin.address }}</p>
+              }
+            </dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Destino</dt>
+            <dd class="mb-0">
+              <p class="font-semibold text-gray-800 mb-0">{{ data.destination.name }}</p>
+              <p class="text-gray-500 mb-0">{{ data.destination.city.name }}</p>
+              @if (data.destination.address) {
+                <p class="text-xs text-gray-400 mb-0">{{ data.destination.address }}</p>
+              }
+            </dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Distancia</dt>
+            <dd class="text-gray-700 mb-0">{{ data.distanceKm | number: '1.0-2' }} km</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-brand-navy mb-1">Duración</dt>
+            <dd class="text-gray-700 mb-0">{{ formatDuration(data.durationMinutes) }}</dd>
+          </div>
+        </dl>
+
+        <h3 class="text-sm font-semibold text-brand-navy mb-2">
+          Frecuencias <span class="font-normal text-gray-400">({{ data.frequencies.length }})</span>
+        </h3>
+        @if (data.frequencies.length) {
+          <div class="overflow-x-auto rounded-lg border border-gray-100">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-gray-50 text-gray-600">
+                <tr>
+                  <th class="px-4 py-2 font-semibold">Salida</th>
+                  <th class="px-4 py-2 font-semibold">Días</th>
+                  <th class="px-4 py-2 font-semibold text-right">Precio base</th>
+                  <th class="px-4 py-2 font-semibold">Estado</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                @for (frequency of data.frequencies; track frequency.id) {
+                  <tr [class.text-gray-400]="!frequency.isActive">
+                    <td class="px-4 py-2 font-semibold whitespace-nowrap">{{ formatDepartureTime(frequency.departureTime) }}</td>
+                    <td class="px-4 py-2">
+                      <div class="flex flex-wrap gap-1">
+                        @for (day of frequency.weekdays; track day) {
+                          <span class="rounded bg-brand-mint px-1.5 py-0.5 text-xs font-semibold text-brand-navy">{{ weekdayLabels[day] }}</span>
+                        }
+                      </div>
+                    </td>
+                    <td class="px-4 py-2 text-right whitespace-nowrap">{{ frequency.basePrice | currency: "USD" }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">
+                      <span class="font-semibold" [class]="frequency.isActive ? 'text-green-600' : 'text-gray-400'">
+                        {{ frequency.isActive ? 'Activa' : 'Inactiva' }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="text-sm text-gray-500 mb-0">Esta ruta aún no tiene frecuencias.</p>
+        }
+      }
+    </div>
+  </div>
+</div>

@@ -1,12 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SILENT_ERRORS } from '../../../core/http/error.interceptor';
-import { PaginatedResponse } from '../../../core/http/paginated';
+import { PaginatedResponse, SortOrder } from '../../../core/http/paginated';
 import { CreateTerminalDto, TerminalDetail, TerminalResponse, UpdateTerminalDto } from './terminal.dto';
-
-export type SortOrder = 'asc' | 'desc';
+import { City } from '../cities/city.dto';
 
 export interface TerminalQuery {
   page: number;
@@ -30,6 +29,14 @@ export class TerminalsService {
       params = params.set('search', search);
     }
     return this.http.get<PaginatedResponse<TerminalResponse>>(this.apiUrl, { params, context: this.context });
+  }
+
+  // La API no filtra por cityId: se busca por el nombre de la ciudad (máximo permitido: 50) y se descartan
+  // los terminales de otras ciudades cuyo nombre también coincida.
+  getByCity(city: City): Observable<TerminalResponse[]> {
+    return this.getAll({ page: 1, limit: 50, search: city.name, order: 'asc' }).pipe(
+      map(response => response.items.filter(terminal => terminal.cityId === city.id)),
+    );
   }
 
   getById(id: number): Observable<TerminalDetail> {

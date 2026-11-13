@@ -59,6 +59,7 @@ export const routes: Routes = [
         children: [
           { path: '', redirectTo: 'terminales', pathMatch: 'full' },
           { path: 'terminales', loadComponent: () => import('./features/network/terminals/terminal-admin/terminal-admin.component').then(m => m.TerminalAdminComponent) },
+          { path: 'rutas', loadComponent: () => import('./features/network/routes/route-admin/route-admin.component').then(m => m.RouteAdminComponent) },
         ],
       },
       { path: 'choferes', loadComponent: () => import('./features/legacy/choferes/principal/principal.component').then(m => m.PrincipalComponent) },

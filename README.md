@@ -48,10 +48,15 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
   - Listado paginado con búsqueda por terminal o ciudad y orden por nombre.
   - Crear terminales eligiendo la ciudad.
   - Editar y eliminar (solo ADMIN). No se puede eliminar un terminal que usan rutas.
+- **Red y horario > Rutas** (ADMIN y OPERATOR)
+  - Listado paginado con filtro por ciudad de origen y de destino, y orden por ID, distancia o duración.
+  - Detalle con los terminales y las frecuencias de la ruta.
+  - Crear rutas eligiendo ciudad y terminal de origen y de destino (solo ADMIN).
+  - Editar distancia y duración, y eliminar (solo ADMIN). No se puede eliminar una ruta con frecuencias o viajes.
 
 ### Pendientes de conectar
 
-Las pantallas de **Viajes**, **Choferes**, **Tripulación** y **Consultas** todavía usan datos locales en memoria. Se van a conectar cuando `company-api` exponga los módulos de rutas, frecuencias, viajes y tripulación.
+Las pantallas de **Viajes**, **Choferes**, **Tripulación** y **Consultas** todavía usan datos locales en memoria. Se van a conectar cuando `company-api` exponga los módulos de frecuencias, viajes y tripulación.
 
 ## Tecnologías
 
@@ -123,7 +128,7 @@ src/app/
 └── features/              # Un dominio por carpeta, como en company-api
     ├── identity/          # auth (login, registro, contraseña), profile, users
     ├── fleet/             # buses (estado, historial, disponibilidad), seats, maintenances
-    ├── network/           # terminals (Red y horario)
+    ├── network/           # cities, terminals y routes (Red y horario)
     └── legacy/            # viajes, choferes, tripulación y consultas con datos locales
 ```
 
