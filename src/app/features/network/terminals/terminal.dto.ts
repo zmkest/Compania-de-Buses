@@ -1,7 +1,4 @@
-export interface City {
-    id: number;
-    name: string;
-}
+import { City } from '../cities/city.dto';
 
 // El listado paginado solo trae cityId; GET /terminals/:id incluye la ciudad.
 export interface TerminalResponse {

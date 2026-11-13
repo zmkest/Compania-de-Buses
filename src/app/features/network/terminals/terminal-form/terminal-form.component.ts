@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { City, CreateTerminalDto, TerminalDetail, UpdateTerminalDto } from '../terminal.dto';
+import { CreateTerminalDto, TerminalDetail, UpdateTerminalDto } from '../terminal.dto';
+import { City } from '../../cities/city.dto';
 import { TerminalsService } from '../terminals.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { AppError } from '../../../../core/errors/app-error';

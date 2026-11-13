@@ -1,0 +1,295 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cancelled.emit()">
+  <div
+    class="w-full max-w-lg bg-white rounded-2xl shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="route-form-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="route-form-title" class="font-brand text-2xl text-brand-navy mb-0">
+          {{ isEdit() ? 'Editar ruta' : 'Nueva ruta' }}
+        </h2>
+        @if (route(); as current) {
+          <p class="text-xs text-gray-500 mt-1 mb-0">
+            ID #{{ current.id }} · {{ current.origin.city.name }} → {{ current.destination.city.name }}
+          </p>
+        } @else if (!isEdit()) {
+          <p class="text-xs text-gray-500 mt-1 mb-0">Paso {{ step() + 1 }} de {{ steps.length }}: {{ steps[step()].description }}.</p>
+        }
+      </div>
+      <button type="button" (click)="cancelled.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    @if (isLoading()) {
+      <div class="px-6 py-12 text-center text-gray-500">
+        <div class="inline-flex items-center gap-2">
+          <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+          Cargando ruta...
+        </div>
+      </div>
+    } @else if (loadError()) {
+      <div class="px-6 py-12 text-center" role="alert">
+        <p class="font-semibold text-red-600 mb-3">{{ loadError() }}</p>
+        <button type="button" (click)="load()" class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition">
+          Reintentar
+        </button>
+      </div>
+    } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="px-6 py-4 space-y-5">
+      @if (!isEdit()) {
+        <!-- Indicador de pasos -->
+        <ol class="flex items-center gap-2 list-none p-0 m-0" aria-label="Pasos">
+          @for (item of steps; track item.title; let index = $index; let last = $last) {
+            <li class="flex items-center gap-2" [class.flex-1]="!last" [attr.aria-current]="index === step() ? 'step' : null">
+              <span
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition"
+                [class]="index < step() ? 'bg-brand-blue text-white' : index === step() ? 'bg-brand-navy text-white' : 'bg-gray-100 text-gray-400'"
+              >
+                @if (index < step()) {
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                    <path d="m5 12 5 5L20 7" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                } @else {
+                  {{ index + 1 }}
+                }
+              </span>
+              <span class="text-sm font-semibold whitespace-nowrap" [class]="index === step() ? 'text-brand-navy' : 'text-gray-400'">
+                {{ item.title }}
+              </span>
+              @if (!last) {
+                <span class="h-0.5 flex-1 rounded" [class]="index < step() ? 'bg-brand-blue' : 'bg-gray-200'" aria-hidden="true"></span>
+              }
+            </li>
+          }
+        </ol>
+      }
+
+      @if (errorMessages().length) {
+        <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
+          @if (errorMessages().length === 1) {
+            {{ errorMessages()[0] }}
+          } @else {
+            <ul class="list-disc pl-4 mb-0">
+              @for (message of errorMessages(); track $index) {
+                <li>{{ message }}</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      @if (route(); as current) {
+        <!-- Origen y destino no se pueden cambiar: se muestran como referencia. -->
+        <div class="grid grid-cols-2 gap-3 rounded-lg bg-gray-50 px-4 py-3 text-sm">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Origen</p>
+            <p class="font-semibold text-gray-800 mb-0">{{ current.origin.name }}</p>
+            <p class="text-gray-500 mb-0">{{ current.origin.city.name }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Destino</p>
+            <p class="font-semibold text-gray-800 mb-0">{{ current.destination.name }}</p>
+            <p class="text-gray-500 mb-0">{{ current.destination.city.name }}</p>
+          </div>
+        </div>
+      }
+
+      @if (!isEdit() && step() === 0) {
+        <div class="space-y-4">
+          <div>
+            <label for="route-origin-city" class="block text-sm font-semibold text-brand-navy mb-0">Ciudad de origen</label>
+            <p id="route-origin-city-hint" class="text-xs text-gray-500 mb-1">Ciudad desde donde parte la ruta. Solo aparecen las que tienen terminales.</p>
+            <select
+              id="route-origin-city"
+              formControlName="originCityId"
+              aria-describedby="route-origin-city-hint"
+              class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            >
+              <option [ngValue]="null" disabled>Selecciona una ciudad</option>
+              @for (city of cities(); track city.id) {
+                <option [ngValue]="city.id">{{ city.name }}</option>
+              }
+            </select>
+            @if (form.controls.originCityId.invalid && form.controls.originCityId.touched) {
+              <p class="text-xs text-red-600 mt-1 mb-0">Selecciona la ciudad de origen.</p>
+            }
+          </div>
+
+          <div>
+            <label for="route-origin" class="block text-sm font-semibold text-brand-navy mb-0">Terminal de origen</label>
+            <p id="route-origin-hint" class="text-xs text-gray-500 mb-1">Terminal de esa ciudad donde los pasajeros abordan.</p>
+            <select
+              id="route-origin"
+              formControlName="originId"
+              aria-describedby="route-origin-hint"
+              class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition disabled:bg-gray-50 disabled:text-gray-400"
+            >
+              <option [ngValue]="null" disabled>
+                @if (!form.controls.originCityId.value) {
+                  Primero elige la ciudad
+                } @else if (originTerminalsResource.isLoading()) {
+                  Cargando terminales...
+                } @else {
+                  Selecciona un terminal
+                }
+              </option>
+              @for (terminal of originTerminals(); track terminal.id) {
+                <option [ngValue]="terminal.id">{{ terminal.name }}</option>
+              }
+            </select>
+            @if (originTerminalsResource.error()) {
+              <p class="text-xs text-red-600 mt-1 mb-0">No se pudieron cargar los terminales de la ciudad.</p>
+            } @else if (form.controls.originId.invalid && form.controls.originId.touched) {
+              <p class="text-xs text-red-600 mt-1 mb-0">Selecciona el terminal de origen.</p>
+            }
+          </div>
+        </div>
+      }
+
+      @if (!isEdit() && step() === 1) {
+        <div class="space-y-4">
+          @if (originSummary(); as origin) {
+            <p class="rounded-lg bg-gray-50 px-4 py-2 text-sm text-gray-600 mb-0">
+              Sale de <span class="font-semibold text-gray-800">{{ origin.terminal }}</span> ({{ origin.city }})
+            </p>
+          }
+
+          <div>
+            <label for="route-destination-city" class="block text-sm font-semibold text-brand-navy mb-0">Ciudad de destino</label>
+            <p id="route-destination-city-hint" class="text-xs text-gray-500 mb-1">Ciudad a donde llega la ruta.</p>
+            <select
+              id="route-destination-city"
+              formControlName="destinationCityId"
+              aria-describedby="route-destination-city-hint"
+              class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            >
+              <option [ngValue]="null" disabled>Selecciona una ciudad</option>
+              @for (city of cities(); track city.id) {
+                <option [ngValue]="city.id">{{ city.name }}</option>
+              }
+            </select>
+            @if (form.controls.destinationCityId.invalid && form.controls.destinationCityId.touched) {
+              <p class="text-xs text-red-600 mt-1 mb-0">Selecciona la ciudad de destino.</p>
+            }
+          </div>
+
+          <div>
+            <label for="route-destination" class="block text-sm font-semibold text-brand-navy mb-0">Terminal de destino</label>
+            <p id="route-destination-hint" class="text-xs text-gray-500 mb-1">Terminal de esa ciudad donde los pasajeros descienden. No puede ser el mismo terminal de origen.</p>
+            <select
+              id="route-destination"
+              formControlName="destinationId"
+              aria-describedby="route-destination-hint"
+              class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition disabled:bg-gray-50 disabled:text-gray-400"
+            >
+              <option [ngValue]="null" disabled>
+                @if (!form.controls.destinationCityId.value) {
+                  Primero elige la ciudad
+                } @else if (destinationTerminalsResource.isLoading()) {
+                  Cargando terminales...
+                } @else if (!destinationTerminals().length) {
+                  No hay otros terminales en esta ciudad
+                } @else {
+                  Selecciona un terminal
+                }
+              </option>
+              @for (terminal of destinationTerminals(); track terminal.id) {
+                <option [ngValue]="terminal.id">{{ terminal.name }}</option>
+              }
+            </select>
+            @if (destinationTerminalsResource.error()) {
+              <p class="text-xs text-red-600 mt-1 mb-0">No se pudieron cargar los terminales de la ciudad.</p>
+            } @else if (form.controls.destinationId.invalid && form.controls.destinationId.touched) {
+              <p class="text-xs text-red-600 mt-1 mb-0">Selecciona el terminal de destino.</p>
+            }
+          </div>
+        </div>
+      }
+
+      @if (isEdit() || step() === 2) {
+        <div class="space-y-4">
+          @if (originSummary(); as origin) {
+            @if (destinationSummary(); as destination) {
+              <div class="rounded-lg bg-gray-50 px-4 py-3 text-sm">
+                <p class="text-gray-600 mb-0">
+                  <span class="font-semibold text-gray-800">{{ origin.terminal }}</span> ({{ origin.city }})
+                  →
+                  <span class="font-semibold text-gray-800">{{ destination.terminal }}</span> ({{ destination.city }})
+                </p>
+              </div>
+            }
+          }
+
+          <div>
+            <label for="route-distance" class="block text-sm font-semibold text-brand-navy mb-0">Distancia (km)</label>
+            <p id="route-distance-hint" class="text-xs text-gray-500 mb-1">Kilómetros entre los dos terminales, hasta 2 decimales (máx. {{ maxDistanceKm }}).</p>
+            <input
+              id="route-distance"
+              type="text"
+              inputmode="decimal"
+              formControlName="distanceKm"
+              aria-describedby="route-distance-hint"
+              placeholder="180.5"
+              autocomplete="off"
+              class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            >
+            @if (form.controls.distanceKm.invalid && form.controls.distanceKm.touched) {
+              <p class="text-xs text-red-600 mt-1 mb-0">Entre 0.01 y {{ maxDistanceKm }} km, máximo 2 decimales.</p>
+            }
+          </div>
+
+          <div>
+            <label for="route-duration" class="block text-sm font-semibold text-brand-navy mb-0">Duración (minutos)</label>
+            <p id="route-duration-hint" class="text-xs text-gray-500 mb-1">Tiempo estimado del viaje en minutos enteros (ej. 4 h 30 min = 270).</p>
+            <input
+              id="route-duration"
+              type="number"
+              min="1"
+              [max]="maxDurationMinutes"
+              step="1"
+              formControlName="durationMinutes"
+              aria-describedby="route-duration-hint"
+              placeholder="270"
+              class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            >
+            @if (form.controls.durationMinutes.invalid && form.controls.durationMinutes.touched) {
+              <p class="text-xs text-red-600 mt-1 mb-0">Minutos enteros entre 1 y {{ maxDurationMinutes }}.</p>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="flex justify-center gap-2 pt-2">
+        @if (!isEdit() && step() > 0) {
+          <button type="button" (click)="back()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+            Atrás
+          </button>
+        } @else {
+          <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+            Cancelar
+          </button>
+        }
+        @if (!isEdit() && !isLastStep()) {
+          <button type="button" (click)="next()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition">
+            Siguiente
+          </button>
+        } @else {
+          <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-wait disabled:opacity-60">
+            @if (isSubmitting()) {
+              Guardando...
+            } @else {
+              {{ isEdit() ? 'Guardar cambios' : 'Crear ruta' }}
+            }
+          </button>
+        }
+      </div>
+    </form>
+    }
+  </div>
+</div>
