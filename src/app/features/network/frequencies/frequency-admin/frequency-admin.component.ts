@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, effect, inject, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, NgTemplateOutlet } from '@angular/common';
@@ -8,6 +8,7 @@ import { WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_SHORT_LABELS } from '../frequency.dto
 import { formatDepartureTime } from '../frequency-format';
 import { SortOrder } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
+import { FrequencyDetailDialogComponent } from '../frequency-detail-dialog/frequency-detail-dialog.component';
 
 const PAGE_SIZE = 10;
 const SORT_FIELDS: FrequencySortBy[] = ['id', 'departureTime', 'basePrice'];
@@ -21,7 +22,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-frequency-admin',
     templateUrl: './frequency-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [CurrencyPipe, NgTemplateOutlet]
+    imports: [CurrencyPipe, NgTemplateOutlet, FrequencyDetailDialogComponent]
 })
 export class FrequencyAdminComponent {
     private readonly frequenciesService = inject(FrequenciesService);
@@ -42,6 +43,8 @@ export class FrequencyAdminComponent {
     readonly weekdayLabels = WEEKDAY_LABELS;
     readonly weekdayShortLabels = WEEKDAY_SHORT_LABELS;
     readonly formatDepartureTime = formatDepartureTime;
+
+    readonly detailId = signal<number | null>(null);
 
     readonly hasFilters = computed(() => this.routeId() !== null || this.weekday() !== null || this.isActive() !== null);
 
