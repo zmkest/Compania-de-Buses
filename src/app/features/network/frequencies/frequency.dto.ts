@@ -49,6 +49,11 @@ export interface FrequencyResponse extends Frequency {
     };
 }
 
+export interface FrequencyDetail extends Frequency {
+    route: FrequencyResponse['route'] & { distanceKm: number; durationMinutes: number };
+    _count: { trips: number };
+}
+
 export interface CreateFrequencyDto {
     routeId: number;
     departureTime: string;
