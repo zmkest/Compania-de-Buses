@@ -59,6 +59,7 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
   - Detalle con la ruta, la hora de llegada estimada, los días de operación y los viajes generados.
   - Editar hora de salida, días de operación y precio base (solo ADMIN). La ruta no se puede cambiar.
   - Activar o desactivar frecuencias desde el listado (solo ADMIN).
+  - Eliminar frecuencias (solo ADMIN). Los viajes ya generados se conservan sin la frecuencia.
 
 ### Pendientes de conectar
 
