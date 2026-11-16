@@ -1,0 +1,109 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="cancelled.emit()">
+  <div
+    class="w-full max-w-lg bg-white rounded-2xl shadow-2xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="frequency-form-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="frequency-form-title" class="font-brand text-2xl text-brand-navy mb-0">Nueva frecuencia</h2>
+        <p class="text-xs text-gray-500 mt-1 mb-0">
+          Ruta #{{ route().id }} · {{ route().origin.city.name }} → {{ route().destination.city.name }}
+        </p>
+      </div>
+      <button type="button" (click)="cancelled.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="px-6 py-4 space-y-5">
+      @if (errorMessages().length) {
+        <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
+          @if (errorMessages().length === 1) {
+            {{ errorMessages()[0] }}
+          } @else {
+            <ul class="list-disc pl-4 mb-0">
+              @for (message of errorMessages(); track $index) {
+                <li>{{ message }}</li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      <div>
+        <label for="frequency-departure" class="block text-sm font-semibold text-brand-navy mb-0">Hora de salida</label>
+        <p id="frequency-departure-hint" class="text-xs text-gray-500 mb-1">Hora en que el bus sale del terminal de origen.</p>
+        <input
+          id="frequency-departure"
+          type="time"
+          formControlName="departureTime"
+          aria-describedby="frequency-departure-hint"
+          class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+        >
+        @if (form.controls.departureTime.invalid && form.controls.departureTime.touched) {
+          <p class="text-xs text-red-600 mt-1 mb-0">Indica la hora de salida (00:00 a 23:59).</p>
+        }
+      </div>
+
+      <div role="group" aria-labelledby="frequency-weekdays-label">
+        <div class="flex items-end justify-between gap-2">
+          <div>
+            <p id="frequency-weekdays-label" class="block text-sm font-semibold text-brand-navy mb-0">Días de operación</p>
+            <p class="text-xs text-gray-500 mb-1">Días de la semana en que sale este horario.</p>
+          </div>
+          <button type="button" (click)="selectAllDays()" class="text-xs font-semibold text-brand-blue hover:text-brand-navy transition mb-1">
+            {{ form.controls.weekdays.value.length === weekdays.length ? 'Quitar todos' : 'Todos los días' }}
+          </button>
+        </div>
+        <div class="grid grid-cols-7 gap-1">
+          @for (day of weekdays; track day) {
+            <button
+              type="button"
+              (click)="toggleDay(day)"
+              [attr.aria-pressed]="isSelected(day)"
+              class="rounded-lg border-2 py-2 text-sm font-semibold transition"
+              [class]="isSelected(day) ? 'border-brand-navy bg-brand-navy text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
+            >
+              {{ weekdayLabels[day] }}
+            </button>
+          }
+        </div>
+        @if (form.controls.weekdays.invalid && form.controls.weekdays.touched) {
+          <p class="text-xs text-red-600 mt-1 mb-0">Elige al menos un día.</p>
+        }
+      </div>
+
+      <div>
+        <label for="frequency-price" class="block text-sm font-semibold text-brand-navy mb-0">Precio base (USD)</label>
+        <p id="frequency-price-hint" class="text-xs text-gray-500 mb-1">Precio del pasaje para este horario, hasta 2 decimales.</p>
+        <input
+          id="frequency-price"
+          type="text"
+          inputmode="decimal"
+          formControlName="basePrice"
+          aria-describedby="frequency-price-hint"
+          placeholder="12.50"
+          autocomplete="off"
+          class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+        >
+        @if (form.controls.basePrice.invalid && form.controls.basePrice.touched) {
+          <p class="text-xs text-red-600 mt-1 mb-0">Mayor a 0 y hasta {{ maxBasePrice }}, máximo 2 decimales.</p>
+        }
+      </div>
+
+      <div class="flex justify-center gap-2 pt-2">
+        <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-wait disabled:opacity-60">
+          {{ isSubmitting() ? 'Guardando...' : 'Crear frecuencia' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

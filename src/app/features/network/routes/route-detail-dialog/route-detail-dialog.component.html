@@ -71,9 +71,23 @@
           </div>
         </dl>
 
-        <h3 class="text-sm font-semibold text-brand-navy mb-2">
-          Frecuencias <span class="font-normal text-gray-400">({{ data.frequencies.length }})</span>
-        </h3>
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <h3 class="text-sm font-semibold text-brand-navy mb-0">
+            Frecuencias <span class="font-normal text-gray-400">({{ data.frequencies.length }})</span>
+          </h3>
+          @if (isAdmin()) {
+            <button
+              type="button"
+              (click)="isFrequencyFormOpen.set(true)"
+              class="inline-flex items-center gap-1 bg-brand-navy text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow hover:bg-brand-blue transition"
+            >
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+              </svg>
+              Nueva frecuencia
+            </button>
+          }
+        </div>
         @if (data.frequencies.length) {
           <div class="overflow-x-auto rounded-lg border border-gray-100">
             <table class="w-full text-sm text-left">
@@ -112,5 +126,9 @@
         }
       }
     </div>
+
+    @if (isFrequencyFormOpen() && route(); as data) {
+      <app-frequency-form [route]="data" (created)="onFrequencyCreated()" (cancelled)="isFrequencyFormOpen.set(false)" />
+    }
   </div>
 </div>

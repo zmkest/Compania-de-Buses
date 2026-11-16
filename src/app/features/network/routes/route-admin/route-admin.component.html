@@ -257,7 +257,7 @@
 }
 
 @if (detailId(); as id) {
-  <app-route-detail-dialog [routeId]="id" (closed)="detailId.set(null)" />
+  <app-route-detail-dialog [routeId]="id" [isAdmin]="isAdmin()" (closed)="detailId.set(null)" />
 }
 
 @if (deletingRoute(); as route) {
