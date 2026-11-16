@@ -138,9 +138,35 @@
                 </td>
                 <td class="px-5 py-3 text-right whitespace-nowrap">{{ frequency.basePrice | currency: 'USD' }}</td>
                 <td class="px-5 py-3 whitespace-nowrap">
-                  <span class="font-semibold" [class]="frequency.isActive ? 'text-green-600' : 'text-gray-400'">
-                    {{ frequency.isActive ? 'Activa' : 'Inactiva' }}
-                  </span>
+                  @if (isAdmin()) {
+                    <button
+                      type="button"
+                      role="switch"
+                      [attr.aria-checked]="frequency.isActive"
+                      [attr.aria-label]="(frequency.isActive ? 'Desactivar' : 'Activar') + ' frecuencia #' + frequency.id"
+                      [title]="frequency.isActive ? 'Desactivar' : 'Activar'"
+                      (click)="toggleActive(frequency)"
+                      [disabled]="togglingId() !== null"
+                      class="inline-flex items-center gap-2 disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <span
+                        class="relative inline-flex h-5 w-9 shrink-0 rounded-full transition"
+                        [class]="frequency.isActive ? 'bg-green-600' : 'bg-gray-300'"
+                      >
+                        <span
+                          class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all"
+                          [class]="frequency.isActive ? 'left-[18px]' : 'left-0.5'"
+                        ></span>
+                      </span>
+                      <span class="font-semibold" [class]="frequency.isActive ? 'text-green-600' : 'text-gray-400'">
+                        {{ togglingId() === frequency.id ? 'Guardando...' : frequency.isActive ? 'Activa' : 'Inactiva' }}
+                      </span>
+                    </button>
+                  } @else {
+                    <span class="font-semibold" [class]="frequency.isActive ? 'text-green-600' : 'text-gray-400'">
+                      {{ frequency.isActive ? 'Activa' : 'Inactiva' }}
+                    </span>
+                  }
                 </td>
                 <td class="px-5 py-3">
                   <div class="flex justify-end gap-1">

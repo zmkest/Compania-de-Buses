@@ -12,6 +12,8 @@ import { FrequencyDetailDialogComponent } from '../frequency-detail-dialog/frequ
 import { FrequencyFormComponent } from '../frequency-form/frequency-form.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { EUserRole } from '../../../../core/auth/user.enum';
+import { NotificationService } from '../../../../core/notifications/notification.service';
+import { AppError } from '../../../../core/errors/app-error';
 
 const PAGE_SIZE = 10;
 const SORT_FIELDS: FrequencySortBy[] = ['id', 'departureTime', 'basePrice'];
@@ -32,6 +34,7 @@ export class FrequencyAdminComponent {
     private readonly routesService = inject(RoutesService);
     private readonly router = inject(Router);
     private readonly authService = inject(AuthService);
+    private readonly notificationService = inject(NotificationService);
 
     readonly page = input(1, { transform: toPage });
     readonly routeId = input(null, { transform: toId });
@@ -50,6 +53,7 @@ export class FrequencyAdminComponent {
 
     readonly detailId = signal<number | null>(null);
     readonly editingFrequency = signal<FrequencyResponse | null>(null);
+    readonly togglingId = signal<number | null>(null);
 
     readonly isAdmin = computed(() => this.authService.currentUser()?.role === EUserRole.ADMIN);
 
@@ -136,6 +140,31 @@ export class FrequencyAdminComponent {
     onUpdated(): void {
         this.editingFrequency.set(null);
         this.frequenciesResource.reload();
+    }
+
+    toggleActive(frequency: FrequencyResponse): void {
+        if (this.togglingId() !== null) {
+            return;
+        }
+        this.togglingId.set(frequency.id);
+        this.frequenciesService.updateActive(frequency.id, !frequency.isActive).subscribe({
+            next: updated => {
+                this.togglingId.set(null);
+                this.notificationService.success(`Frecuencia #${updated.id} ${updated.isActive ? 'activada' : 'desactivada'}.`);
+                if (this.isActive() === null) {
+                    this.frequenciesResource.value.update(response => response && {
+                        ...response,
+                        items: response.items.map(item => item.id === updated.id ? updated : item),
+                    });
+                } else {
+                    this.frequenciesResource.reload();
+                }
+            },
+            error: (err: AppError) => {
+                this.togglingId.set(null);
+                this.notificationService.error(err.message);
+            },
+        });
     }
 
     private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {

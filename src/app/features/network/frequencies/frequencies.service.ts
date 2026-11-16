@@ -51,4 +51,8 @@ export class FrequenciesService {
   update(id: number, data: UpdateFrequencyDto): Observable<FrequencyResponse> {
     return this.http.patch<FrequencyResponse>(`${this.apiUrl}/${id}`, data, { context: this.context });
   }
+
+  updateActive(id: number, isActive: boolean): Observable<FrequencyResponse> {
+    return this.http.patch<FrequencyResponse>(`${this.apiUrl}/${id}/active`, { isActive }, { context: this.context });
+  }
 }
