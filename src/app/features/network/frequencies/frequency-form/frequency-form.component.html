@@ -76,6 +76,12 @@
         @if (form.controls.weekdays.invalid && form.controls.weekdays.touched) {
           <p class="text-xs text-red-600 mt-1 mb-0">Elige al menos un día.</p>
         }
+        @if (clash(); as clash) {
+          <p class="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2 mt-2 mb-0" role="alert">
+            Ya existe la frecuencia #{{ clash.id }} en esta ruta a las {{ form.controls.departureTime.value }} para: {{ clash.days }}.
+            Cambia la hora o los días.
+          </p>
+        }
       </div>
 
       <div>
@@ -100,7 +106,7 @@
         <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
           Cancelar
         </button>
-        <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-wait disabled:opacity-60">
+        <button type="submit" [disabled]="isSubmitting() || clash()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60">
           @if (isSubmitting()) {
             Guardando...
           } @else {

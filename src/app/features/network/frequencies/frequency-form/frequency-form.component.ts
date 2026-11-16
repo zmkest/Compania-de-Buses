@@ -1,8 +1,10 @@
 import { Component, ChangeDetectionStrategy, OnInit, computed, inject, input, output, signal } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { CreateFrequencyDto, EWeekday, Frequency, FrequencyResponse, UpdateFrequencyDto, WEEKDAYS, WEEKDAY_SHORT_LABELS } from '../frequency.dto';
 import { formatDepartureTime } from '../frequency-format';
 import { FrequenciesService } from '../frequencies.service';
+import { RoutesService } from '../../routes/routes.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { AppError } from '../../../../core/errors/app-error';
 
@@ -23,6 +25,7 @@ function atLeastOneDay(control: AbstractControl<EWeekday[]>): ValidationErrors |
 export class FrequencyFormComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);
     private readonly frequenciesService = inject(FrequenciesService);
+    private readonly routesService = inject(RoutesService);
     private readonly notification = inject(NotificationService);
 
     readonly route = input.required<FrequencyResponse['route']>();
@@ -57,6 +60,31 @@ export class FrequencyFormComponent implements OnInit {
         }
     }
 
+    private readonly formValue = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+
+    readonly routeFrequenciesResource = rxResource({
+        params: () => this.route().id,
+        stream: ({ params }) => this.routesService.getById(params),
+    });
+
+    readonly clash = computed(() => {
+        const { departureTime, weekdays } = this.formValue();
+        if (!departureTime || !weekdays?.length || !this.routeFrequenciesResource.hasValue()) {
+            return null;
+        }
+        const currentId = this.frequency()?.id;
+        for (const other of this.routeFrequenciesResource.value().frequencies) {
+            if (other.id === currentId || formatDepartureTime(other.departureTime) !== departureTime) {
+                continue;
+            }
+            const shared = weekdays.filter(day => other.weekdays.includes(day));
+            if (shared.length) {
+                return { id: other.id, days: shared.map(day => WEEKDAY_SHORT_LABELS[day]).join(', ') };
+            }
+        }
+        return null;
+    });
+
     isSelected(day: EWeekday): boolean {
         return this.form.controls.weekdays.value.includes(day);
     }
@@ -75,7 +103,7 @@ export class FrequencyFormComponent implements OnInit {
     }
 
     submit(): void {
-        if (this.form.invalid || this.isSubmitting()) {
+        if (this.form.invalid || this.clash() || this.isSubmitting()) {
             this.form.markAllAsTouched();
             return;
         }
