@@ -4,11 +4,14 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, NgTemplateOutlet } from '@angular/common';
 import { FrequenciesService, FrequencySortBy } from '../frequencies.service';
 import { RoutesService } from '../../routes/routes.service';
-import { WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_SHORT_LABELS } from '../frequency.dto';
+import { FrequencyResponse, WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_SHORT_LABELS } from '../frequency.dto';
 import { formatDepartureTime } from '../frequency-format';
 import { SortOrder } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
 import { FrequencyDetailDialogComponent } from '../frequency-detail-dialog/frequency-detail-dialog.component';
+import { FrequencyFormComponent } from '../frequency-form/frequency-form.component';
+import { AuthService } from '../../../../core/auth/auth.service';
+import { EUserRole } from '../../../../core/auth/user.enum';
 
 const PAGE_SIZE = 10;
 const SORT_FIELDS: FrequencySortBy[] = ['id', 'departureTime', 'basePrice'];
@@ -22,12 +25,13 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-frequency-admin',
     templateUrl: './frequency-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [CurrencyPipe, NgTemplateOutlet, FrequencyDetailDialogComponent]
+    imports: [CurrencyPipe, NgTemplateOutlet, FrequencyDetailDialogComponent, FrequencyFormComponent]
 })
 export class FrequencyAdminComponent {
     private readonly frequenciesService = inject(FrequenciesService);
     private readonly routesService = inject(RoutesService);
     private readonly router = inject(Router);
+    private readonly authService = inject(AuthService);
 
     readonly page = input(1, { transform: toPage });
     readonly routeId = input(null, { transform: toId });
@@ -45,6 +49,9 @@ export class FrequencyAdminComponent {
     readonly formatDepartureTime = formatDepartureTime;
 
     readonly detailId = signal<number | null>(null);
+    readonly editingFrequency = signal<FrequencyResponse | null>(null);
+
+    readonly isAdmin = computed(() => this.authService.currentUser()?.role === EUserRole.ADMIN);
 
     readonly hasFilters = computed(() => this.routeId() !== null || this.weekday() !== null || this.isActive() !== null);
 
@@ -124,6 +131,11 @@ export class FrequencyAdminComponent {
     reload(): void {
         this.frequenciesResource.reload();
         this.routesResource.reload();
+    }
+
+    onUpdated(): void {
+        this.editingFrequency.set(null);
+        this.frequenciesResource.reload();
     }
 
     private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {
