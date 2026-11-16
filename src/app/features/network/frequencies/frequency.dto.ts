@@ -1,3 +1,5 @@
+import { TerminalDetail } from '../terminals/terminal.dto';
+
 export enum EWeekday {
     MONDAY = 'MONDAY',
     TUESDAY = 'TUESDAY',
@@ -20,6 +22,16 @@ export const WEEKDAY_SHORT_LABELS: Record<EWeekday, string> = {
     [EWeekday.SUNDAY]: 'Dom',
 };
 
+export const WEEKDAY_LABELS: Record<EWeekday, string> = {
+    [EWeekday.MONDAY]: 'Lunes',
+    [EWeekday.TUESDAY]: 'Martes',
+    [EWeekday.WEDNESDAY]: 'Miércoles',
+    [EWeekday.THURSDAY]: 'Jueves',
+    [EWeekday.FRIDAY]: 'Viernes',
+    [EWeekday.SATURDAY]: 'Sábado',
+    [EWeekday.SUNDAY]: 'Domingo',
+};
+
 export interface Frequency {
     id: number;
     routeId: number;
@@ -27,6 +39,14 @@ export interface Frequency {
     weekdays: EWeekday[];
     basePrice: string;
     isActive: boolean;
+}
+
+export interface FrequencyResponse extends Frequency {
+    route: {
+        id: number;
+        origin: Pick<TerminalDetail, 'id' | 'name' | 'city'>;
+        destination: Pick<TerminalDetail, 'id' | 'name' | 'city'>;
+    };
 }
 
 export interface CreateFrequencyDto {
