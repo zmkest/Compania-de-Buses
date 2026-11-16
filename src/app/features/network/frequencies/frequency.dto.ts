@@ -54,6 +54,10 @@ export interface FrequencyDetail extends Frequency {
     _count: { trips: number };
 }
 
+export interface DeletedFrequency extends Frequency {
+    detachedTrips: number;
+}
+
 export interface CreateFrequencyDto {
     routeId: number;
     departureTime: string;

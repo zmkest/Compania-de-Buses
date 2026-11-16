@@ -10,6 +10,7 @@ import { SortOrder } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
 import { FrequencyDetailDialogComponent } from '../frequency-detail-dialog/frequency-detail-dialog.component';
 import { FrequencyFormComponent } from '../frequency-form/frequency-form.component';
+import { FrequencyDeleteDialogComponent } from '../frequency-delete-dialog/frequency-delete-dialog.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { EUserRole } from '../../../../core/auth/user.enum';
 import { NotificationService } from '../../../../core/notifications/notification.service';
@@ -27,7 +28,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-frequency-admin',
     templateUrl: './frequency-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [CurrencyPipe, NgTemplateOutlet, FrequencyDetailDialogComponent, FrequencyFormComponent]
+    imports: [CurrencyPipe, NgTemplateOutlet, FrequencyDetailDialogComponent, FrequencyFormComponent, FrequencyDeleteDialogComponent]
 })
 export class FrequencyAdminComponent {
     private readonly frequenciesService = inject(FrequenciesService);
@@ -54,6 +55,8 @@ export class FrequencyAdminComponent {
     readonly detailId = signal<number | null>(null);
     readonly editingFrequency = signal<FrequencyResponse | null>(null);
     readonly togglingId = signal<number | null>(null);
+    readonly deletingFrequency = signal<FrequencyResponse | null>(null);
+    readonly isDeleting = signal(false);
 
     readonly isAdmin = computed(() => this.authService.currentUser()?.role === EUserRole.ADMIN);
 
@@ -162,6 +165,25 @@ export class FrequencyAdminComponent {
             },
             error: (err: AppError) => {
                 this.togglingId.set(null);
+                this.notificationService.error(err.message);
+            },
+        });
+    }
+
+    confirmDelete(frequency: FrequencyResponse): void {
+        this.isDeleting.set(true);
+        this.frequenciesService.delete(frequency.id).subscribe({
+            next: deleted => {
+                this.isDeleting.set(false);
+                this.deletingFrequency.set(null);
+                const trips = deleted.detachedTrips;
+                const detail = trips ? ` ${trips} ${trips === 1 ? 'viaje conserva' : 'viajes conservan'} su historial.` : '';
+                this.notificationService.success(`Frecuencia #${frequency.id} eliminada.${detail}`);
+                this.frequenciesResource.reload();
+            },
+            error: (err: AppError) => {
+                this.isDeleting.set(false);
+                this.deletingFrequency.set(null);
                 this.notificationService.error(err.message);
             },
         });
