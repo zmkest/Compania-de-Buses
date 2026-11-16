@@ -1,8 +1,8 @@
-import { Component, ChangeDetectionStrategy, inject, input, output, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { CreateFrequencyDto, EWeekday, Frequency, WEEKDAYS, WEEKDAY_SHORT_LABELS } from '../frequency.dto';
+import { CreateFrequencyDto, EWeekday, Frequency, FrequencyResponse, UpdateFrequencyDto, WEEKDAYS, WEEKDAY_SHORT_LABELS } from '../frequency.dto';
+import { formatDepartureTime } from '../frequency-format';
 import { FrequenciesService } from '../frequencies.service';
-import { RouteResponse } from '../../routes/route.dto';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { AppError } from '../../../../core/errors/app-error';
 
@@ -20,19 +20,22 @@ function atLeastOneDay(control: AbstractControl<EWeekday[]>): ValidationErrors |
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ReactiveFormsModule]
 })
-export class FrequencyFormComponent {
+export class FrequencyFormComponent implements OnInit {
     private readonly formBuilder = inject(FormBuilder);
     private readonly frequenciesService = inject(FrequenciesService);
     private readonly notification = inject(NotificationService);
 
-    readonly route = input.required<RouteResponse>();
+    readonly route = input.required<FrequencyResponse['route']>();
+    readonly frequency = input<FrequencyResponse | null>(null);
 
     readonly created = output<Frequency>();
+    readonly updated = output<FrequencyResponse>();
     readonly cancelled = output<void>();
 
     readonly weekdays = WEEKDAYS;
     readonly weekdayLabels = WEEKDAY_SHORT_LABELS;
     readonly maxBasePrice = MAX_BASE_PRICE;
+    readonly isEdit = computed(() => this.frequency() !== null);
 
     readonly errorMessages = signal<string[]>([]);
     readonly isSubmitting = signal(false);
@@ -42,6 +45,17 @@ export class FrequencyFormComponent {
         weekdays: this.formBuilder.nonNullable.control<EWeekday[]>([], atLeastOneDay),
         basePrice: ['', [Validators.required, Validators.pattern(PRICE_PATTERN), Validators.min(0.01), Validators.max(MAX_BASE_PRICE)]],
     });
+
+    ngOnInit(): void {
+        const frequency = this.frequency();
+        if (frequency) {
+            this.form.setValue({
+                departureTime: formatDepartureTime(frequency.departureTime),
+                weekdays: WEEKDAYS.filter(day => frequency.weekdays.includes(day)),
+                basePrice: String(Number(frequency.basePrice)),
+            });
+        }
+    }
 
     isSelected(day: EWeekday): boolean {
         return this.form.controls.weekdays.value.includes(day);
@@ -67,6 +81,13 @@ export class FrequencyFormComponent {
         }
 
         const { departureTime, weekdays, basePrice } = this.form.getRawValue();
+        const frequency = this.frequency();
+
+        if (frequency) {
+            this.update(frequency, { departureTime, weekdays, basePrice: Number(basePrice) });
+            return;
+        }
+
         const data: CreateFrequencyDto = {
             routeId: this.route().id,
             departureTime,
@@ -78,15 +99,42 @@ export class FrequencyFormComponent {
         this.errorMessages.set([]);
 
         this.frequenciesService.create(data).subscribe({
-            next: frequency => {
+            next: created => {
                 this.isSubmitting.set(false);
                 this.notification.success(`Frecuencia de las ${departureTime} creada.`);
-                this.created.emit(frequency);
+                this.created.emit(created);
             },
-            error: (err: AppError) => {
-                this.isSubmitting.set(false);
-                this.errorMessages.set(err.fieldErrors?.length ? err.fieldErrors : [err.message]);
-            },
+            error: (err: AppError) => this.onSubmitError(err),
         });
+    }
+
+    private update(frequency: FrequencyResponse, values: Required<UpdateFrequencyDto>): void {
+        const changes: UpdateFrequencyDto = {
+            ...(values.departureTime !== formatDepartureTime(frequency.departureTime) && { departureTime: values.departureTime }),
+            ...(values.weekdays.join() !== WEEKDAYS.filter(day => frequency.weekdays.includes(day)).join() && { weekdays: values.weekdays }),
+            ...(values.basePrice !== Number(frequency.basePrice) && { basePrice: values.basePrice }),
+        };
+
+        if (Object.keys(changes).length === 0) {
+            this.cancelled.emit();
+            return;
+        }
+
+        this.isSubmitting.set(true);
+        this.errorMessages.set([]);
+
+        this.frequenciesService.update(frequency.id, changes).subscribe({
+            next: updated => {
+                this.isSubmitting.set(false);
+                this.notification.success(`Frecuencia #${updated.id} actualizada.`);
+                this.updated.emit(updated);
+            },
+            error: (err: AppError) => this.onSubmitError(err),
+        });
+    }
+
+    private onSubmitError(err: AppError): void {
+        this.isSubmitting.set(false);
+        this.errorMessages.set(err.fieldErrors?.length ? err.fieldErrors : [err.message]);
     }
 }

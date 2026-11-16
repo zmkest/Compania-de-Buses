@@ -57,6 +57,7 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
 - **Red y horario > Frecuencias** (ADMIN y OPERATOR)
   - Listado paginado con filtro por ruta, día de la semana y estado, y orden por ID, hora de salida o precio base.
   - Detalle con la ruta, la hora de llegada estimada, los días de operación y los viajes generados.
+  - Editar hora de salida, días de operación y precio base (solo ADMIN). La ruta no se puede cambiar.
 
 ### Pendientes de conectar
 

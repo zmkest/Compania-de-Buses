@@ -60,3 +60,5 @@ export interface CreateFrequencyDto {
     weekdays: EWeekday[];
     basePrice: number;
 }
+
+export type UpdateFrequencyDto = Partial<Omit<CreateFrequencyDto, 'routeId'>>;

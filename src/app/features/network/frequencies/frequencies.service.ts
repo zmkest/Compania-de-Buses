@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SILENT_ERRORS } from '../../../core/http/error.interceptor';
 import { PaginatedResponse, SortOrder } from '../../../core/http/paginated';
-import { CreateFrequencyDto, EWeekday, Frequency, FrequencyDetail, FrequencyResponse } from './frequency.dto';
+import { CreateFrequencyDto, UpdateFrequencyDto, EWeekday, Frequency, FrequencyDetail, FrequencyResponse } from './frequency.dto';
 
 export type FrequencySortBy = 'id' | 'departureTime' | 'basePrice';
 
@@ -46,5 +46,9 @@ export class FrequenciesService {
 
   create(data: CreateFrequencyDto): Observable<Frequency> {
     return this.http.post<Frequency>(this.apiUrl, data, { context: this.context });
+  }
+
+  update(id: number, data: UpdateFrequencyDto): Observable<FrequencyResponse> {
+    return this.http.patch<FrequencyResponse>(`${this.apiUrl}/${id}`, data, { context: this.context });
   }
 }

@@ -156,6 +156,19 @@
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                     </button>
+                    @if (isAdmin()) {
+                      <button
+                        type="button"
+                        (click)="editingFrequency.set(frequency)"
+                        class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
+                        [attr.aria-label]="'Editar frecuencia #' + frequency.id"
+                        title="Editar"
+                      >
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                          <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                    }
                   </div>
                 </td>
               </tr>
@@ -238,4 +251,13 @@
 
 @if (detailId(); as id) {
   <app-frequency-detail-dialog [frequencyId]="id" (closed)="detailId.set(null)" />
+}
+
+@if (editingFrequency(); as frequency) {
+  <app-frequency-form
+    [route]="frequency.route"
+    [frequency]="frequency"
+    (updated)="onUpdated()"
+    (cancelled)="editingFrequency.set(null)"
+  />
 }

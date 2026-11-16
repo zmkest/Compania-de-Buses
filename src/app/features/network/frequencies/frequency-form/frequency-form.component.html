@@ -8,7 +8,7 @@
   >
     <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
       <div>
-        <h2 id="frequency-form-title" class="font-brand text-2xl text-brand-navy mb-0">Nueva frecuencia</h2>
+        <h2 id="frequency-form-title" class="font-brand text-2xl text-brand-navy mb-0">{{ isEdit() ? 'Editar frecuencia #' + frequency()?.id : 'Nueva frecuencia' }}</h2>
         <p class="text-xs text-gray-500 mt-1 mb-0">
           Ruta #{{ route().id }} · {{ route().origin.city.name }} → {{ route().destination.city.name }}
         </p>
@@ -101,7 +101,11 @@
           Cancelar
         </button>
         <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-wait disabled:opacity-60">
-          {{ isSubmitting() ? 'Guardando...' : 'Crear frecuencia' }}
+          @if (isSubmitting()) {
+            Guardando...
+          } @else {
+            {{ isEdit() ? 'Guardar cambios' : 'Crear frecuencia' }}
+          }
         </button>
       </div>
     </form>
