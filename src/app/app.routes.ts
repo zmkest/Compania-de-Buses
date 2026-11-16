@@ -60,6 +60,7 @@ export const routes: Routes = [
           { path: '', redirectTo: 'terminales', pathMatch: 'full' },
           { path: 'terminales', loadComponent: () => import('./features/network/terminals/terminal-admin/terminal-admin.component').then(m => m.TerminalAdminComponent) },
           { path: 'rutas', loadComponent: () => import('./features/network/routes/route-admin/route-admin.component').then(m => m.RouteAdminComponent) },
+          { path: 'frecuencias', loadComponent: () => import('./features/network/frequencies/frequency-admin/frequency-admin.component').then(m => m.FrequencyAdminComponent) },
         ],
       },
       { path: 'choferes', loadComponent: () => import('./features/legacy/choferes/principal/principal.component').then(m => m.PrincipalComponent) },

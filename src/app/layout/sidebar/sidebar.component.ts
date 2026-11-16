@@ -46,6 +46,7 @@ const menu: MenuItem[] =[
             children: [
                 { route: 'red/terminales', title: 'Terminales', icon: 'M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6' },
                 { route: 'red/rutas', title: 'Rutas', icon: 'M6 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM18 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM6 15V9a4 4 0 0 1 4-4h6M18 9v6a4 4 0 0 1-4 4H8' },
+                { route: 'red/frecuencias', title: 'Frecuencias', icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2' },
             ]
         },
         {
