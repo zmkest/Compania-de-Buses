@@ -53,6 +53,7 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
   - Detalle con los terminales y las frecuencias de la ruta.
   - Crear rutas eligiendo ciudad y terminal de origen y de destino (solo ADMIN).
   - Editar distancia y duración, y eliminar (solo ADMIN). No se puede eliminar una ruta con frecuencias o viajes.
+  - Crear frecuencias desde el detalle de la ruta: hora de salida, días de operación y precio base (solo ADMIN). No se permiten dos frecuencias de la misma ruta a la misma hora en un mismo día.
 
 ### Pendientes de conectar
 
