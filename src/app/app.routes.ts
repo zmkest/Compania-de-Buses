@@ -28,8 +28,7 @@ export const routes: Routes = [
     loadComponent: () => import('./layout/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'viajes', pathMatch: 'full' },
-      { path: 'viajes', loadComponent: () => import('./features/legacy/viajes/principal/principal.component').then(m => m.PrincipalComponent) },
+      { path: '', redirectTo: 'profile', pathMatch: 'full' },
       {
         path: 'flota',
         canActivate: [roleGuard(EUserRole.ADMIN)],
@@ -63,9 +62,6 @@ export const routes: Routes = [
           { path: 'frecuencias', loadComponent: () => import('./features/network/frequencies/frequency-admin/frequency-admin.component').then(m => m.FrequencyAdminComponent) },
         ],
       },
-      { path: 'choferes', loadComponent: () => import('./features/legacy/choferes/principal/principal.component').then(m => m.PrincipalComponent) },
-      { path: 'tripulacion', loadComponent: () => import('./features/legacy/tripulacion/principal/principal.component').then(m => m.PrincipalComponent) },
-      { path: 'consultas', loadComponent: () => import('./features/legacy/consultas/consultas.component').then(m => m.ConsultasComponent) },
       { path: 'profile', loadComponent: () => import('./features/identity/profile/profile.component').then(m => m.ProfileComponent) },
       {
         path: 'usuarios',

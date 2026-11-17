@@ -10,8 +10,6 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
 
 ## Funcionalidades
 
-### Conectadas a la API
-
 - **Autenticación**
   - Inicio de sesión con JWT. El refresh token viaja en una cookie HTTP-only y se renueva automáticamente.
   - Registro.
@@ -61,10 +59,6 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
   - Activar o desactivar frecuencias desde el listado (solo ADMIN).
   - Eliminar frecuencias (solo ADMIN). Los viajes ya generados se conservan sin la frecuencia.
 
-### Pendientes de conectar
-
-Las pantallas de **Viajes**, **Choferes**, **Tripulación** y **Consultas** todavía usan datos locales en memoria. Se van a conectar cuando `company-api` exponga los módulos de frecuencias, viajes y tripulación.
-
 ## Tecnologías
 
 - **Angular 22**
@@ -72,7 +66,7 @@ Las pantallas de **Viajes**, **Choferes**, **Tripulación** y **Consultas** toda
   - Signals y `rxResource`.
   - `withComponentInputBinding`, para que los filtros y la paginación vivan en la URL.
 - **TypeScript 6** y **RxJS 7**
-- **Tailwind CSS 3** para los estilos. Bootstrap queda en las pantallas antiguas.
+- **Tailwind CSS 3** para los estilos.
 - **pnpm** como gestor de paquetes.
 
 ## Requisitos
@@ -135,8 +129,7 @@ src/app/
 └── features/              # Un dominio por carpeta, como en company-api
     ├── identity/          # auth (login, registro, contraseña), profile, users
     ├── fleet/             # buses (estado, historial, disponibilidad), seats, maintenances
-    ├── network/           # cities, terminals y routes (Red y horario)
-    └── legacy/            # viajes, choferes, tripulación y consultas con datos locales
+    └── network/           # cities, terminals y routes (Red y horario)
 ```
 
 Cada feature guarda juntos sus componentes, su servicio HTTP y sus DTOs/enums. Lo que usa más de un dominio va en `shared/` o `core/`.
