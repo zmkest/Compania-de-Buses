@@ -45,6 +45,10 @@ const menu: MenuItem[] =[
                 { route: 'red/frecuencias', title: 'Frecuencias', icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2' },
             ]
         },
+        {
+            route: 'viajes', title: 'Viajes', imageUrl: 'assets/img/viaje.png',
+            roles: [EUserRole.ADMIN, EUserRole.OPERATOR]
+        },
     ]
 
 @Component({

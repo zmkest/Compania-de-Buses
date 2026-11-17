@@ -58,6 +58,8 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
   - Editar hora de salida, días de operación y precio base (solo ADMIN). La ruta no se puede cambiar.
   - Activar o desactivar frecuencias desde el listado (solo ADMIN).
   - Eliminar frecuencias (solo ADMIN). Los viajes ya generados se conservan sin la frecuencia.
+- **Viajes** (ADMIN y OPERATOR)
+  - Listado paginado con filtro por ruta, estado, placa del bus, viajes sin bus y rango de fechas de salida, y orden por ID, salida o precio.
 
 ## Tecnologías
 
@@ -129,7 +131,8 @@ src/app/
 └── features/              # Un dominio por carpeta, como en company-api
     ├── identity/          # auth (login, registro, contraseña), profile, users
     ├── fleet/             # buses (estado, historial, disponibilidad), seats, maintenances
-    └── network/           # cities, terminals y routes (Red y horario)
+    ├── network/           # cities, terminals y routes (Red y horario)
+    └── operations/        # trips (Viajes)
 ```
 
 Cada feature guarda juntos sus componentes, su servicio HTTP y sus DTOs/enums. Lo que usa más de un dominio va en `shared/` o `core/`.
