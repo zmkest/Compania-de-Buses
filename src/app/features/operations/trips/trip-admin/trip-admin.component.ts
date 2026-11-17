@@ -5,7 +5,7 @@ import { CurrencyPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
 import { TripSortBy, TripsService } from '../trips.service';
 import { RoutesService } from '../../../network/routes/routes.service';
 import { TRIP_STATUSES, TRIP_STATUS_BADGE_CLASSES, TRIP_STATUS_LABELS } from '../trip.dto';
-import { SortOrder } from '../../../../core/http/paginated';
+import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toDate, toId, toOneOf, toPage, toSearch } from '../../../../core/routing/query-params';
 import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 
@@ -79,7 +79,7 @@ export class TripAdminComponent {
     readonly trips = computed(() => this.tripsPage()?.items ?? []);
     readonly total = computed(() => this.tripsPage()?.meta.total);
     readonly totalPages = computed(() => this.tripsPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
 
     readonly routes = computed(() => this.routesResource.hasValue() ? this.routesResource.value() : []);
 

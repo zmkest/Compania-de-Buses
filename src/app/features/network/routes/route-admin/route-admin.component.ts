@@ -9,7 +9,7 @@ import { EUserRole } from '../../../../core/auth/user.enum';
 import { RouteResponse } from '../route.dto';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { AppError } from '../../../../core/errors/app-error';
-import { SortOrder } from '../../../../core/http/paginated';
+import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
 import { formatDuration } from '../route-format';
 import { RouteFormComponent } from '../route-form/route-form.component';
@@ -79,7 +79,7 @@ export class RouteAdminComponent {
     readonly routes = computed(() => this.routesPage()?.items ?? []);
     readonly total = computed(() => this.routesPage()?.meta.total);
     readonly totalPages = computed(() => this.routesPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
 
     readonly cities = computed(() => this.citiesResource.hasValue() ? this.citiesResource.value() : []);
 

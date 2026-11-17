@@ -6,6 +6,7 @@ import { SearchBoxComponent } from '../../../../shared/components/search-box/sea
 import { SeatMapPanelComponent } from '../seat-map-panel/seat-map-panel.component';
 import { BusSeatCount } from '../seat.dto';
 import { toId, toPage, toSearch } from '../../../../core/routing/query-params';
+import { pageWindow } from '../../../../core/http/paginated';
 
 // Pocas filas para que el mapa de abajo quede a la vista.
 const PAGE_SIZE = 5;
@@ -35,7 +36,7 @@ export class SeatAdminComponent {
 
     readonly buses = computed(() => this.busesPage()?.items ?? []);
     readonly totalPages = computed(() => this.busesPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
 
     constructor() {
         // Una URL vieja puede dejar la página fuera de rango.

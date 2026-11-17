@@ -7,6 +7,7 @@ import { BusesService } from '../buses.service';
 import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { MaintenanceDetailDialogComponent } from '../../maintenances/maintenance-detail-dialog/maintenance-detail-dialog.component';
 import { toOneOf, toPage, toSearch } from '../../../../core/routing/query-params';
+import { pageWindow } from '../../../../core/http/paginated';
 
 const PAGE_SIZE = 10;
 
@@ -79,7 +80,7 @@ export class BusStatusHistoryComponent {
     readonly records = computed(() => this.historyPage()?.items ?? []);
     readonly total = computed(() => this.historyPage()?.meta.total ?? 0);
     readonly totalPages = computed(() => this.historyPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
     readonly stats = computed(() => this.statsResource.hasValue() ? this.statsResource.value() : undefined);
     readonly hasFilters = computed(() => !!this.search() || this.status() !== null);
 

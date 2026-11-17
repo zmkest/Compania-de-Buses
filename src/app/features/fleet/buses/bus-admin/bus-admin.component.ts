@@ -12,6 +12,7 @@ import { BusDeleteDialogComponent } from '../bus-delete-dialog/bus-delete-dialog
 import { BusStatusDialogComponent } from '../bus-status-dialog/bus-status-dialog.component';
 import { AppError } from '../../../../core/errors/app-error';
 import { toPage, toSearch } from '../../../../core/routing/query-params';
+import { pageWindow } from '../../../../core/http/paginated';
 
 const PAGE_SIZE = 5;
 
@@ -59,7 +60,7 @@ export class BusAdminComponent {
 
     readonly buses = computed(() => this.busesPage()?.items ?? []);
     readonly totalPages = computed(() => this.busesPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
     readonly stats = computed(() => this.statsResource.hasValue() ? this.statsResource.value() : undefined);
 
     constructor() {
