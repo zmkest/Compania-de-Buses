@@ -62,6 +62,11 @@ export const routes: Routes = [
           { path: 'frecuencias', loadComponent: () => import('./features/network/frequencies/frequency-admin/frequency-admin.component').then(m => m.FrequencyAdminComponent) },
         ],
       },
+      {
+        path: 'viajes',
+        loadComponent: () => import('./features/operations/trips/trip-admin/trip-admin.component').then(m => m.TripAdminComponent),
+        canActivate: [roleGuard(EUserRole.ADMIN, EUserRole.OPERATOR)],
+      },
       { path: 'profile', loadComponent: () => import('./features/identity/profile/profile.component').then(m => m.ProfileComponent) },
       {
         path: 'usuarios',
