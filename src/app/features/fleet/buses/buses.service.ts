@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
-import { Observable, catchError, forkJoin, map, of } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { BusResponse, BusStatusHistoryResponse, CreateBusDto, UpdateBusDto, UpdateBusStatusDto } from './bus.dto';
 import { EBusStatus } from './bus.enum';
@@ -43,6 +43,17 @@ export class BusesService {
       params = params.set('search', search);
     }
     return this.http.get<PaginatedResponse<BusResponse>>(this.apiUrl, { params, context: this.context });
+  }
+
+  getAllOptions(): Observable<BusResponse[]> {
+    const query: BusQuery = { page: 1, limit: 50 };
+    return this.getAll(query).pipe(
+      switchMap(first => {
+        const rest = Array.from({ length: first.meta.totalPages - 1 }, (_, index) => this.getAll({ ...query, page: index + 2 }));
+        return rest.length ? forkJoin(rest).pipe(map(pages => [first, ...pages])) : of([first]);
+      }),
+      map(pages => pages.flatMap(page => page.items)),
+    );
   }
 
   getStats(): Observable<BusStats> {
