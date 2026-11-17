@@ -6,7 +6,7 @@ import { FrequenciesService, FrequencySortBy } from '../frequencies.service';
 import { RoutesService } from '../../routes/routes.service';
 import { FrequencyResponse, WEEKDAYS, WEEKDAY_LABELS, WEEKDAY_SHORT_LABELS } from '../frequency.dto';
 import { formatDepartureTime } from '../frequency-format';
-import { SortOrder } from '../../../../core/http/paginated';
+import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
 import { FrequencyDetailDialogComponent } from '../frequency-detail-dialog/frequency-detail-dialog.component';
 import { FrequencyFormComponent } from '../frequency-form/frequency-form.component';
@@ -84,7 +84,7 @@ export class FrequencyAdminComponent {
     readonly frequencies = computed(() => this.frequenciesPage()?.items ?? []);
     readonly total = computed(() => this.frequenciesPage()?.meta.total);
     readonly totalPages = computed(() => this.frequenciesPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
 
     readonly routes = computed(() => this.routesResource.hasValue() ? this.routesResource.value() : []);
 

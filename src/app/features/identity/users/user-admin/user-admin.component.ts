@@ -12,6 +12,7 @@ import { UserFormComponent } from '../user-form/user-form.component';
 import { UserDeleteDialogComponent } from '../user-delete-dialog/user-delete-dialog.component';
 import { AppError } from '../../../../core/errors/app-error';
 import { toPage, toSearch } from '../../../../core/routing/query-params';
+import { pageWindow } from '../../../../core/http/paginated';
 
 const PAGE_SIZE = 5;
 
@@ -59,7 +60,7 @@ export class UserAdminComponent {
 
     readonly users = computed(() => this.usersPage()?.items ?? []);
     readonly totalPages = computed(() => this.usersPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
     readonly stats = computed(() => this.statsResource.hasValue() ? this.statsResource.value() : undefined);
 
     constructor() {

@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, computed, effect, inject, input, si
 import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { TerminalsService } from '../terminals.service';
-import { SortOrder } from '../../../../core/http/paginated';
+import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { CitiesService } from '../../cities/cities.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { EUserRole } from '../../../../core/auth/user.enum';
@@ -59,7 +59,7 @@ export class TerminalAdminComponent {
     readonly terminals = computed(() => this.terminalsPage()?.items ?? []);
     readonly total = computed(() => this.terminalsPage()?.meta.total);
     readonly totalPages = computed(() => this.terminalsPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
 
     readonly cities = computed(() => this.citiesResource.hasValue() ? this.citiesResource.value() : []);
 

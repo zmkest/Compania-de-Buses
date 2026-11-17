@@ -19,6 +19,7 @@ import { MaintenanceFormComponent } from '../maintenance-form/maintenance-form.c
 import { MaintenanceCompleteDialogComponent } from '../maintenance-complete-dialog/maintenance-complete-dialog.component';
 import { MaintenanceCancelDialogComponent } from '../maintenance-cancel-dialog/maintenance-cancel-dialog.component';
 import { toDate, toPage, toSearch } from '../../../../core/routing/query-params';
+import { pageWindow } from '../../../../core/http/paginated';
 
 const PAGE_SIZE = 10;
 
@@ -85,7 +86,7 @@ export class MaintenanceAdminComponent {
     readonly maintenances = computed(() => this.maintenancesPage()?.items ?? []);
     readonly total = computed(() => this.maintenancesPage()?.meta.total ?? 0);
     readonly totalPages = computed(() => this.maintenancesPage()?.meta.totalPages ?? 1);
-    readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, index) => index + 1));
+    readonly pages = computed(() => pageWindow(this.page(), this.totalPages()));
     readonly stats = computed(() => this.statsResource.hasValue() ? this.statsResource.value() : undefined);
     readonly typeStats = computed(() => this.typeStatsResource.hasValue() ? this.typeStatsResource.value() : undefined);
     readonly hasFilters = computed(() => !!this.search() || !!this.startDate() || !!this.endDate());
