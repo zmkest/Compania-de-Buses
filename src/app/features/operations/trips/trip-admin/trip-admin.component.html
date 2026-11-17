@@ -1,10 +1,24 @@
 <section class="max-w-7xl mx-auto space-y-6">
-  <header>
-    <p class="text-xs font-semibold uppercase tracking-wider text-brand-blue mb-1">Operación</p>
-    <h1 class="font-brand text-4xl text-brand-navy mb-1">Viajes</h1>
-    <p class="text-sm text-gray-500 mb-0">
-      Salidas programadas de cada ruta, el bus asignado, su precio y su estado.
-    </p>
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wider text-brand-blue mb-1">Operación</p>
+      <h1 class="font-brand text-4xl text-brand-navy mb-1">Viajes</h1>
+      <p class="text-sm text-gray-500 mb-0">
+        Salidas programadas de cada ruta, el bus asignado, su precio y su estado.
+      </p>
+    </div>
+    <button
+      type="button"
+      (click)="isCreating.set(true)"
+      [disabled]="!routesResource.hasValue()"
+      [title]="routesResource.error() ? 'No se pudieron cargar las rutas' : ''"
+      class="inline-flex items-center gap-2 bg-brand-navy text-white font-semibold px-5 py-2.5 rounded-lg shadow hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+      </svg>
+      Nuevo viaje
+    </button>
   </header>
 
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
@@ -255,3 +269,7 @@
     }
   </button>
 </ng-template>
+
+@if (isCreating()) {
+  <app-trip-form [routes]="routes()" (created)="onCreated()" (cancelled)="isCreating.set(false)" />
+}

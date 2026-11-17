@@ -47,3 +47,10 @@ export interface TripResponse extends Trip {
     route: { id: number; origin: TripTerminal; destination: TripTerminal };
     bus: { id: number; plate: string; model: string } | null;
 }
+
+export interface CreateTripDto {
+    routeId: number;
+    busId: number;
+    scheduledDeparture: string;
+    price: number;
+}

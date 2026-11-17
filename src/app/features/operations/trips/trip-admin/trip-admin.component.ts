@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, effect, inject, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
@@ -8,6 +8,7 @@ import { TRIP_STATUSES, TRIP_STATUS_BADGE_CLASSES, TRIP_STATUS_LABELS } from '..
 import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toDate, toId, toOneOf, toPage, toSearch } from '../../../../core/routing/query-params';
 import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
+import { TripFormComponent } from '../trip-form/trip-form.component';
 
 const PAGE_SIZE = 10;
 const SORT_FIELDS: TripSortBy[] = ['id', 'scheduledDeparture', 'price'];
@@ -21,7 +22,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-trip-admin',
     templateUrl: './trip-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [CurrencyPipe, DatePipe, NgTemplateOutlet, SearchBoxComponent]
+    imports: [CurrencyPipe, DatePipe, NgTemplateOutlet, SearchBoxComponent, TripFormComponent]
 })
 export class TripAdminComponent {
     private readonly tripsService = inject(TripsService);
@@ -44,6 +45,8 @@ export class TripAdminComponent {
     readonly statuses = TRIP_STATUSES;
     readonly statusLabels = TRIP_STATUS_LABELS;
     readonly statusBadgeClasses = TRIP_STATUS_BADGE_CLASSES;
+
+    readonly isCreating = signal(false);
 
     readonly hasFilters = computed(() =>
         this.routeId() !== null || !!this.busPlate() || this.status() !== null || !!this.from() || !!this.to() || this.unassigned() !== null
@@ -151,6 +154,11 @@ export class TripAdminComponent {
     reload(): void {
         this.tripsResource.reload();
         this.routesResource.reload();
+    }
+
+    onCreated(): void {
+        this.isCreating.set(false);
+        this.tripsResource.reload();
     }
 
     private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {
