@@ -48,6 +48,29 @@ export interface TripResponse extends Trip {
     bus: { id: number; plate: string; model: string } | null;
 }
 
+export const MAX_GENERATION_DAYS = 31;
+
+export interface GenerateTripsDto {
+    from: string;
+    to: string;
+    routeId?: number;
+}
+
+export interface GeneratedUnassigned {
+    frequencyId: number;
+    scheduledDeparture: string;
+    code: string;
+    message: string;
+    conflictTripId?: number;
+}
+
+export interface GenerateTripsResult {
+    created: number;
+    skipped: number;
+    assigned: number;
+    unassigned: GeneratedUnassigned[];
+}
+
 export interface CreateTripDto {
     routeId: number;
     busId: number;

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SILENT_ERRORS } from '../../../core/http/error.interceptor';
 import { PaginatedResponse, SortOrder } from '../../../core/http/paginated';
-import { CreateTripDto, ETripStatus, TripResponse } from './trip.dto';
+import { CreateTripDto, ETripStatus, GenerateTripsDto, GenerateTripsResult, TripResponse } from './trip.dto';
 
 export type TripSortBy = 'id' | 'scheduledDeparture' | 'price';
 
@@ -54,5 +54,9 @@ export class TripsService {
 
   create(data: CreateTripDto): Observable<TripResponse> {
     return this.http.post<TripResponse>(this.apiUrl, data, { context: this.context });
+  }
+
+  generate(data: GenerateTripsDto): Observable<GenerateTripsResult> {
+    return this.http.post<GenerateTripsResult>(`${this.apiUrl}/generate`, data, { context: this.context });
   }
 }

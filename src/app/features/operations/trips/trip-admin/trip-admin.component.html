@@ -7,18 +7,32 @@
         Salidas programadas de cada ruta, el bus asignado, su precio y su estado.
       </p>
     </div>
-    <button
-      type="button"
-      (click)="isCreating.set(true)"
-      [disabled]="!routesResource.hasValue()"
-      [title]="routesResource.error() ? 'No se pudieron cargar las rutas' : ''"
-      class="inline-flex items-center gap-2 bg-brand-navy text-white font-semibold px-5 py-2.5 rounded-lg shadow hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60"
-    >
-      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-        <path d="M12 5v14M5 12h14" stroke-linecap="round" />
-      </svg>
-      Nuevo viaje
-    </button>
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        (click)="isGenerating.set(true)"
+        [disabled]="!routesResource.hasValue()"
+        [title]="routesResource.error() ? 'No se pudieron cargar las rutas' : ''"
+        class="inline-flex items-center gap-2 border-2 border-brand-navy text-brand-navy font-semibold px-5 py-2 rounded-lg hover:bg-brand-mint transition disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M8 3v4M16 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM12 12v6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Generar desde frecuencias
+      </button>
+      <button
+        type="button"
+        (click)="isCreating.set(true)"
+        [disabled]="!routesResource.hasValue()"
+        [title]="routesResource.error() ? 'No se pudieron cargar las rutas' : ''"
+        class="inline-flex items-center gap-2 bg-brand-navy text-white font-semibold px-5 py-2.5 rounded-lg shadow hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+        </svg>
+        Nuevo viaje
+      </button>
+    </div>
   </header>
 
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
@@ -272,4 +286,8 @@
 
 @if (isCreating()) {
   <app-trip-form [routes]="routes()" (created)="onCreated()" (cancelled)="isCreating.set(false)" />
+}
+
+@if (isGenerating()) {
+  <app-trip-generate-dialog [routes]="routes()" (closed)="onGenerateClosed($event)" />
 }
