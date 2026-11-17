@@ -9,6 +9,7 @@ import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toDate, toId, toOneOf, toPage, toSearch } from '../../../../core/routing/query-params';
 import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { TripFormComponent } from '../trip-form/trip-form.component';
+import { TripGenerateDialogComponent } from '../trip-generate-dialog/trip-generate-dialog.component';
 
 const PAGE_SIZE = 10;
 const SORT_FIELDS: TripSortBy[] = ['id', 'scheduledDeparture', 'price'];
@@ -22,7 +23,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-trip-admin',
     templateUrl: './trip-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [CurrencyPipe, DatePipe, NgTemplateOutlet, SearchBoxComponent, TripFormComponent]
+    imports: [CurrencyPipe, DatePipe, NgTemplateOutlet, SearchBoxComponent, TripFormComponent, TripGenerateDialogComponent]
 })
 export class TripAdminComponent {
     private readonly tripsService = inject(TripsService);
@@ -47,6 +48,7 @@ export class TripAdminComponent {
     readonly statusBadgeClasses = TRIP_STATUS_BADGE_CLASSES;
 
     readonly isCreating = signal(false);
+    readonly isGenerating = signal(false);
 
     readonly hasFilters = computed(() =>
         this.routeId() !== null || !!this.busPlate() || this.status() !== null || !!this.from() || !!this.to() || this.unassigned() !== null
@@ -159,6 +161,13 @@ export class TripAdminComponent {
     onCreated(): void {
         this.isCreating.set(false);
         this.tripsResource.reload();
+    }
+
+    onGenerateClosed(created: boolean): void {
+        this.isGenerating.set(false);
+        if (created) {
+            this.tripsResource.reload();
+        }
     }
 
     private navigate(queryParams: Record<string, string | number | null>, replaceUrl = false): void {
