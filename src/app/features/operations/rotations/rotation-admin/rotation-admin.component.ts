@@ -39,6 +39,7 @@ export class RotationAdminComponent {
 
     readonly isCreating = signal(false);
     readonly detailId = signal<number | null>(null);
+    readonly editingId = signal<number | null>(null);
 
     readonly hasFilters = computed(() => this.busId() !== null || this.isActive() !== null);
 
@@ -112,6 +113,11 @@ export class RotationAdminComponent {
 
     onCreated(): void {
         this.isCreating.set(false);
+        this.rotationsResource.reload();
+    }
+
+    onUpdated(): void {
+        this.editingId.set(null);
         this.rotationsResource.reload();
     }
 
