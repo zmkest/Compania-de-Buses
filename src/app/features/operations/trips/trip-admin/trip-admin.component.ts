@@ -4,7 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
 import { TripSortBy, TripsService } from '../trips.service';
 import { RoutesService } from '../../../network/routes/routes.service';
-import { TRIP_STATUSES, TRIP_STATUS_BADGE_CLASSES, TRIP_STATUS_LABELS } from '../trip.dto';
+import { ETripStatus, TRIP_STATUSES, TRIP_STATUS_BADGE_CLASSES, TRIP_STATUS_LABELS, TripResponse } from '../trip.dto';
 import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toDate, toId, toOneOf, toPage, toSearch } from '../../../../core/routing/query-params';
 import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
@@ -45,12 +45,14 @@ export class TripAdminComponent {
     readonly order = input<SortOrder, string | undefined>(DEFAULT_ORDER, { transform: value => toOneOf(SORT_ORDERS)(value) ?? DEFAULT_ORDER });
 
     readonly statuses = TRIP_STATUSES;
+    readonly scheduledStatus = ETripStatus.SCHEDULED;
     readonly statusLabels = TRIP_STATUS_LABELS;
     readonly statusBadgeClasses = TRIP_STATUS_BADGE_CLASSES;
 
     readonly isCreating = signal(false);
     readonly isGenerating = signal(false);
     readonly detailId = signal<number | null>(null);
+    readonly editingTrip = signal<TripResponse | null>(null);
 
     readonly hasFilters = computed(() =>
         this.routeId() !== null || !!this.busPlate() || this.status() !== null || !!this.from() || !!this.to() || this.unassigned() !== null
@@ -162,6 +164,11 @@ export class TripAdminComponent {
 
     onCreated(): void {
         this.isCreating.set(false);
+        this.tripsResource.reload();
+    }
+
+    onUpdated(): void {
+        this.editingTrip.set(null);
         this.tripsResource.reload();
     }
 

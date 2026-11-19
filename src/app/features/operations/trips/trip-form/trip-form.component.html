@@ -8,8 +8,10 @@
   >
     <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
       <div>
-        <h2 id="trip-form-title" class="font-brand text-2xl text-brand-navy mb-0">Nuevo viaje</h2>
-        <p class="text-xs text-gray-500 mt-1 mb-0">Viaje puntual, fuera de las frecuencias.</p>
+        <h2 id="trip-form-title" class="font-brand text-2xl text-brand-navy mb-0">{{ isEdit() ? 'Editar viaje #' + trip()?.id : 'Nuevo viaje' }}</h2>
+        <p class="text-xs text-gray-500 mt-1 mb-0">
+          {{ isEdit() ? 'Reprograma la salida, cambia el bus o el precio. La ruta no se puede cambiar.' : 'Viaje puntual, fuera de las frecuencias.' }}
+        </p>
       </div>
       <button type="button" (click)="cancelled.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -38,7 +40,7 @@
         <select
           id="trip-route"
           formControlName="routeId"
-          class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition disabled:bg-gray-50 disabled:text-gray-500"
         >
           <option value="" disabled>Elige una ruta</option>
           @for (route of routes(); track route.id) {
@@ -78,15 +80,17 @@
 
       <div>
         <label for="trip-bus" class="block text-sm font-semibold text-brand-navy mb-0">Bus</label>
-        <p id="trip-bus-hint" class="text-xs text-gray-500 mb-1">No se muestran los buses fuera de servicio.</p>
+        <p id="trip-bus-hint" class="text-xs text-gray-500 mb-1">
+          No se muestran los buses fuera de servicio.{{ isEdit() ? ' Puedes dejar el viaje sin bus.' : '' }}
+        </p>
         <select
           id="trip-bus"
           formControlName="busId"
           aria-describedby="trip-bus-hint"
           class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
         >
-          <option value="" disabled>
-            {{ busesResource.isLoading() ? 'Cargando buses...' : busesResource.error() ? 'No se pudieron cargar los buses' : 'Elige un bus' }}
+          <option value="" [disabled]="!isEdit()">
+            {{ busesResource.isLoading() ? 'Cargando buses...' : busesResource.error() ? 'No se pudieron cargar los buses' : isEdit() ? 'Sin asignar' : 'Elige un bus' }}
           </option>
           @for (bus of buses(); track bus.id) {
             <option [value]="bus.id">{{ bus.plate }} · {{ bus.model }} · {{ busStatusLabels[bus.status] }}</option>
@@ -120,7 +124,7 @@
           Cancelar
         </button>
         <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60">
-          {{ isSubmitting() ? 'Guardando...' : 'Crear viaje' }}
+          {{ isSubmitting() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Crear viaje' }}
         </button>
       </div>
     </form>
