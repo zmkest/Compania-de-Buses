@@ -7,6 +7,16 @@
         Ciclos semanales de frecuencias que recorre un mismo bus. Al generar viajes, el bus de la rotación se asigna solo.
       </p>
     </div>
+    <button
+      type="button"
+      (click)="isCreating.set(true)"
+      class="inline-flex items-center gap-2 bg-brand-navy text-white font-semibold px-5 py-2.5 rounded-lg shadow hover:bg-brand-navy transition"
+    >
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+      </svg>
+      Nueva rotación
+    </button>
   </header>
 
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
@@ -189,3 +199,7 @@
     }
   </button>
 </ng-template>
+
+@if (isCreating()) {
+  <app-rotation-form (created)="onCreated()" (cancelled)="isCreating.set(false)" />
+}

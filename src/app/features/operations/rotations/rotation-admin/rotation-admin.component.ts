@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy, computed, effect, inject, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { RotationSortBy, RotationsService } from '../rotations.service';
+import { RotationFormComponent } from '../rotation-form/rotation-form.component';
 import { BusesService } from '../../../fleet/buses/buses.service';
 import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
@@ -19,7 +20,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-rotation-admin',
     templateUrl: './rotation-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, NgTemplateOutlet]
+    imports: [DatePipe, NgTemplateOutlet, RotationFormComponent]
 })
 export class RotationAdminComponent {
     private readonly rotationsService = inject(RotationsService);
@@ -34,6 +35,8 @@ export class RotationAdminComponent {
     } });
     readonly sortBy = input<RotationSortBy, string | undefined>(DEFAULT_SORT_BY, { transform: value => toOneOf(SORT_FIELDS)(value) ?? DEFAULT_SORT_BY });
     readonly order = input<SortOrder, string | undefined>(DEFAULT_ORDER, { transform: value => toOneOf(SORT_ORDERS)(value) ?? DEFAULT_ORDER });
+
+    readonly isCreating = signal(false);
 
     readonly hasFilters = computed(() => this.busId() !== null || this.isActive() !== null);
 
@@ -103,6 +106,11 @@ export class RotationAdminComponent {
         if (page >= 1 && page <= this.totalPages() && page !== this.page()) {
             this.navigate({ page: page === 1 ? null : page });
         }
+    }
+
+    onCreated(): void {
+        this.isCreating.set(false);
+        this.rotationsResource.reload();
     }
 
     reload(): void {
