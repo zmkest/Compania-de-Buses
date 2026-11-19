@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { RotationSortBy, RotationsService } from '../rotations.service';
+import { RotationDetailDialogComponent } from '../rotation-detail-dialog/rotation-detail-dialog.component';
 import { RotationFormComponent } from '../rotation-form/rotation-form.component';
 import { BusesService } from '../../../fleet/buses/buses.service';
 import { SortOrder, pageWindow } from '../../../../core/http/paginated';
@@ -20,7 +21,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-rotation-admin',
     templateUrl: './rotation-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, NgTemplateOutlet, RotationFormComponent]
+    imports: [DatePipe, NgTemplateOutlet, RotationFormComponent, RotationDetailDialogComponent]
 })
 export class RotationAdminComponent {
     private readonly rotationsService = inject(RotationsService);
@@ -37,6 +38,7 @@ export class RotationAdminComponent {
     readonly order = input<SortOrder, string | undefined>(DEFAULT_ORDER, { transform: value => toOneOf(SORT_ORDERS)(value) ?? DEFAULT_ORDER });
 
     readonly isCreating = signal(false);
+    readonly detailId = signal<number | null>(null);
 
     readonly hasFilters = computed(() => this.busId() !== null || this.isActive() !== null);
 
