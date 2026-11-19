@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SILENT_ERRORS } from '../../../core/http/error.interceptor';
 import { PaginatedResponse, SortOrder } from '../../../core/http/paginated';
-import { CreateTripDto, ETripStatus, GenerateTripsDto, GenerateTripsResult, TripResponse } from './trip.dto';
+import { CreateTripDto, ETripStatus, GenerateTripsDto, GenerateTripsResult, TripDetail, TripResponse } from './trip.dto';
 
 export type TripSortBy = 'id' | 'scheduledDeparture' | 'price';
 
@@ -50,6 +50,10 @@ export class TripsService {
       params = params.set('unassigned', unassigned);
     }
     return this.http.get<PaginatedResponse<TripResponse>>(this.apiUrl, { params, context: this.context });
+  }
+
+  getById(id: number): Observable<TripDetail> {
+    return this.http.get<TripDetail>(`${this.apiUrl}/${id}`, { context: this.context });
   }
 
   create(data: CreateTripDto): Observable<TripResponse> {

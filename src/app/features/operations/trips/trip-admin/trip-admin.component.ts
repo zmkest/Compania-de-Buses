@@ -10,6 +10,7 @@ import { toDate, toId, toOneOf, toPage, toSearch } from '../../../../core/routin
 import { SearchBoxComponent } from '../../../../shared/components/search-box/search-box.component';
 import { TripFormComponent } from '../trip-form/trip-form.component';
 import { TripGenerateDialogComponent } from '../trip-generate-dialog/trip-generate-dialog.component';
+import { TripDetailDialogComponent } from '../trip-detail-dialog/trip-detail-dialog.component';
 
 const PAGE_SIZE = 10;
 const SORT_FIELDS: TripSortBy[] = ['id', 'scheduledDeparture', 'price'];
@@ -23,7 +24,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-trip-admin',
     templateUrl: './trip-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [CurrencyPipe, DatePipe, NgTemplateOutlet, SearchBoxComponent, TripFormComponent, TripGenerateDialogComponent]
+    imports: [CurrencyPipe, DatePipe, NgTemplateOutlet, SearchBoxComponent, TripFormComponent, TripGenerateDialogComponent, TripDetailDialogComponent]
 })
 export class TripAdminComponent {
     private readonly tripsService = inject(TripsService);
@@ -49,6 +50,7 @@ export class TripAdminComponent {
 
     readonly isCreating = signal(false);
     readonly isGenerating = signal(false);
+    readonly detailId = signal<number | null>(null);
 
     readonly hasFilters = computed(() =>
         this.routeId() !== null || !!this.busPlate() || this.status() !== null || !!this.from() || !!this.to() || this.unassigned() !== null

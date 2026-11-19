@@ -1,4 +1,5 @@
 import { TerminalDetail } from '../../network/terminals/terminal.dto';
+import { EBusStatus } from '../../fleet/buses/bus.enum';
 
 export enum ETripStatus {
     SCHEDULED = 'SCHEDULED',
@@ -46,6 +47,30 @@ export interface Trip {
 export interface TripResponse extends Trip {
     route: { id: number; origin: TripTerminal; destination: TripTerminal };
     bus: { id: number; plate: string; model: string } | null;
+}
+
+export type CrewPosition = 'DRIVER' | 'ASSISTANT';
+
+export const CREW_POSITION_LABELS: Record<CrewPosition, string> = {
+    DRIVER: 'Conductor',
+    ASSISTANT: 'Asistente',
+};
+
+export interface TripCrewMember {
+    id: number;
+    document: string;
+    name: string;
+    position: CrewPosition;
+    status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+}
+
+export interface TripDetail extends Trip {
+    route: { id: number; distanceKm: number; durationMinutes: number; origin: TripTerminal; destination: TripTerminal };
+    bus: { id: number; plate: string; model: string; status: EBusStatus } | null;
+    rotation: { id: number; name: string } | null;
+    crew: TripCrewMember[];
+    totalSeats: number | null;
+    seatsLeft: number | null;
 }
 
 export const MAX_GENERATION_DAYS = 31;

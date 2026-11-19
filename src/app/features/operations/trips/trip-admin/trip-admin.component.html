@@ -147,12 +147,13 @@
               <ng-container *ngTemplateOutlet="sortButton; context: { field: 'price', label: 'Precio' }" />
             </th>
             <th class="px-5 py-3 font-semibold">Estado</th>
+            <th class="px-5 py-3 font-semibold text-right">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
           @if (tripsResource.isLoading()) {
             <tr>
-              <td colspan="7" class="px-5 py-12 text-center text-gray-500">
+              <td colspan="8" class="px-5 py-12 text-center text-gray-500">
                 <div class="inline-flex items-center gap-2">
                   <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
                   Cargando viajes...
@@ -161,7 +162,7 @@
             </tr>
           } @else if (tripsResource.error()) {
             <tr>
-              <td colspan="7" class="px-5 py-12 text-center" role="alert">
+              <td colspan="8" class="px-5 py-12 text-center" role="alert">
                 <p class="font-semibold text-red-600 mb-3">No se pudieron cargar los viajes</p>
                 <button
                   type="button"
@@ -210,10 +211,26 @@
                     {{ statusLabels[trip.status] }}
                   </span>
                 </td>
+                <td class="px-5 py-3">
+                  <div class="flex justify-end gap-1">
+                    <button
+                      type="button"
+                      (click)="detailId.set(trip.id)"
+                      class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
+                      [attr.aria-label]="'Ver detalle del viaje #' + trip.id"
+                      title="Ver detalle"
+                    >
+                      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke-linejoin="round" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="px-5 py-12 text-center">
+                <td colspan="8" class="px-5 py-12 text-center">
                   <p class="font-semibold text-gray-700 mb-1">
                     {{ hasFilters() ? 'No hay viajes con esos filtros' : 'Aún no hay viajes registrados' }}
                   </p>
@@ -290,4 +307,8 @@
 
 @if (isGenerating()) {
   <app-trip-generate-dialog [routes]="routes()" (closed)="onGenerateClosed($event)" />
+}
+
+@if (detailId(); as id) {
+  <app-trip-detail-dialog [tripId]="id" (closed)="detailId.set(null)" />
 }
