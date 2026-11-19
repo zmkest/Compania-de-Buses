@@ -1,4 +1,6 @@
+import { EBusStatus } from '../../fleet/buses/bus.enum';
 import { EWeekday } from '../../network/frequencies/frequency.dto';
+import { TerminalDetail } from '../../network/terminals/terminal.dto';
 
 export interface Rotation {
     id: number;
@@ -12,6 +14,30 @@ export interface Rotation {
 export interface RotationResponse extends Rotation {
     bus: { id: number; plate: string } | null;
     _count: { legs: number };
+}
+
+type RotationTerminal = Pick<TerminalDetail, 'id' | 'name' | 'city'>;
+
+export interface RotationLeg {
+    id: number;
+    weekday: EWeekday;
+    frequency: {
+        id: number;
+        departureTime: string;
+        isActive: boolean;
+        route: {
+            id: number;
+            durationMinutes: number;
+            origin: RotationTerminal;
+            destination: RotationTerminal;
+        };
+    };
+}
+
+export interface RotationDetail extends Rotation {
+    bus: { id: number; plate: string; model: string; status: EBusStatus } | null;
+    legs: RotationLeg[];
+    _count: { trips: number };
 }
 
 export interface RotationLegDto {
