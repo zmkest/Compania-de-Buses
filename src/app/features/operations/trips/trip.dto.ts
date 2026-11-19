@@ -102,3 +102,9 @@ export interface CreateTripDto {
     scheduledDeparture: string;
     price: number;
 }
+
+export interface UpdateTripDto {
+    scheduledDeparture?: string;
+    busId?: number | null;
+    price?: number;
+}
