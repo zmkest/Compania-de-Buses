@@ -8,9 +8,13 @@
   >
     <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
       <div>
-        <h2 id="rotation-form-title" class="font-brand text-2xl text-brand-navy mb-0">Nueva rotación</h2>
+        <h2 id="rotation-form-title" class="font-brand text-2xl text-brand-navy mb-0">{{ isEdit() ? 'Editar rotación #' + rotationId() : 'Nueva rotación' }}</h2>
         <p class="text-xs text-gray-500 mt-1 mb-0">
-          Ciclo semanal que recorre un mismo bus: cada tramo llega al terminal del que sale el siguiente, y el último conecta con el primero.
+          @if (isEdit()) {
+            Cambia el nombre o los tramos. Los viajes futuros que ya no coincidan con los tramos dejan de pertenecer a la rotación.
+          } @else {
+            Ciclo semanal que recorre un mismo bus: cada tramo llega al terminal del que sale el siguiente, y el último conecta con el primero.
+          }
         </p>
       </div>
       <button type="button" (click)="cancelled.emit()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
@@ -20,159 +24,196 @@
       </button>
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="flex min-h-0 flex-col">
-      <div class="overflow-y-auto px-6 py-4 space-y-5">
-        @if (errorMessages().length) {
-          <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
-            @if (errorMessages().length === 1) {
-              {{ errorMessages()[0] }}
-            } @else {
-              <ul class="list-disc pl-4 mb-0">
-                @for (message of errorMessages(); track $index) {
-                  <li>{{ message }}</li>
-                }
-              </ul>
-            }
-          </div>
-        }
-
-        <div>
-          <label for="rotation-name" class="block text-sm font-semibold text-brand-navy mb-1">Nombre</label>
-          <input
-            id="rotation-name"
-            type="text"
-            formControlName="name"
-            [maxlength]="maxNameLength"
-            placeholder="Quito - Guayaquil semanal"
-            autocomplete="off"
-            class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
-          >
-          @if (form.controls.name.invalid && form.controls.name.touched) {
-            <p class="text-xs text-red-600 mt-1 mb-0">Indica un nombre de hasta {{ maxNameLength }} caracteres.</p>
-          }
+    @if (isEdit() && rotationResource.isLoading()) {
+      <div class="px-6 py-12 text-center text-gray-500">
+        <div class="inline-flex items-center gap-2">
+          <span class="h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" aria-hidden="true"></span>
+          Cargando rotación...
         </div>
-
-        <div>
-          <label for="rotation-bus" class="block text-sm font-semibold text-brand-navy mb-0">Bus</label>
-          <p id="rotation-bus-hint" class="text-xs text-gray-500 mb-1">
-            Opcional. No se muestran los buses fuera de servicio y la API rechaza los que ya tienen otra rotación activa.
-          </p>
-          <select
-            id="rotation-bus"
-            formControlName="busId"
-            aria-describedby="rotation-bus-hint"
-            class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
-          >
-            <option value="">
-              {{ busesResource.isLoading() ? 'Cargando buses...' : busesResource.error() ? 'No se pudieron cargar los buses' : 'Sin asignar' }}
-            </option>
-            @for (bus of buses(); track bus.id) {
-              <option [value]="bus.id">{{ bus.plate }} · {{ bus.model }} · {{ busStatusLabels[bus.status] }}</option>
-            }
-          </select>
-        </div>
-
-        <fieldset formArrayName="legs">
-          <div class="flex items-end justify-between gap-2 mb-1">
-            <div>
-              <legend class="block text-sm font-semibold text-brand-navy mb-0">Tramos ({{ legCount() }})</legend>
-              <p class="text-xs text-gray-500 mb-0">
-                {{ frequenciesResource.isLoading() ? 'Cargando frecuencias...' : frequenciesResource.error() ? 'No se pudieron cargar las frecuencias.' : 'Elige el día y una frecuencia activa que opere ese día.' }}
-              </p>
+      </div>
+    } @else if (isEdit() && rotationResource.error()) {
+      <div class="px-6 py-12 text-center" role="alert">
+        <p class="font-semibold text-red-600 mb-3">No se pudo cargar la rotación</p>
+        <button
+          type="button"
+          (click)="rotationResource.reload()"
+          class="border-2 border-brand-navy text-brand-navy font-semibold px-4 py-1.5 rounded-lg hover:bg-brand-mint transition"
+        >
+          Reintentar
+        </button>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" class="flex min-h-0 flex-col">
+        <div class="overflow-y-auto px-6 py-4 space-y-5">
+          @if (errorMessages().length) {
+            <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
+              @if (errorMessages().length === 1) {
+                {{ errorMessages()[0] }}
+              } @else {
+                <ul class="list-disc pl-4 mb-0">
+                  @for (message of errorMessages(); track $index) {
+                    <li>{{ message }}</li>
+                  }
+                </ul>
+              }
             </div>
-            @if (frequenciesResource.error()) {
-              <button
-                type="button"
-                (click)="frequenciesResource.reload()"
-                class="border-2 border-brand-navy text-brand-navy text-sm font-semibold px-3 py-1 rounded-lg hover:bg-brand-mint transition"
-              >
-                Reintentar
-              </button>
+          }
+
+          <div>
+            <label for="rotation-name" class="block text-sm font-semibold text-brand-navy mb-1">Nombre</label>
+            <input
+              id="rotation-name"
+              type="text"
+              formControlName="name"
+              [maxlength]="maxNameLength"
+              placeholder="Quito - Guayaquil semanal"
+              autocomplete="off"
+              class="w-full rounded-lg border-2 border-gray-200 px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+            >
+            @if (form.controls.name.invalid && form.controls.name.touched) {
+              <p class="text-xs text-red-600 mt-1 mb-0">Indica un nombre de hasta {{ maxNameLength }} caracteres.</p>
             }
           </div>
 
-          <ul class="space-y-2 mb-0 pl-0 list-none">
-            @for (leg of legs.controls; track leg; let index = $index) {
-              <li [formGroupName]="index" class="flex items-start gap-2">
-                <span class="mt-2 w-6 shrink-0 text-right text-sm text-gray-400">{{ index + 1 }}.</span>
-                <div class="w-36 shrink-0">
-                  <select
-                    formControlName="weekday"
-                    (change)="onWeekdayChange(index)"
-                    [attr.aria-label]="'Día del tramo ' + (index + 1)"
-                    class="w-full rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
-                  >
-                    <option value="" disabled>Día</option>
-                    @for (weekday of weekdays; track weekday) {
-                      <option [value]="weekday">{{ weekdayLabels[weekday] }}</option>
-                    }
-                  </select>
-                  @if (leg.controls.weekday.invalid && leg.controls.weekday.touched) {
-                    <p class="text-xs text-red-600 mt-1 mb-0">Elige el día.</p>
-                  }
-                </div>
-                <div class="min-w-0 flex-1">
-                  <select
-                    formControlName="frequencyId"
-                    [attr.aria-label]="'Frecuencia del tramo ' + (index + 1)"
-                    class="w-full rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
-                  >
-                    @let options = frequenciesFor(leg.controls.weekday.value);
-                    <option value="" disabled>
-                      {{ !leg.controls.weekday.value ? 'Primero elige el día' : options.length ? 'Elige una frecuencia' : 'Sin frecuencias activas ese día' }}
-                    </option>
-                    @for (frequency of options; track frequency.id) {
-                      <option [value]="frequency.id">
-                        {{ formatDepartureTime(frequency.departureTime) }} · {{ frequency.route.origin.city.name }} → {{ frequency.route.destination.city.name }} (#{{ frequency.id }})
-                      </option>
-                    }
-                  </select>
-                  @if (leg.controls.frequencyId.invalid && leg.controls.frequencyId.touched) {
-                    <p class="text-xs text-red-600 mt-1 mb-0">Elige la frecuencia.</p>
-                  }
-                </div>
+          @if (isEdit()) {
+            <div>
+              <p class="block text-sm font-semibold text-brand-navy mb-0">Bus</p>
+              <p class="text-gray-700 mb-0">
+                @if (rotation()?.bus; as bus) {
+                  <span class="font-semibold">{{ bus.plate }}</span> · {{ bus.model }}
+                } @else {
+                  Sin asignar
+                }
+              </p>
+              <p class="text-xs text-gray-500 mb-0">El bus no se cambia desde este formulario.</p>
+            </div>
+          } @else {
+            <div>
+              <label for="rotation-bus" class="block text-sm font-semibold text-brand-navy mb-0">Bus</label>
+              <p id="rotation-bus-hint" class="text-xs text-gray-500 mb-1">
+                Opcional. No se muestran los buses fuera de servicio y la API rechaza los que ya tienen otra rotación activa.
+              </p>
+              <select
+                id="rotation-bus"
+                formControlName="busId"
+                aria-describedby="rotation-bus-hint"
+                class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+              >
+                <option value="">
+                  {{ busesResource.isLoading() ? 'Cargando buses...' : busesResource.error() ? 'No se pudieron cargar los buses' : 'Sin asignar' }}
+                </option>
+                @for (bus of buses(); track bus.id) {
+                  <option [value]="bus.id">{{ bus.plate }} · {{ bus.model }} · {{ busStatusLabels[bus.status] }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <fieldset formArrayName="legs">
+            <div class="flex items-end justify-between gap-2 mb-1">
+              <div>
+                <legend class="block text-sm font-semibold text-brand-navy mb-0">Tramos ({{ legCount() }})</legend>
+                <p class="text-xs text-gray-500 mb-0">
+                  {{ frequenciesResource.isLoading() ? 'Cargando frecuencias...' : frequenciesResource.error() ? 'No se pudieron cargar las frecuencias.' : 'Elige el día y una frecuencia activa que opere ese día.' }}
+                </p>
+              </div>
+              @if (frequenciesResource.error()) {
                 <button
                   type="button"
-                  (click)="removeLeg(index)"
-                  [disabled]="legCount() === 1"
-                  class="mt-1 rounded-lg p-2 text-red-600 hover:bg-red-50 transition disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
-                  [attr.aria-label]="'Quitar tramo ' + (index + 1)"
-                  title="Quitar"
+                  (click)="frequenciesResource.reload()"
+                  class="border-2 border-brand-navy text-brand-navy text-sm font-semibold px-3 py-1 rounded-lg hover:bg-brand-mint transition"
                 >
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
-                  </svg>
+                  Reintentar
                 </button>
-              </li>
+              }
+            </div>
+
+            <ul class="space-y-2 mb-0 pl-0 list-none">
+              @for (leg of legs.controls; track leg; let index = $index) {
+                <li [formGroupName]="index" class="flex items-start gap-2">
+                  <span class="mt-2 w-6 shrink-0 text-right text-sm text-gray-400">{{ index + 1 }}.</span>
+                  <div class="w-36 shrink-0">
+                    <select
+                      formControlName="weekday"
+                      (change)="onWeekdayChange(index)"
+                      [attr.aria-label]="'Día del tramo ' + (index + 1)"
+                      class="w-full rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+                    >
+                      <option value="" disabled>Día</option>
+                      @for (weekday of weekdays; track weekday) {
+                        <option [value]="weekday">{{ weekdayLabels[weekday] }}</option>
+                      }
+                    </select>
+                    @if (leg.controls.weekday.invalid && leg.controls.weekday.touched) {
+                      <p class="text-xs text-red-600 mt-1 mb-0">Elige el día.</p>
+                    }
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <select
+                      formControlName="frequencyId"
+                      [attr.aria-label]="'Frecuencia del tramo ' + (index + 1)"
+                      class="w-full rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+                    >
+                      @let options = frequenciesFor(leg.controls.weekday.value);
+                      <option value="" disabled>
+                        {{ !leg.controls.weekday.value ? 'Primero elige el día' : options.length ? 'Elige una frecuencia' : 'Sin frecuencias activas ese día' }}
+                      </option>
+                      @for (frequency of options; track frequency.id) {
+                        <option [value]="frequency.id">
+                          {{ formatDepartureTime(frequency.departureTime) }} · {{ frequency.route.origin.city.name }} → {{ frequency.route.destination.city.name }} (#{{ frequency.id }}){{ frequency.isActive ? '' : ' · inactiva' }}
+                        </option>
+                      }
+                    </select>
+                    @if (leg.controls.frequencyId.invalid && leg.controls.frequencyId.touched) {
+                      <p class="text-xs text-red-600 mt-1 mb-0">Elige la frecuencia.</p>
+                    }
+                  </div>
+                  <button
+                    type="button"
+                    (click)="removeLeg(index)"
+                    [disabled]="legCount() === 1"
+                    class="mt-1 rounded-lg p-2 text-red-600 hover:bg-red-50 transition disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+                    [attr.aria-label]="'Quitar tramo ' + (index + 1)"
+                    title="Quitar"
+                  >
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+                    </svg>
+                  </button>
+                </li>
+              }
+            </ul>
+
+            @if (hasInactiveLegs()) {
+              <p class="text-xs text-amber-700 mt-2 mb-0" role="status">Hay tramos con la frecuencia inactiva: reemplázalos o quítalos para guardar cambios en los tramos.</p>
             }
-          </ul>
+            @if (legs.hasError('duplicated')) {
+              <p class="text-xs text-red-600 mt-2 mb-0" role="alert">Hay tramos repetidos: la misma frecuencia el mismo día.</p>
+            }
 
-          @if (legs.hasError('duplicated')) {
-            <p class="text-xs text-red-600 mt-2 mb-0" role="alert">Hay tramos repetidos: la misma frecuencia el mismo día.</p>
-          }
+            <button
+              type="button"
+              (click)="addLeg()"
+              [disabled]="legCount() >= maxLegs"
+              class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue hover:text-brand-navy transition disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+              </svg>
+              Agregar tramo
+            </button>
+          </fieldset>
+        </div>
 
-          <button
-            type="button"
-            (click)="addLeg()"
-            [disabled]="legCount() >= maxLegs"
-            class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue hover:text-brand-navy transition disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" stroke-linecap="round" />
-            </svg>
-            Agregar tramo
+        <div class="flex justify-center gap-2 border-t border-gray-100 px-6 py-4">
+          <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+            Cancelar
           </button>
-        </fieldset>
-      </div>
-
-      <div class="flex justify-center gap-2 border-t border-gray-100 px-6 py-4">
-        <button type="button" (click)="cancelled.emit()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
-          Cancelar
-        </button>
-        <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60">
-          {{ isSubmitting() ? 'Guardando...' : 'Crear rotación' }}
-        </button>
-      </div>
-    </form>
+          <button type="submit" [disabled]="isSubmitting()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60">
+            {{ isSubmitting() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Crear rotación' }}
+          </button>
+        </div>
+      </form>
+    }
   </div>
 </div>

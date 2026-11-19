@@ -141,6 +141,17 @@
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                     </button>
+                    <button
+                      type="button"
+                      (click)="editingId.set(rotation.id)"
+                      class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
+                      [attr.aria-label]="'Editar rotación #' + rotation.id"
+                      title="Editar"
+                    >
+                      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z" stroke-linejoin="round" />
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -223,4 +234,8 @@
 
 @if (detailId(); as id) {
   <app-rotation-detail-dialog [rotationId]="id" (closed)="detailId.set(null)" />
+}
+
+@if (editingId(); as id) {
+  <app-rotation-form [rotationId]="id" (updated)="onUpdated()" (cancelled)="editingId.set(null)" />
 }

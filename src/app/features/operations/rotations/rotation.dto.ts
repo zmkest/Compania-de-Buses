@@ -50,3 +50,9 @@ export interface CreateRotationDto {
     busId?: number;
     legs: RotationLegDto[];
 }
+
+export type UpdateRotationDto = Partial<Omit<CreateRotationDto, 'busId'>>;
+
+export interface UpdatedRotation extends RotationDetail {
+    detachedTrips: number;
+}
