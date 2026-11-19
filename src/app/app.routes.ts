@@ -64,8 +64,11 @@ export const routes: Routes = [
       },
       {
         path: 'viajes',
-        loadComponent: () => import('./features/operations/trips/trip-admin/trip-admin.component').then(m => m.TripAdminComponent),
         canActivate: [roleGuard(EUserRole.ADMIN, EUserRole.OPERATOR)],
+        children: [
+          { path: '', loadComponent: () => import('./features/operations/trips/trip-admin/trip-admin.component').then(m => m.TripAdminComponent) },
+          { path: 'rotaciones', loadComponent: () => import('./features/operations/rotations/rotation-admin/rotation-admin.component').then(m => m.RotationAdminComponent) },
+        ],
       },
       { path: 'profile', loadComponent: () => import('./features/identity/profile/profile.component').then(m => m.ProfileComponent) },
       {

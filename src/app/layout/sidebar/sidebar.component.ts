@@ -47,7 +47,11 @@ const menu: MenuItem[] =[
         },
         {
             route: 'viajes', title: 'Viajes', imageUrl: 'assets/img/viaje.png',
-            roles: [EUserRole.ADMIN, EUserRole.OPERATOR]
+            roles: [EUserRole.ADMIN, EUserRole.OPERATOR],
+            children: [
+                { route: 'viajes', title: 'Viajes', icon: 'M8 3v4M16 3v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z' },
+                { route: 'viajes/rotaciones', title: 'Rotaciones', icon: 'M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2M18 2v4h-4M6 22v-4h4' },
+            ]
         },
     ]
 
