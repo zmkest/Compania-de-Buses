@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SILENT_ERRORS } from '../../../core/http/error.interceptor';
 import { PaginatedResponse, SortOrder } from '../../../core/http/paginated';
-import { RotationResponse } from './rotation.dto';
+import { CreateRotationDto, Rotation, RotationResponse } from './rotation.dto';
 
 export type RotationSortBy = 'id' | 'name' | 'createdAt';
 
@@ -34,5 +34,9 @@ export class RotationsService {
       params = params.set('isActive', isActive);
     }
     return this.http.get<PaginatedResponse<RotationResponse>>(this.apiUrl, { params, context: this.context });
+  }
+
+  create(data: CreateRotationDto): Observable<Rotation> {
+    return this.http.post<Rotation>(this.apiUrl, data, { context: this.context });
   }
 }

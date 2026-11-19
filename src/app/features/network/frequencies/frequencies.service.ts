@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SILENT_ERRORS } from '../../../core/http/error.interceptor';
 import { PaginatedResponse, SortOrder } from '../../../core/http/paginated';
@@ -38,6 +38,17 @@ export class FrequenciesService {
       params = params.set('isActive', isActive);
     }
     return this.http.get<PaginatedResponse<FrequencyResponse>>(this.apiUrl, { params, context: this.context });
+  }
+
+  getActiveOptions(): Observable<FrequencyResponse[]> {
+    const query: FrequencyQuery = { page: 1, limit: 50, routeId: null, weekday: null, isActive: true, sortBy: 'departureTime', order: 'asc' };
+    return this.getAll(query).pipe(
+      switchMap(first => {
+        const rest = Array.from({ length: first.meta.totalPages - 1 }, (_, index) => this.getAll({ ...query, page: index + 2 }));
+        return rest.length ? forkJoin(rest).pipe(map(pages => [first, ...pages])) : of([first]);
+      }),
+      map(pages => pages.flatMap(page => page.items)),
+    );
   }
 
   getById(id: number): Observable<FrequencyDetail> {

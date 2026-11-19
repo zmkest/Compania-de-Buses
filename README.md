@@ -62,6 +62,9 @@ Frontend en Angular para gestionar una compañía de buses: usuarios, flota (bus
   - Listado paginado con filtro por ruta, estado, placa del bus, viajes sin bus y rango de fechas de salida, y orden por ID, salida o precio.
   - Crear un viaje a mano eligiendo ruta, fecha y hora de salida, bus y precio. Muestra la llegada estimada según la duración de la ruta y la API rechaza buses fuera de servicio, con otro viaje en ese horario o que no estén en el terminal de origen.
   - Generar viajes desde las frecuencias activas para un rango de hasta 31 días, opcionalmente de una sola ruta. Los viajes que ya existen se omiten y el bus se asigna según la rotación; al terminar se muestra cuántos se crearon, cuántos quedaron con bus y por qué otros quedaron sin bus.
+- **Viajes > Rotaciones** (ADMIN y OPERATOR)
+  - Listado paginado con filtro por bus y estado, y orden por ID, nombre o fecha de creación.
+  - Crear rotaciones con nombre, bus opcional y sus tramos (día de la semana + frecuencia activa que opere ese día). El formulario avisa de tramos repetidos y la API valida que el ciclo encadene terminales con el margen mínimo entre llegada y salida, que ningún tramo esté en otra rotación y que el bus no tenga otra rotación activa.
 
 ## Tecnologías
 
