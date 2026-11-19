@@ -121,10 +121,30 @@
                   }
                 </td>
                 <td class="px-5 py-3 text-right">{{ rotation._count.legs }}</td>
-                <td class="px-5 py-3">
-                  <span class="font-semibold" [class]="rotation.isActive ? 'text-green-600' : 'text-gray-400'">
-                    {{ rotation.isActive ? 'Activa' : 'Inactiva' }}
-                  </span>
+                <td class="px-5 py-3 whitespace-nowrap">
+                  <button
+                    type="button"
+                    role="switch"
+                    [attr.aria-checked]="rotation.isActive"
+                    [attr.aria-label]="(rotation.isActive ? 'Desactivar' : 'Activar') + ' rotación #' + rotation.id"
+                    [title]="rotation.isActive ? 'Desactivar: al generar viajes no se usará esta rotación' : 'Activar'"
+                    (click)="toggleActive(rotation)"
+                    [disabled]="togglingId() !== null"
+                    class="inline-flex items-center gap-2 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    <span
+                      class="relative inline-flex h-5 w-9 shrink-0 rounded-full transition"
+                      [class]="rotation.isActive ? 'bg-green-600' : 'bg-gray-300'"
+                    >
+                      <span
+                        class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all"
+                        [class]="rotation.isActive ? 'left-[18px]' : 'left-0.5'"
+                      ></span>
+                    </span>
+                    <span class="font-semibold" [class]="rotation.isActive ? 'text-green-600' : 'text-gray-400'">
+                      {{ togglingId() === rotation.id ? 'Guardando...' : rotation.isActive ? 'Activa' : 'Inactiva' }}
+                    </span>
+                  </button>
                 </td>
                 <td class="px-5 py-3 whitespace-nowrap text-gray-500">{{ rotation.createdAt | date: 'dd/MM/yyyy' }}</td>
                 <td class="px-5 py-3">
