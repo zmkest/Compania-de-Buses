@@ -47,4 +47,8 @@ export class RotationsService {
   update(id: number, data: UpdateRotationDto): Observable<UpdatedRotation> {
     return this.http.patch<UpdatedRotation>(`${this.apiUrl}/${id}`, data, { context: this.context });
   }
+
+  updateActive(id: number, isActive: boolean): Observable<RotationDetail> {
+    return this.http.patch<RotationDetail>(`${this.apiUrl}/${id}/active`, { isActive }, { context: this.context });
+  }
 }

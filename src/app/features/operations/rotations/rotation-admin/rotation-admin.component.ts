@@ -3,11 +3,14 @@ import { Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { RotationSortBy, RotationsService } from '../rotations.service';
+import { RotationResponse } from '../rotation.dto';
 import { RotationDetailDialogComponent } from '../rotation-detail-dialog/rotation-detail-dialog.component';
 import { RotationFormComponent } from '../rotation-form/rotation-form.component';
 import { BusesService } from '../../../fleet/buses/buses.service';
 import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
+import { NotificationService } from '../../../../core/notifications/notification.service';
+import { AppError } from '../../../../core/errors/app-error';
 
 const PAGE_SIZE = 10;
 const SORT_FIELDS: RotationSortBy[] = ['id', 'name', 'createdAt'];
@@ -27,6 +30,7 @@ export class RotationAdminComponent {
     private readonly rotationsService = inject(RotationsService);
     private readonly busesService = inject(BusesService);
     private readonly router = inject(Router);
+    private readonly notificationService = inject(NotificationService);
 
     readonly page = input(1, { transform: toPage });
     readonly busId = input(null, { transform: toId });
@@ -40,6 +44,7 @@ export class RotationAdminComponent {
     readonly isCreating = signal(false);
     readonly detailId = signal<number | null>(null);
     readonly editingId = signal<number | null>(null);
+    readonly togglingId = signal<number | null>(null);
 
     readonly hasFilters = computed(() => this.busId() !== null || this.isActive() !== null);
 
@@ -119,6 +124,31 @@ export class RotationAdminComponent {
     onUpdated(): void {
         this.editingId.set(null);
         this.rotationsResource.reload();
+    }
+
+    toggleActive(rotation: RotationResponse): void {
+        if (this.togglingId() !== null) {
+            return;
+        }
+        this.togglingId.set(rotation.id);
+        this.rotationsService.updateActive(rotation.id, !rotation.isActive).subscribe({
+            next: updated => {
+                this.togglingId.set(null);
+                this.notificationService.success(`Rotación "${updated.name}" ${updated.isActive ? 'activada' : 'desactivada'}.`);
+                if (this.isActive() === null) {
+                    this.rotationsResource.value.update(response => response && {
+                        ...response,
+                        items: response.items.map(item => item.id === updated.id ? { ...item, isActive: updated.isActive, updatedAt: updated.updatedAt } : item),
+                    });
+                } else {
+                    this.rotationsResource.reload();
+                }
+            },
+            error: (err: AppError) => {
+                this.togglingId.set(null);
+                this.notificationService.error(err.message);
+            },
+        });
     }
 
     reload(): void {
