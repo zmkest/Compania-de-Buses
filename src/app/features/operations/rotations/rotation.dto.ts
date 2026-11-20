@@ -58,6 +58,10 @@ export interface UpdatedRotation extends RotationDetail {
     detachedTrips: number;
 }
 
+export interface DeletedRotation extends Rotation {
+    detachedTrips: number;
+}
+
 export interface ChangeRotationBusDto {
     busId: number | null;
     applyFrom?: string;
