@@ -1,5 +1,6 @@
 import { EBusStatus } from '../../fleet/buses/bus.enum';
 import { EWeekday } from '../../network/frequencies/frequency.dto';
+import { GeneratedUnassigned } from '../trips/trip.dto';
 import { TerminalDetail } from '../../network/terminals/terminal.dto';
 
 export interface Rotation {
@@ -55,4 +56,19 @@ export type UpdateRotationDto = Partial<Omit<CreateRotationDto, 'busId'>>;
 
 export interface UpdatedRotation extends RotationDetail {
     detachedTrips: number;
+}
+
+export interface ChangeRotationBusDto {
+    busId: number | null;
+    applyFrom?: string;
+}
+
+export interface RotationTripUnassigned extends GeneratedUnassigned {
+    tripId: number;
+}
+
+export interface ChangeRotationBusResult {
+    rotation: RotationDetail;
+    reassigned: number;
+    unassigned: RotationTripUnassigned[];
 }

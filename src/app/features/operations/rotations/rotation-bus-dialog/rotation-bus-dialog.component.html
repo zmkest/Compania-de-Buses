@@ -1,0 +1,140 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" (click)="close()">
+  <div
+    class="w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] flex flex-col"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="rotation-bus-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-start justify-between border-b border-gray-100 px-6 py-4">
+      <div>
+        <h2 id="rotation-bus-title" class="font-brand text-2xl text-brand-navy mb-0">Cambiar bus</h2>
+        <p class="text-xs text-gray-500 mt-1 mb-0">
+          Rotación #{{ rotation().id }} · {{ rotation().name }} · Bus actual: {{ rotation().bus?.plate ?? 'sin asignar' }}
+        </p>
+      </div>
+      <button type="button" (click)="close()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Cerrar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    @if (result(); as summary) {
+      <div class="px-6 py-4 space-y-4 overflow-y-auto">
+        <p class="text-sm text-gray-700 mb-0">
+          Bus de la rotación: <span class="font-semibold">{{ summary.rotation.bus?.plate ?? 'sin asignar' }}</span>
+        </p>
+        <div class="grid grid-cols-2 gap-2 text-center">
+          <div class="rounded-xl border-2 border-emerald-600 p-2">
+            <p class="text-xs font-semibold mb-1">Viajes reasignados</p>
+            <p class="text-2xl font-bold text-emerald-700 mb-0">{{ summary.reassigned }}</p>
+          </div>
+          <div class="rounded-xl border-2 p-2" [class]="summary.unassigned.length ? 'border-amber-500' : 'border-gray-200'">
+            <p class="text-xs font-semibold mb-1">Sin bus</p>
+            <p class="text-2xl font-bold mb-0" [class]="summary.unassigned.length ? 'text-amber-700' : 'text-gray-500'">{{ summary.unassigned.length }}</p>
+          </div>
+        </div>
+
+        @if (summary.unassigned.length) {
+          <ul class="divide-y divide-gray-100 rounded-lg border border-amber-200 bg-amber-50 text-sm max-h-60 overflow-y-auto pl-0 mb-0">
+            @for (item of summary.unassigned; track item.tripId) {
+              <li class="px-3 py-2 list-none">
+                <p class="font-semibold text-gray-800 mb-0">
+                  Viaje #{{ item.tripId }} · {{ item.scheduledDeparture | date: 'dd/MM/yyyy HH:mm' }} · Frecuencia #{{ item.frequencyId }}
+                </p>
+                <p class="text-xs text-gray-600 mb-0">{{ item.message }}</p>
+              </li>
+            }
+          </ul>
+        } @else if (!summary.reassigned) {
+          <p class="text-sm text-gray-500 mb-0">No había viajes programados de esta rotación desde esa fecha.</p>
+        }
+
+        <button type="button" (click)="close()" class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition">
+          Listo
+        </button>
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="submit()" class="px-6 py-4 space-y-5">
+        @if (errorMessages().length) {
+          <div class="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2" role="alert">
+            @if (errorMessages().length === 1) {
+              {{ errorMessages()[0] }}
+            } @else {
+              <ul class="list-disc pl-4 mb-0">
+                @for (message of errorMessages(); track $index) {
+                  <li>{{ message }}</li>
+                }
+              </ul>
+            }
+          </div>
+        }
+
+        <div>
+          <label for="rotation-bus-select" class="block text-sm font-semibold text-brand-navy mb-0">Nuevo bus</label>
+          <p id="rotation-bus-select-hint" class="text-xs text-gray-500 mb-1">
+            No se muestran los buses fuera de servicio y la API rechaza los que ya tienen otra rotación activa.
+          </p>
+          <select
+            id="rotation-bus-select"
+            formControlName="busId"
+            aria-describedby="rotation-bus-select-hint"
+            class="w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+          >
+            <option value="">Sin asignar</option>
+            @for (bus of availableBuses(); track bus.id) {
+              <option [value]="bus.id">{{ bus.plate }} · {{ bus.model }} · {{ busStatusLabels[bus.status] }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="flex items-start gap-2 text-sm text-gray-700">
+            <input type="checkbox" formControlName="reassign" class="mt-1 h-4 w-4 accent-brand-blue">
+            <span>
+              <span class="font-semibold text-brand-navy">Reasignar viajes ya generados</span>
+              <span class="block text-xs text-gray-500">
+                Los viajes programados de la rotación desde la fecha indicada pasan al nuevo bus. Si no se marca, solo cambia el bus para las próximas generaciones.
+              </span>
+            </span>
+          </label>
+          @if (form.controls.reassign.value) {
+            <div>
+              <label for="rotation-bus-from" class="block text-xs font-semibold text-gray-500 mb-1">Aplicar desde</label>
+              <input
+                id="rotation-bus-from"
+                type="date"
+                formControlName="applyFrom"
+                [min]="today"
+                class="w-full rounded-lg border-2 border-gray-200 px-3 py-2 focus:outline-none focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/20 transition"
+              >
+              @if (missingDate()) {
+                <p class="text-xs text-red-600 mt-1 mb-0">Indica desde qué fecha aplicar el cambio.</p>
+              } @else if (pastDate()) {
+                <p class="text-xs text-red-600 mt-1 mb-0">La fecha no puede ser anterior a hoy.</p>
+              }
+            </div>
+          }
+        </div>
+
+        @if (unchanged() && !form.controls.reassign.value) {
+          <p class="text-xs text-gray-500 mb-0">Elige un bus distinto al actual o marca la reasignación de viajes.</p>
+        }
+
+        <div class="flex justify-center gap-2 pt-2">
+          <button type="button" (click)="close()" class="w-full border-2 border-gray-200 text-gray-600 font-semibold px-5 py-2 rounded-lg hover:bg-gray-50 transition">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="isSubmitting() || missingDate() || pastDate() || (unchanged() && !form.controls.reassign.value)"
+            class="w-full bg-brand-blue text-white font-semibold px-5 py-2 rounded-lg hover:bg-brand-navy transition disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {{ isSubmitting() ? 'Guardando...' : 'Cambiar bus' }}
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

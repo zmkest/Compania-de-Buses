@@ -6,6 +6,7 @@ import { RotationSortBy, RotationsService } from '../rotations.service';
 import { RotationResponse } from '../rotation.dto';
 import { RotationDetailDialogComponent } from '../rotation-detail-dialog/rotation-detail-dialog.component';
 import { RotationFormComponent } from '../rotation-form/rotation-form.component';
+import { RotationBusDialogComponent } from '../rotation-bus-dialog/rotation-bus-dialog.component';
 import { BusesService } from '../../../fleet/buses/buses.service';
 import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
@@ -24,7 +25,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-rotation-admin',
     templateUrl: './rotation-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, NgTemplateOutlet, RotationFormComponent, RotationDetailDialogComponent]
+    imports: [DatePipe, NgTemplateOutlet, RotationFormComponent, RotationDetailDialogComponent, RotationBusDialogComponent]
 })
 export class RotationAdminComponent {
     private readonly rotationsService = inject(RotationsService);
@@ -45,6 +46,7 @@ export class RotationAdminComponent {
     readonly detailId = signal<number | null>(null);
     readonly editingId = signal<number | null>(null);
     readonly togglingId = signal<number | null>(null);
+    readonly busChanging = signal<RotationResponse | null>(null);
 
     readonly hasFilters = computed(() => this.busId() !== null || this.isActive() !== null);
 
@@ -124,6 +126,15 @@ export class RotationAdminComponent {
     onUpdated(): void {
         this.editingId.set(null);
         this.rotationsResource.reload();
+    }
+
+    onBusDialogClosed(changed: boolean): void {
+        const rotation = this.busChanging();
+        this.busChanging.set(null);
+        if (changed && rotation) {
+            this.notificationService.success(`Bus de la rotación "${rotation.name}" actualizado.`);
+            this.rotationsResource.reload();
+        }
     }
 
     toggleActive(rotation: RotationResponse): void {
