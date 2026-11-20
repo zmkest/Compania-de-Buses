@@ -163,6 +163,21 @@
                     </button>
                     <button
                       type="button"
+                      (click)="busChanging.set(rotation)"
+                      [disabled]="busesResource.isLoading()"
+                      class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition disabled:cursor-wait disabled:opacity-40"
+                      [attr.aria-label]="'Cambiar bus de la rotación #' + rotation.id"
+                      title="Cambiar bus"
+                    >
+                      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="4" y="3" width="16" height="14" rx="2" stroke-linejoin="round" />
+                        <path d="M4 11h16M8 17v3M16 17v3" stroke-linecap="round" />
+                        <circle cx="8" cy="14" r="0.5" fill="currentColor" />
+                        <circle cx="16" cy="14" r="0.5" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
                       (click)="editingId.set(rotation.id)"
                       class="rounded-lg p-2 text-brand-navy hover:bg-brand-mint transition"
                       [attr.aria-label]="'Editar rotación #' + rotation.id"
@@ -258,4 +273,8 @@
 
 @if (editingId(); as id) {
   <app-rotation-form [rotationId]="id" (updated)="onUpdated()" (cancelled)="editingId.set(null)" />
+}
+
+@if (busChanging(); as rotation) {
+  <app-rotation-bus-dialog [rotation]="rotation" [buses]="buses()" (closed)="onBusDialogClosed($event)" />
 }
