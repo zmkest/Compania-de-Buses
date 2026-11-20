@@ -187,6 +187,17 @@
                         <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z" stroke-linejoin="round" />
                       </svg>
                     </button>
+                    <button
+                      type="button"
+                      (click)="deletingRotation.set(rotation)"
+                      class="rounded-lg p-2 text-red-600 hover:bg-red-50 transition"
+                      [attr.aria-label]="'Eliminar rotación #' + rotation.id"
+                      title="Eliminar"
+                    >
+                      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -277,4 +288,13 @@
 
 @if (busChanging(); as rotation) {
   <app-rotation-bus-dialog [rotation]="rotation" [buses]="buses()" (closed)="onBusDialogClosed($event)" />
+}
+
+@if (deletingRotation(); as rotation) {
+  <app-rotation-delete-dialog
+    [rotation]="rotation"
+    [isDeleting]="isDeleting()"
+    (confirmed)="confirmDelete($event)"
+    (cancelled)="deletingRotation.set(null)"
+  />
 }

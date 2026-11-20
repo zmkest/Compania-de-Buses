@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SILENT_ERRORS } from '../../../core/http/error.interceptor';
 import { PaginatedResponse, SortOrder } from '../../../core/http/paginated';
-import { ChangeRotationBusDto, ChangeRotationBusResult, CreateRotationDto, Rotation, RotationDetail, RotationResponse, UpdateRotationDto, UpdatedRotation } from './rotation.dto';
+import { ChangeRotationBusDto, ChangeRotationBusResult, CreateRotationDto, DeletedRotation, Rotation, RotationDetail, RotationResponse, UpdateRotationDto, UpdatedRotation } from './rotation.dto';
 
 export type RotationSortBy = 'id' | 'name' | 'createdAt';
 
@@ -54,5 +54,9 @@ export class RotationsService {
 
   changeBus(id: number, data: ChangeRotationBusDto): Observable<ChangeRotationBusResult> {
     return this.http.patch<ChangeRotationBusResult>(`${this.apiUrl}/${id}/bus`, data, { context: this.context });
+  }
+
+  delete(id: number): Observable<DeletedRotation> {
+    return this.http.delete<DeletedRotation>(`${this.apiUrl}/${id}`, { context: this.context });
   }
 }

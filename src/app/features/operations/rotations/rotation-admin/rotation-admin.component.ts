@@ -7,6 +7,7 @@ import { RotationResponse } from '../rotation.dto';
 import { RotationDetailDialogComponent } from '../rotation-detail-dialog/rotation-detail-dialog.component';
 import { RotationFormComponent } from '../rotation-form/rotation-form.component';
 import { RotationBusDialogComponent } from '../rotation-bus-dialog/rotation-bus-dialog.component';
+import { RotationDeleteDialogComponent } from '../rotation-delete-dialog/rotation-delete-dialog.component';
 import { BusesService } from '../../../fleet/buses/buses.service';
 import { SortOrder, pageWindow } from '../../../../core/http/paginated';
 import { toId, toOneOf, toPage } from '../../../../core/routing/query-params';
@@ -25,7 +26,7 @@ const DEFAULT_ORDER: SortOrder = 'asc';
     selector: 'app-rotation-admin',
     templateUrl: './rotation-admin.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [DatePipe, NgTemplateOutlet, RotationFormComponent, RotationDetailDialogComponent, RotationBusDialogComponent]
+    imports: [DatePipe, NgTemplateOutlet, RotationFormComponent, RotationDetailDialogComponent, RotationBusDialogComponent, RotationDeleteDialogComponent]
 })
 export class RotationAdminComponent {
     private readonly rotationsService = inject(RotationsService);
@@ -47,6 +48,8 @@ export class RotationAdminComponent {
     readonly editingId = signal<number | null>(null);
     readonly togglingId = signal<number | null>(null);
     readonly busChanging = signal<RotationResponse | null>(null);
+    readonly deletingRotation = signal<RotationResponse | null>(null);
+    readonly isDeleting = signal(false);
 
     readonly hasFilters = computed(() => this.busId() !== null || this.isActive() !== null);
 
@@ -157,6 +160,25 @@ export class RotationAdminComponent {
             },
             error: (err: AppError) => {
                 this.togglingId.set(null);
+                this.notificationService.error(err.message);
+            },
+        });
+    }
+
+    confirmDelete(rotation: RotationResponse): void {
+        this.isDeleting.set(true);
+        this.rotationsService.delete(rotation.id).subscribe({
+            next: deleted => {
+                this.isDeleting.set(false);
+                this.deletingRotation.set(null);
+                const trips = deleted.detachedTrips;
+                const detail = trips ? ` ${trips} ${trips === 1 ? 'viaje conserva' : 'viajes conservan'} su bus.` : '';
+                this.notificationService.success(`Rotación "${rotation.name}" eliminada.${detail}`);
+                this.rotationsResource.reload();
+            },
+            error: (err: AppError) => {
+                this.isDeleting.set(false);
+                this.deletingRotation.set(null);
                 this.notificationService.error(err.message);
             },
         });
